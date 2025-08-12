@@ -1,0 +1,42 @@
+/data/groups/technologies/spatial.catalyst/Julien/spaceranger/references/refdata-gex-mm10-2020-A/fasta/genome.fa
+/data/groups/technologies/spatial.catalyst/Julien/spaceranger/references/refdata-gex-mm10-2020-A/genes/genes.gtf
+chrM
+refdata-gex-mm10-2020-A
+5
+0
+Success! The gtf file is proprely formatted, Start building reference
+Aug 12 09:31:45 ..... started STAR run
+Aug 12 09:31:45 ... starting to generate Genome files
+Aug 12 09:32:40 ... starting to sort Suffix Array. This may take a long time...
+Aug 12 09:32:55 ... sorting Suffix Array chunks and saving them to disk...
+Aug 12 09:46:53 ... loading chunks from disk, packing SA...
+Aug 12 09:49:26 ... finished generating suffix array
+Aug 12 09:49:26 ... generating Suffix Array index
+Aug 12 09:52:10 ... completed Suffix Array index
+Aug 12 09:52:10 ..... processing annotations GTF
+Aug 12 09:52:18 ..... inserting junctions into the genome indices
+Aug 12 09:54:03 ... writing Genome to disk ...
+Aug 12 09:54:11 ... writing Suffix Array to disk ...
+Aug 12 09:55:09 ... writing SAindex to disk
+Aug 12 09:55:16 ..... finished successfully
+/data/groups/technologies/spatial.catalyst/Julien/spaceranger/references/refdata-gex-GRCh38-2020-A/fasta/genome.fa
+/data/groups/technologies/spatial.catalyst/Julien/spaceranger/references/refdata-gex-GRCh38-2020-A/genes/genes.gtf
+chrM
+refdata-gex-GRCh38-2020-A
+5
+0
+Success! The gtf file is proprely formatted, Start building reference
+Aug 12 09:55:43 ..... started STAR run
+Aug 12 09:55:43 ... starting to generate Genome files
+Aug 12 09:56:44 ... starting to sort Suffix Array. This may take a long time...
+Aug 12 09:57:00 ... sorting Suffix Array chunks and saving them to disk...
+Aug 12 10:23:44 ... loading chunks from disk, packing SA...
+Aug 12 10:26:59 ... finished generating suffix array
+Aug 12 10:26:59 ... generating Suffix Array index
+Aug 12 10:30:08 ... completed Suffix Array index
+Aug 12 10:30:08 ..... processing annotations GTF
+Aug 12 10:30:23 ..... inserting junctions into the genome indices
+Aug 12 10:32:31 ... writing Genome to disk ...
+Aug 12 10:32:39 ... writing Suffix Array to disk ...
+Aug 12 10:33:32 ... writing SAindex to disk
+Aug 12 10:33:41 ..... finished successfully
