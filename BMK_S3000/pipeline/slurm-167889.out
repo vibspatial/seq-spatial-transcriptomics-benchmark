@@ -1,0 +1,1364 @@
+
+The following have been reloaded with a version change:
+  1) GCCcore/13.3.0 => GCCcore/12.3.0
+  2) ncurses/6.4 => ncurses/6.4-GCCcore-12.3.0
+  3) zlib/1.3.1-GCCcore-13.3.0 => zlib/1.2.13-GCCcore-12.3.0
+
+2025-07-17 13:19:44:	Start Time :[2025-07-17 13:19:44]
+2025-07-17 13:19:44:	step: 2 3 4 5 6 8
+2025-07-17 13:19:44:	perl /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/Umi2Gene -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/BMK_S3000/sequencing/4941_02_Exp100_SC57_SPC_004_R2.fastq.gz -u /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/01.fastq2BcUmi/exp100_28Feb2025.bc_umi_read.tsv.id -g /data/groups/technologies/spatial.catalyst/Julien/BMK_references/mouse/refdata-gex-mm10-2020-A/star_BSTMatrix -f /data/groups/technologies/spatial.catalyst/Julien/BMK_references/mouse/refdata-gex-mm10-2020-A/genes/genes.gtf -r /data/groups/technologies/spatial.catalyst/Julien/BMK_references/mouse/refdata-gex-mm10-2020-A/genes/features.tsv -d /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene -p exp100_28Feb2025 -j 100 -t 8 -x /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/01.fastq2BcUmi/exp100_28Feb2025.filter -c 0 -a 0
+2025-07-17 13:19:45:	Start Time :[2025-07-17 13:19:45]
+2025-07-17 13:19:45:	perl /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/tools/cut_reads_seq_v1.6_filter.pl /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/BMK_S3000/sequencing/4941_02_Exp100_SC57_SPC_004_R2.fastq.gz /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/01.fastq2BcUmi/exp100_28Feb2025.filter /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene/exp100_28Feb2025.cut0.fq 0 0 B
+
+2025-07-17 14:21:11:	done.
+2025-07-17 14:21:11:	Elaseped time: 3686s
+
+2025-07-17 14:21:11:	STAR --runMode alignReads --runThreadN 8 --genomeDir /data/groups/technologies/spatial.catalyst/Julien/BMK_references/mouse/refdata-gex-mm10-2020-A/star_BSTMatrix --outSAMtype BAM Unsorted --sjdbOverhang 100 --outSJfilterReads Unique --outFileNamePrefix /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene/exp100_28Feb2025 --readFilesIn /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene/exp100_28Feb2025.cut0.fq --outFilterMatchNminOverLread 0.33 --outFilterScoreMinOverLread 0.33
+	/home/VIB.LOCAL/julien.mortier/.conda/envs/BSTMAtrix_env/bin/STAR-avx2 --runMode alignReads --runThreadN 8 --genomeDir /data/groups/technologies/spatial.catalyst/Julien/BMK_references/mouse/refdata-gex-mm10-2020-A/star_BSTMatrix --outSAMtype BAM Unsorted --sjdbOverhang 100 --outSJfilterReads Unique --outFileNamePrefix /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene/exp100_28Feb2025 --readFilesIn /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene/exp100_28Feb2025.cut0.fq --outFilterMatchNminOverLread 0.33 --outFilterScoreMinOverLread 0.33
+	STAR version: 2.7.11b   compiled: 2024-07-03T14:39:20+0000 :/opt/conda/conda-bld/star_1720017372352/work/source
+Jul 17 14:21:12 ..... started STAR run
+Jul 17 14:21:12 ..... loading genome
+Jul 17 14:22:46 ..... started mapping
+Jul 18 08:25:21 ..... finished mapping
+Jul 18 08:25:22 ..... finished successfully
+2025-07-18 08:25:22:	done.
+2025-07-18 08:25:22:	Elaseped time: 65051s
+
+2025-07-18 08:25:22:	perl /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/gene_mapping/get_reads_gene_not_consider_ant_gene.v3.11.pl -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene/exp100_28Feb2025Aligned.out.bam -g /data/groups/technologies/spatial.catalyst/Julien/BMK_references/mouse/refdata-gex-mm10-2020-A/genes/genes.gtf -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene/exp100_28Feb2025 -t 8
+2025-07-18 08:25:22:	Start Time :[2025-07-18 08:25:22]
+2025-07-18 18:42:41:	End Time :[2025-07-18 18:42:41]
+2025-07-18 18:46:13:	done.
+2025-07-18 18:46:13:	Elaseped time: 37251s
+
+2025-07-18 18:46:13:	perl /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/gene_mapping/gene_map_stat_v1.3.pl -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene/exp100_28Feb2025Log.final.out -s /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene/exp100_28Feb2025.stat -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene/exp100_28Feb2025.total.stat
+2025-07-18 18:46:13:	Start Time :[2025-07-18 18:46:13]
+2025-07-18 18:46:13:	End Time :[2025-07-18 18:46:13]
+2025-07-18 18:46:13:	done.
+2025-07-18 18:46:13:	Elaseped time: 0s
+
+2025-07-18 18:46:13:	perl /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/gene_mapping/get_umi_gene_v3.4.pl -u /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/01.fastq2BcUmi/exp100_28Feb2025.bc_umi_read.tsv.id -g /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene/exp100_28Feb2025.map2gene -b Null -f /data/groups/technologies/spatial.catalyst/Julien/BMK_references/mouse/refdata-gex-mm10-2020-A/genes/features.tsv -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene/exp100_28Feb2025.umi_gene.tsv
+2025-07-18 18:46:13:	Start Time :[2025-07-18 18:46:13]
+2025-07-18 20:28:50:	get reads-gene info done.
+2025-07-18 22:25:13:	End Time :[2025-07-18 22:25:13]
+2025-07-18 22:26:46:	done.
+2025-07-18 22:26:46:	Elaseped time: 13233s
+
+2025-07-18 22:26:46:	End Time :[2025-07-18 22:26:46]
+2025-07-18 22:26:46:	done.
+2025-07-18 22:26:46:	Elaseped time: 119222s
+
+2025-07-18 22:26:46:	perl /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/LinkBcChip -f /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/BMK_S3000/barcode_decoding_files/20241023-DH14DN10F2-A2-20X-V2AB-final_signal.txt -s /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/01.fastq2BcUmi/exp100_28Feb2025.umi -u /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/01.fastq2BcUmi/exp100_28Feb2025.bc_umi_read.tsv -l /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/01.fastq2BcUmi/exp100_28Feb2025.full_stat -g /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene/exp100_28Feb2025.umi_gene.tsv -d /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/03.LinkBcChip -p exp100_28Feb2025
+2025-07-18 22:26:46:	Start Time :[2025-07-18 22:26:46]
+2025-07-18 22:26:46:	perl /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/barcode_decode/barcodeV2AB_flu_recognition_v2.3.g.pl -f /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/BMK_S3000/barcode_decoding_files/20241023-DH14DN10F2-A2-20X-V2AB-final_signal.txt -b /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/ref_file/barcode-index.txt -s /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/01.fastq2BcUmi/exp100_28Feb2025.full_stat -g /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene/exp100_28Feb2025.umi_gene.tsv -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/03.LinkBcChip/exp100_28Feb2025
+2025-07-18 22:26:46:	Start Time :[2025-07-18 22:26:46]
+2025-07-18 22:26:46:	get chip info
+total spot number: 4144770
+block row number: 43
+block col number: 42
+2025-07-18 22:26:46:	start get barcode index
+2025-07-18 22:26:47:	start reading seq barcode
+total bc number: 29929396
+2025-07-18 22:30:22:	start reading .umi_gene.tsv file
+2025-07-18 23:05:09:	start get flu info1
+conf spot num: 3687538
+conf bc num: 3526848
+2025-07-18 23:05:35:	start check spot bc
+2025-07-18 23:05:56:	start get flu info2
+bc number with fault-tolerant: 204196
+spot number with fault-tolerant: 7505
+2025-07-18 23:06:34:	start get conf spot barcode
+conf spot number: 2078963
+conf dup spot number: 310248
+2025-07-18 23:06:49:	start process indistinct spot
+indistinct spot number: 1701077
+processed spot number: 1206835
+2025-07-18 23:31:25:	start output
+2025-07-18 23:31:37:	End Time :[2025-07-18 23:31:37]
+2025-07-18 23:34:12:	done.
+2025-07-18 23:34:12:	Elaseped time: 4046s
+
+2025-07-18 23:34:12:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/03.LinkBcChip/exp100_28Feb2025.barcode_pos.tsv /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/03.LinkBcChip/../exp100_28Feb2025/barcode_pos.tsv
+2025-07-18 23:34:13:	done.
+2025-07-18 23:34:13:	Elaseped time: 1s
+
+2025-07-18 23:34:13:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/03.LinkBcChip/exp100_28Feb2025.barcode.tsv /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/03.LinkBcChip/../exp100_28Feb2025/barcode.tsv
+2025-07-18 23:34:14:	done.
+2025-07-18 23:34:14:	Elaseped time: 1s
+
+2025-07-18 23:34:14:	End Time :[2025-07-18 23:34:14]
+2025-07-18 23:34:14:	done.
+2025-07-18 23:34:14:	Elaseped time: 4048s
+
+2025-07-18 23:34:14:	perl /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/MatrixMake -f /data/groups/technologies/spatial.catalyst/Julien/BMK_references/mouse/refdata-gex-mm10-2020-A/genes/features.tsv -b /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/03.LinkBcChip/exp100_28Feb2025.barcode.tsv -g /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene/exp100_28Feb2025.umi_gene.tsv -q /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/01.fastq2BcUmi/exp100_28Feb2025.qual.stat -d /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake -p exp100_28Feb2025
+2025-07-18 23:34:14:	Start Time :[2025-07-18 23:34:14]
+2025-07-18 23:34:14:	perl /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/tools/filter_bc_v1.1.pl -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/03.LinkBcChip/exp100_28Feb2025.barcode.tsv -u /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene/exp100_28Feb2025.umi_gene.tsv -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/exp100_28Feb2025.select
+2025-07-18 23:34:14:	Start Time :[2025-07-18 23:34:14]
+2025-07-18 23:41:40:	End Time :[2025-07-18 23:41:40]
+2025-07-18 23:41:40:	done.
+2025-07-18 23:41:40:	Elaseped time: 446s
+
+2025-07-18 23:41:40:	perl /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/gene_mapping/count_sequencing_saturation_v1.3.pl -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/exp100_28Feb2025.select.umi_gene.tsv -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/exp100_28Feb2025.sequencing_saturation.stat -n 1884630125
+2025-07-18 23:41:40:	Start Time :[2025-07-18 23:41:40]
+2025-07-19 00:04:48:	End Time :[2025-07-19 00:04:48]
+2025-07-19 00:05:01:	done.
+2025-07-19 00:05:01:	Elaseped time: 1401s
+
+2025-07-19 00:05:01:	Rscript /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/gene_mapping/seq_saturation_plot_v1.3.r -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/exp100_28Feb2025.sequencing_saturation.stat -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/exp100_28Feb2025.sequencing_saturation.png
+null device 
+          1 
+2025-07-19 00:05:09:	done.
+2025-07-19 00:05:09:	Elaseped time: 8s
+
+2025-07-19 00:05:09:	perl /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/barcode_decode/generate_matrix_v1.3.pl -f /data/groups/technologies/spatial.catalyst/Julien/BMK_references/mouse/refdata-gex-mm10-2020-A/genes/features.tsv -b /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/03.LinkBcChip/exp100_28Feb2025.barcode.tsv -g /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/exp100_28Feb2025.select.umi_gene.tsv -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/exp100_28Feb2025.matrix.tsv
+2025-07-19 00:05:09:	Start Time :[2025-07-19 00:05:09]
+2025-07-19 00:42:43:	End Time :[2025-07-19 00:42:43]
+2025-07-19 00:43:30:	done.
+2025-07-19 00:43:30:	Elaseped time: 2301s
+
+2025-07-19 00:43:30:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/exp100_28Feb2025.matrix.tsv /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/../exp100_28Feb2025/matrix.tsv
+2025-07-19 00:43:48:	done.
+2025-07-19 00:43:48:	Elaseped time: 18s
+
+2025-07-19 00:43:48:	cp /data/groups/technologies/spatial.catalyst/Julien/BMK_references/mouse/refdata-gex-mm10-2020-A/genes/features.tsv /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/../exp100_28Feb2025/features.tsv
+2025-07-19 00:43:48:	done.
+2025-07-19 00:43:48:	Elaseped time: 0s
+
+2025-07-19 00:43:48:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/exp100_28Feb2025.select.umi_gene.tsv /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/../exp100_28Feb2025/umi_gene.tsv && gzip -f /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/../exp100_28Feb2025/umi_gene.tsv
+2025-07-19 01:03:48:	done.
+2025-07-19 01:03:48:	Elaseped time: 1200s
+
+2025-07-19 01:03:48:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/exp100_28Feb2025.select.bc_umi_read.tsv /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/../exp100_28Feb2025/bc_umi_read.tsv && gzip -f /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/../exp100_28Feb2025/bc_umi_read.tsv
+2025-07-19 01:24:00:	done.
+2025-07-19 01:24:00:	Elaseped time: 1212s
+
+2025-07-19 01:24:00:	End Time :[2025-07-19 01:24:00]
+2025-07-19 01:24:00:	done.
+2025-07-19 01:24:00:	Elaseped time: 6586s
+
+2025-07-19 01:24:00:	  python /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/AllheStat.py -m /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/exp100_28Feb2025/ -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat -e /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BMChiper/exp100/img_dist.tif -c S3000
+indir=/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/exp100_28Feb2025, outdir=/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/level_matrix/, options={'-i': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/exp100_28Feb2025', '-o': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/level_matrix/', '-L': '18,9,7,6,5,4,3,2,1', '-W': '42', '-H': '43', '-C': '45', '-R': '51'}, levels=[18, 9, 7, 6, 5, 4, 3, 2, 1]
+df.shape[0]=3285798
+count=100000
+count=200000
+count=300000
+count=400000
+count=500000
+count=600000
+count=700000
+count=800000
+count=900000
+count=1000000
+count=1100000
+count=1200000
+count=1300000
+count=1400000
+count=1500000
+count=1600000
+count=1700000
+count=1800000
+count=1900000
+count=2000000
+count=2100000
+count=2200000
+count=2300000
+count=2400000
+count=2500000
+count=2600000
+count=2700000
+count=2800000
+count=2900000
+count=3000000
+count=3100000
+count=3200000
+total_read:848833329, chip_read:848833329.0, chip_rate:1.0
+bc_num:3285798
+sort count=10000000
+sort count=20000000
+sort count=30000000
+sort count=40000000
+sort count=50000000
+sort count=60000000
+sort count=70000000
+sort count=80000000
+sort count=90000000
+sort count=100000000
+sort count=110000000
+sort count=120000000
+sort count=130000000
+sort count=140000000
+sort count=150000000
+sort count=160000000
+sort count=170000000
+sort count=180000000
+sort count=190000000
+sort count=200000000
+sort count=210000000
+sort count=220000000
+sort count=230000000
+sort count=240000000
+sort count=250000000
+sort count=260000000
+sort count=270000000
+sort count=280000000
+struct cluster
+struct cluster gene matrix
+len(self.sort_matrix)=3285798
+cluster count=1000000
+cluster count=2000000
+cluster count=3000000
+umi_total:448928268
+output
+output bc_cluster
+output center_coord
+output bc list
+output gene_list
+output exp_matrix
+gene exp matrix is ok
+row num=27940725, umi total=448928268
+struct cluster
+struct cluster gene matrix
+len(self.sort_matrix)=3285798
+cluster count=1000000
+cluster count=2000000
+cluster count=3000000
+umi_total:448928268
+output
+output bc_cluster
+output center_coord
+output bc list
+output gene_list
+output exp_matrix
+gene exp matrix is ok
+row num=62105663, umi total=448928268
+struct cluster
+struct cluster gene matrix
+len(self.sort_matrix)=3285798
+cluster count=1000000
+cluster count=2000000
+cluster count=3000000
+umi_total:448928268
+output
+output bc_cluster
+output center_coord
+output bc list
+output gene_list
+output exp_matrix
+gene exp matrix is ok
+row num=79269645, umi total=448928268
+struct cluster
+struct cluster gene matrix
+len(self.sort_matrix)=3285798
+cluster count=1000000
+cluster count=2000000
+cluster count=3000000
+umi_total:448928268
+output
+output bc_cluster
+output center_coord
+output bc list
+output gene_list
+output exp_matrix
+gene exp matrix is ok
+row num=91052253, umi total=448928268
+struct cluster
+struct cluster gene matrix
+len(self.sort_matrix)=3285798
+cluster count=1000000
+cluster count=2000000
+cluster count=3000000
+umi_total:448928268
+output
+output bc_cluster
+output center_coord
+output bc list
+output gene_list
+output exp_matrix
+gene exp matrix is ok
+row num=106200906, umi total=448928268
+struct cluster
+struct cluster gene matrix
+len(self.sort_matrix)=3285798
+cluster count=1000000
+cluster count=2000000
+cluster count=3000000
+umi_total:448928268
+output
+output bc_cluster
+output center_coord
+output bc list
+output gene_list
+output exp_matrix
+gene exp matrix is ok
+row num=126514635, umi total=448928268
+struct cluster
+struct cluster gene matrix
+len(self.sort_matrix)=3285798
+cluster count=1000000
+cluster count=2000000
+cluster count=3000000
+umi_total:448928268
+output
+output bc_cluster
+output center_coord
+output bc list
+output gene_list
+output exp_matrix
+gene exp matrix is ok
+row num=155389097, umi total=448928268
+struct cluster
+struct cluster gene matrix
+len(self.sort_matrix)=3285798
+cluster count=1000000
+cluster count=2000000
+cluster count=3000000
+umi_total:448928268
+output
+output bc_cluster
+output center_coord
+output bc list
+output gene_list
+output exp_matrix
+gene exp matrix is ok
+row num=200882542, umi total=448928268
+struct cluster
+struct cluster gene matrix
+len(self.sort_matrix)=3285798
+cluster count=1000000
+cluster count=2000000
+cluster count=3000000
+umi_total:448928268
+output
+output bc_cluster
+output center_coord
+output bc list
+output gene_list
+output exp_matrix
+gene exp matrix is ok
+row num=288762376, umi total=448928268
+infile=/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BMChiper/exp100/img_dist.tif, outdir=/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/, options={'-i': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BMChiper/exp100/img_dist.tif', '-o': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/', '-s': '1', '-c': 'S3000'}
+{'roi_fill': '', 'block_width': 46, 'block_height': 46, 'spot_width': 30, 'spot_height': 35, 'he_file': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BMChiper/exp100/img_dist.tif', 'outdir': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/heAuto_level_matrix', 'matrix_dir': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/level_matrix/', 'roi_file': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/roi_heAuto.json'}
+level_5
+level_2
+level_6
+level_3
+level_4
+level_9
+level_1
+level_18
+level_7
+levels:[18, 9, 7, 6, 5, 4, 3, 2, 1]
+self.he_width=19954,self.chip_width=19954.0,self.std_chip_zoom=19.954
+gene list file is ok
+supspot pos is ok
+supspot list is ok
+reading is ok
+sub is ok
+<class 'pandas.core.frame.DataFrame'>
+Index: 20678345 entries, 185868 to 27719780
+Data columns (total 3 columns):
+ #   Column   Dtype
+---  ------   -----
+ 0   gene     int64
+ 1   supspot  int64
+ 2   umi      int64
+dtypes: int64(3)
+memory usage: 631.1 MB
+sub_df:None
+sub_df.head():         gene  supspot  umi
+185868   3733        1   11
+185869   9363        1  115
+185870  13185        1   41
+185871  17577        1    2
+185872  18824        1   39
+gene exp matrix is ok
+self.he_width=19954,self.chip_width=19954.0,self.std_chip_zoom=19.954
+gene list file is ok
+supspot pos is ok
+supspot list is ok
+reading is ok
+sub is ok
+<class 'pandas.core.frame.DataFrame'>
+Index: 49984922 entries, 296923 to 61732270
+Data columns (total 3 columns):
+ #   Column   Dtype
+---  ------   -----
+ 0   gene     int64
+ 1   supspot  int64
+ 2   umi      int64
+dtypes: int64(3)
+memory usage: 1.5 GB
+sub_df:None
+sub_df.head():         gene  supspot  umi
+296923  20023        1    5
+296924   6400        1    2
+296925   2559        1    1
+296926  22386        1    5
+296927   9450        1    1
+gene exp matrix is ok
+self.he_width=19954,self.chip_width=19954.0,self.std_chip_zoom=19.954
+gene list file is ok
+supspot pos is ok
+supspot list is ok
+reading is ok
+sub is ok
+<class 'pandas.core.frame.DataFrame'>
+Index: 65028307 entries, 310056 to 78849972
+Data columns (total 3 columns):
+ #   Column   Dtype
+---  ------   -----
+ 0   gene     int64
+ 1   supspot  int64
+ 2   umi      int64
+dtypes: int64(3)
+memory usage: 1.9 GB
+sub_df:None
+sub_df.head():         gene  supspot  umi
+310056  11015        1   73
+310057   9370        1    2
+310058   1180        1    1
+310059  24812        1   16
+310060  26812        1    1
+gene exp matrix is ok
+self.he_width=19954,self.chip_width=19954.0,self.std_chip_zoom=19.954
+gene list file is ok
+supspot pos is ok
+supspot list is ok
+reading is ok
+sub is ok
+<class 'pandas.core.frame.DataFrame'>
+Index: 75415277 entries, 325861 to 90590431
+Data columns (total 3 columns):
+ #   Column   Dtype
+---  ------   -----
+ 0   gene     int64
+ 1   supspot  int64
+ 2   umi      int64
+dtypes: int64(3)
+memory usage: 2.2 GB
+sub_df:None
+sub_df.head():         gene  supspot  umi
+325861  19751        1    2
+325862  28852        1    1
+325863  19720        1    1
+325864  17942        1    3
+325865  25221        1    5
+gene exp matrix is ok
+self.he_width=19954,self.chip_width=19954.0,self.std_chip_zoom=19.954
+gene list file is ok
+supspot pos is ok
+supspot list is ok
+reading is ok
+sub is ok
+<class 'pandas.core.frame.DataFrame'>
+Index: 88820371 entries, 359274 to 105685797
+Data columns (total 3 columns):
+ #   Column   Dtype
+---  ------   -----
+ 0   gene     int64
+ 1   supspot  int64
+ 2   umi      int64
+dtypes: int64(3)
+memory usage: 2.6 GB
+sub_df:None
+sub_df.head():         gene  supspot  umi
+359274  27617        1    1
+359275  11516        1   70
+359276  12190        1    1
+359277  17544        1    1
+359278   1469        1   72
+gene exp matrix is ok
+self.he_width=19954,self.chip_width=19954.0,self.std_chip_zoom=19.954
+gene list file is ok
+supspot pos is ok
+supspot list is ok
+reading is ok
+sub is ok
+<class 'pandas.core.frame.DataFrame'>
+Index: 106913041 entries, 404905 to 125931020
+Data columns (total 3 columns):
+ #   Column   Dtype
+---  ------   -----
+ 0   gene     int64
+ 1   supspot  int64
+ 2   umi      int64
+dtypes: int64(3)
+memory usage: 3.2 GB
+sub_df:None
+sub_df.head():         gene  supspot  umi
+404905  11517        1    1
+404906  11516        1   40
+404907  14670        1    3
+404908  11015        1   15
+404909  27802        1    2
+gene exp matrix is ok
+self.he_width=19954,self.chip_width=19954.0,self.std_chip_zoom=19.954
+gene list file is ok
+supspot pos is ok
+supspot list is ok
+reading is ok
+sub is ok
+<class 'pandas.core.frame.DataFrame'>
+Index: 132707548 entries, 456794 to 154735124
+Data columns (total 3 columns):
+ #   Column   Dtype
+---  ------   -----
+ 0   gene     int64
+ 1   supspot  int64
+ 2   umi      int64
+dtypes: int64(3)
+memory usage: 4.0 GB
+sub_df:None
+sub_df.head():         gene  supspot  umi
+456794  20436        1    4
+456795  27783        1    1
+456796   1469        1   18
+456797  17644        1    1
+456798  19205        1    1
+gene exp matrix is ok
+self.he_width=19954,self.chip_width=19954.0,self.std_chip_zoom=19.954
+gene list file is ok
+supspot pos is ok
+supspot list is ok
+reading is ok
+sub is ok
+<class 'pandas.core.frame.DataFrame'>
+Index: 173532583 entries, 584152 to 200122989
+Data columns (total 3 columns):
+ #   Column   Dtype
+---  ------   -----
+ 0   gene     int64
+ 1   supspot  int64
+ 2   umi      int64
+dtypes: int64(3)
+memory usage: 5.2 GB
+sub_df:None
+sub_df.head():         gene  supspot  umi
+584152  20436        1    1
+584153  17799        1    2
+584154  11516        1    2
+584155  18690        1    1
+584156   1469        1    6
+gene exp matrix is ok
+self.he_width=19954,self.chip_width=19954.0,self.std_chip_zoom=19.954
+gene list file is ok
+supspot pos is ok
+supspot list is ok
+reading is ok
+sub is ok
+<class 'pandas.core.frame.DataFrame'>
+Index: 253602110 entries, 864394 to 287776252
+Data columns (total 3 columns):
+ #   Column   Dtype
+---  ------   -----
+ 0   gene     int64
+ 1   supspot  int64
+ 2   umi      int64
+dtypes: int64(3)
+memory usage: 7.6 GB
+sub_df:None
+sub_df.head():         gene  supspot  umi
+864394  26404        1    1
+864395  27783        1    1
+864396  28143        1    1
+864397  28150        1    1
+864398  11516        1    2
+gene exp matrix is ok
+/home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTools//UMICountDistPlot.py:131: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  cn = plt.cm.get_cmap('RdYlBu_r')
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+{'block_width': 42, 'block_height': 43, 'spot_width': 45, 'spot_height': 51, 'he_file': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/he_roi.tif', 'indir': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/level_matrix/level_18/', 'outfile': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/umi_plot/all_umi_count.tif'}
+max umi count:275929, min umi count:1
+val:[ 30000  60000  90000 120000 150000 180000 210000 240000 270000], pos:[0.10872362 0.21744724 0.32617086 0.43489448 0.5436181  0.65234173
+ 0.76106535 0.86978897 0.97851259]
+/home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTools//UMICountDistPlot.py:131: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  cn = plt.cm.get_cmap('RdYlBu_r')
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+{'block_width': 42, 'block_height': 43, 'spot_width': 45, 'spot_height': 51, 'he_file': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/he_roi.tif', 'indir': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/heAuto_level_matrix/subdata/L18_heAuto/', 'outfile': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/umi_plot/roi_umi_count.tif'}
+max umi count:275929, min umi count:65720
+val:[ 30000  60000  90000 120000 150000 180000 210000 240000 270000], pos:[0.10872362 0.21744724 0.32617086 0.43489448 0.5436181  0.65234173
+ 0.76106535 0.86978897 0.97851259]
+/home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTools//UMICountDistPlot_white.py:131: MatplotlibDeprecationWarning: The get_cmap function was deprecated in Matplotlib 3.7 and will be removed in 3.11. Use ``matplotlib.colormaps[name]`` or ``matplotlib.colormaps.get_cmap()`` or ``pyplot.get_cmap()`` instead.
+  cn = plt.cm.get_cmap('RdYlBu_r')
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+findfont: Font family 'Times New Roman' not found.
+{'block_width': 42, 'block_height': 43, 'spot_width': 45, 'spot_height': 51, 'he_file': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/he_roi.tif', 'indir': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/heAuto_level_matrix/subdata/L18_heAuto/', 'outfile': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/umi_plot/roi_umi_count_white.tif'}
+max umi count:275929, min umi count:65720
+val:[ 30000  60000  90000 120000 150000 180000 210000 240000 270000], pos:[0.10872362 0.21744724 0.32617086 0.43489448 0.5436181  0.65234173
+ 0.76106535 0.86978897 0.97851259]
+{'gray': 200, 'gray_auto': 1, 'fl_gray': 15, 'fl_gray_auto': 1, 'flu': False, 'flu_channl': 1, 'inside': 1, 'chip_type': 'S3000', 'matrix_dir': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/exp100_28Feb2025/', 'outdir': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat', 'he_file': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BMChiper/exp100/img_dist.tif'}
+cmd:/home/VIB.LOCAL/julien.mortier/.conda/envs/BSTMAtrix_env/bin/python /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTools//levelMatrix.py -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/exp100_28Feb2025 -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/level_matrix/ -L 18,9,7,6,5,4,3,2,1 -W 42 -H 43 -C 45 -R 51
+cmd:/home/VIB.LOCAL/julien.mortier/.conda/envs/BSTMAtrix_env/bin/python /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTools//HERegionSearch.py -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BMChiper/exp100/img_dist.tif -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/ -s 1 -c S3000
+cmd:/home/VIB.LOCAL/julien.mortier/.conda/envs/BSTMAtrix_env/bin/python /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTools//RoiLevelMatrix.py -e /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BMChiper/exp100/img_dist.tif -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/heAuto_level_matrix -m /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/level_matrix/ -r /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/roi_heAuto.json -f /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/roi_fill_value.txt -W 42 -H 43 -C 45 -R 51
+cmd:/home/VIB.LOCAL/julien.mortier/.conda/envs/BSTMAtrix_env/bin/python /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTools//UMICountDistPlot.py -e /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/he_roi.tif -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/level_matrix/level_18/ -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/umi_plot/all_umi_count.tif -W 42 -H 43 -C 45 -R 51
+cmd:/home/VIB.LOCAL/julien.mortier/.conda/envs/BSTMAtrix_env/bin/python /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTools//UMICountDistPlot.py -e /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/he_roi.tif -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/heAuto_level_matrix/subdata/L18_heAuto/ -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/umi_plot/roi_umi_count.tif -W 42 -H 43 -C 45 -R 51
+cmd:/home/VIB.LOCAL/julien.mortier/.conda/envs/BSTMAtrix_env/bin/python /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTools//UMICountDistPlot_white.py -e /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/he_roi.tif -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/heAuto_level_matrix/subdata/L18_heAuto/ -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/umi_plot/roi_umi_count_white.tif -W 42 -H 43 -C 45 -R 51
+args:{'gray': 200, 'gray_auto': 1, 'fl_gray': 15, 'fl_gray_auto': 1, 'flu': False, 'flu_channl': 1, 'inside': 1, 'chip_type': 'S3000', 'matrix_dir': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/exp100_28Feb2025', 'outdir': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat', 'he_file': '/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BMChiper/exp100/img_dist.tif'}
+  bc_name  read_num
+0  L9_931   31373.0
+1  L9_932   52636.0
+2  L9_933   58659.0
+3  L9_934   63701.0
+4  L9_935   70829.0
+2025-07-19 06:33:49:	done.
+2025-07-19 06:33:49:	Elaseped time: 18589s
+
+2025-07-19 06:33:49:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/he_roi_small.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/BSTViewer_project/
+2025-07-19 06:33:49:	done.
+2025-07-19 06:33:49:	Elaseped time: 0s
+
+2025-07-19 06:33:49:	Rscript /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/cluster.R -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/BSTViewer_project/subdata/L3_heAuto/ -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L3 --prefix L3 --he_png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/he_roi_small.png --res 0.5 --MinCell 50 --MinFeatures 10 --point_size 0.2 --block_width 42 --block_height 43 --spot_width 45 --spot_height 51
+Rscript /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/cluster.R -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/BSTViewer_project/subdata/L4_heAuto/ -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L4 --prefix L4 --he_png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/he_roi_small.png --res 0.5 --MinCell 40 --MinFeatures 20 --point_size 0.3 --block_width 42 --block_height 43 --spot_width 45 --spot_height 51
+Rscript /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/cluster.R -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/BSTViewer_project/subdata/L5_heAuto/ -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L5 --prefix L5 --he_png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/he_roi_small.png --res 0.5 --MinCell 30 --MinFeatures 40 --point_size 0.6 --block_width 42 --block_height 43 --spot_width 45 --spot_height 51
+Rscript /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/cluster.R -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/BSTViewer_project/subdata/L6_heAuto/ -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L6 --prefix L6 --he_png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/he_roi_small.png --res 0.5 --MinCell 30 --MinFeatures 50 --point_size 0.7 --block_width 42 --block_height 43 --spot_width 45 --spot_height 51
+Rscript /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/cluster.R -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/BSTViewer_project/subdata/L7_heAuto/ -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L7 --prefix L7 --he_png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/he_roi_small.png --res 0.5 --MinCell 20 --MinFeatures 60 --point_size 0.8 --block_width 42 --block_height 43 --spot_width 45 --spot_height 51
+Rscript /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/cluster.R -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/BSTViewer_project/subdata/L9_heAuto/ -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L9 --prefix L9 --he_png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/he_roi_small.png --res 0.5 --MinCell 10 --MinFeatures 80 --point_size 1.1 --block_width 42 --block_height 43 --spot_width 45 --spot_height 51
+Rscript /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/cluster.R -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/BSTViewer_project/subdata/L18_heAuto/ -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L18 --prefix L18 --he_png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/he_roi_small.png --res 0.5 --MinCell 5 --MinFeatures 100 --point_size 2.2 --block_width 42 --block_height 43 --spot_width 45 --spot_height 51
+
+Performing log-normalization
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Calculating gene variances
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Calculating feature variances of standardized and clipped values
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Centering and scaling data matrix
+  |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================================================| 100%
+PC_ 1 
+Positive:  Alb, Mup3, Cyp2f2, mt-Cytb, Gls2, Mup20, Hpx, Serpina1e, Hal, Pigr 
+	   Hsd17b13, Pck1, Ass1, Cps1, Hsd11b1, Arg1, Wfdc21, Hsd17b6, Fbp1, Ctsc 
+	   Serpina12, Amdhd1, Apoc2, Mug2, Etnppl, Uroc1, Aldh1b1, Scd1, Gldc, A330008L17Rik 
+Negative:  Mup9, Mup17, Mup1, Cyp2e1, Mup19, Oat, Cyp2c29, Mup8, Cyp2a5, Rgn 
+	   Cyp1a2, Cyp2c50, Mup12, Mgst1, Slco1b2, Aldh1a1, Pon1, Cyp2c37, Fcho2, Acaa1b 
+	   Mup18, Cyp3a11, Gsta3, Gulo, Cyp2c54, Car3, Gstm1, Glul, Aldh3a2, Rnase4 
+PC_ 2 
+Positive:  Mup11, Wfdc21, Cps1, Serpina1e, Hamp, Sfi1, Mup3, Igfbp2, Mgst1, Cyp3a11 
+	   Mug2, Ass1, Scd1, Arg1, Car3, Errfi1, Mup12, Slc7a2, Slco1b2, Acaa1b 
+	   Akr1c6, Gm29966, Aox3, Paqr9, Pck1, Rnase4, Alb, Pon1, Cdo1, Mup18 
+Negative:  Tmsb4x, Gsn, Igfbp7, Dcn, Col3a1, Igfbp3, Sparc, H2-Eb1, Bgn, H2-Aa 
+	   Spp1, H2-Ab1, Prelp, Col1a2, Cd74, Crip1, S100a6, Mgp, Col1a1, Lyz2 
+	   Timp2, Gm9844, Ly6a, C1qc, Col14a1, Tmsb10, Ctss, Ecm1, Gas6, Vim 
+PC_ 3 
+Positive:  Scd1, Hamp, Mup11, Wfdc21, Serpina1e, Cps1, Igfbp2, Cd5l, C1qc, Lyz2 
+	   Cdo1, Pon1, Clec4f, Vsig4, Wfdc17, Tmsb4x, C1qa, Fcna, Ctss, C1qb 
+	   Akr1c6, Paqr9, Rnase4, Gsta3, Tyrobp, Csad, Car3, Csf1r, Cyp2c50, Rgn 
+Negative:  Mup20, Slc1a2, Glul, Aldh1b1, Cyp2a5, Spp1, Hsd17b6, Rhbg, Dct, Slc13a3 
+	   Ugt2b38, Oat, Serpina7, Gstm2, Cyp2c37, Gstm3, Hal, Slc22a1, Rdh9, Cyp2a4 
+	   Lhpp, Ces2c, Hsd17b13, Gsn, Mup18, Hcrtr2, Cryl1, Fabp4, Mup4, Apoa4 
+PC_ 4 
+Positive:  Cd5l, C1qc, Clec4f, Vsig4, C1qb, Ctss, Wfdc17, C1qa, Lyz2, Ctsc 
+	   Mup18, Csf1r, Tmsb4x, Tyrobp, Slc1a2, Fcna, Cfp, Glul, Mup12, Mup20 
+	   Fcer1g, Lpl, Lgmn, Gm26716, Sdc3, Marco, Timd4, Cyp2a5, Mup8, Cybb 
+Negative:  Gsn, Col3a1, S100a6, Igfbp5, Hamp, Scd1, Col1a1, Mgp, Igfbp2, Col1a2 
+	   Hba-a1, Hba-a2, Timp2, Hbb-bs, Cps1, Dpt, Hbb-bt, Serpina1e, Gas6, Sparc 
+	   Fbln5, Spp1, Serpinh1, Igfbp7, Vim, Ap4e1, Wfdc21, Prss23, Cavin1, Slpi 
+PC_ 5 
+Positive:  Dcn, Ecm1, Cd5l, Vsig4, C1qc, Clec4f, Fcna, Reln, Colec11, Igfbp7 
+	   Tgfbi, Sod3, Ctss, Igfbp3, C1qb, C1qa, Prelp, Csf1r, Bgn, Wfdc17 
+	   Col14a1, Sparc, Lyz2, Plvap, Gm26716, Sdc3, Pth1r, Tyrobp, Lgmn, Cfp 
+Negative:  Ifit1, Ifit3, Rsad2, Cmpk2, Ifit3b, Cxcl9, Tgtp2, Cxcl10, Oasl1, Isg15 
+	   Tgtp1, Usp18, Gbp6, Saa2, Ifi47, Igtp, Gbp2, Saa3, Calhm6, Saa1 
+	   Ifit2, Mt2, Gbp10, Art3, Ccl5, Stat1, Iigp1, Rnf213, Mt1, Gbp7 
+Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+To use Python UMAP via reticulate, set umap.method to 'umap-learn' and metric to 'correlation'
+This message will be shown once per session
+06:39:07 UMAP embedding parameters a = 0.9922 b = 1.112
+06:39:07 Read 96854 rows and found 30 numeric columns
+06:39:07 Using Annoy for neighbor search, n_neighbors = 30
+06:39:07 Building Annoy index with metric = cosine, n_trees = 50
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+06:39:15 Writing NN index file to temp file /data/tmp/167889/Rtmp6nRJty/file647aa6aaa4cf3
+06:39:16 Searching Annoy index using 1 thread, search_k = 3000
+06:39:55 Annoy recall = 100%
+06:39:55 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+06:39:57 Initializing from normalized Laplacian + noise (using irlba)
+06:40:01 Commencing optimization for 200 epochs, with 4662064 positive edges
+Using method 'umap'
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+06:40:53 Optimization finished
+[1] "ProcessingTime: 404.91seconds"
+Performing log-normalization
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Calculating gene variances
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Calculating feature variances of standardized and clipped values
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Centering and scaling data matrix
+  |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================================================| 100%
+PC_ 1 
+Positive:  Alb, Mup3, Cyp2f2, Gls2, mt-Cytb, Hpx, Hal, Mup20, Pigr, Serpina1e 
+	   Hsd17b13, Pck1, Ass1, Cps1, Hsd11b1, Arg1, Uox, Hsd17b6, Wfdc21, Fbp1 
+	   Ctsc, Serpina12, Rida, Amdhd1, C9, Mug2, Apoc2, Etnppl, Uroc1, Slc25a47 
+Negative:  Mup9, Mup17, Mup1, Cyp2e1, Mup19, Cyp2c29, Oat, Mup8, Cyp1a2, Rgn 
+	   Cyp2a5, Cyp2c50, Mgst1, Mup12, Aldh1a1, Slco1b2, Acaa1b, Cyp2c37, Pon1, Gsta3 
+	   Fcho2, Cyp2c54, Car3, Gstm1, Gulo, Cyp3a11, Mup18, Aldh3a2, Akr1c6, Rnase4 
+PC_ 2 
+Positive:  Mup11, Wfdc21, Cps1, Hamp, Serpina1e, Mup16, Igfbp2, Scd1, C9, Mup3 
+	   Mug2, Acox1, Sfi1, Mgst1, Uox, Ass1, Ces1e, Arg1, Cyp3a11, Paqr9 
+	   Akr1c6, Car3, Aox3, Cdo1, Rdh16f2, Rnase4, Hsd11b1, Hsd3b7, Slc7a2, Acaa1b 
+Negative:  Gsn, Col3a1, Igfbp3, Igfbp7, Tmsb4x, Mgp, Dcn, Spp1, S100a6, Col1a1 
+	   Sparc, Col1a2, Bgn, Dpt, Crip1, H2-Eb1, Timp2, H2-Aa, H2-Ab1, Gas6 
+	   Fbln5, Gm9844, Prelp, Ly6a, Tmsb10, S100a11, Vim, Cd74, Fmo2, Serpinh1 
+PC_ 3 
+Positive:  Scd1, Hamp, Wfdc21, Igfbp2, Mup11, Serpina1e, Cps1, Lyz2, Cd5l, C1qc 
+	   Tmsb4x, Cdo1, Vsig4, Clec4f, Wfdc17, C1qa, Ctss, C1qb, Fcna, Pon1 
+	   Paqr9, Ces1e, Tyrobp, Rnase4, Akr1c6, Csad, Ces1d, Gsta3, Csf1r, Cd74 
+Negative:  Mup20, Slc1a2, Aldh1b1, Glul, Hsd17b6, Cyp2a5, Ugt2b38, Dct, Rhbg, Slc13a3 
+	   Spp1, Serpina7, Mup18, Oat, Gstm2, Cyp2a4, Lhpp, Mup4, Rdh9, Gstm3 
+	   Slc22a1, Hal, Cryl1, Hcrtr2, Ces2c, Sds, Cyp2c37, Cib3, Apoa4, Hsd17b13 
+PC_ 4 
+Positive:  Gsn, Igfbp5, S100a6, Scd1, Hamp, Col1a1, Igfbp2, Col3a1, Mgp, Ap4e1 
+	   Cps1, Slpi, Dpt, Timp2, Col1a2, Serpina1e, Wfdc21, Fmo2, Hba-a2, Hba-a1 
+	   Cdo1, Igfbp6, Hbb-bs, Prss23, Cavin1, Fbln5, Hbb-bt, Gas6, Smoc2, Crip1 
+Negative:  Cd5l, C1qc, Clec4f, Vsig4, C1qb, Ctss, C1qa, Wfdc17, Lyz2, Tmsb4x 
+	   Ctsc, Csf1r, Tyrobp, Fcna, Mup18, Slc1a2, Cfp, Fcer1g, Glul, Lpl 
+	   Lgmn, Sdc3, Gm26716, Marco, Timd4, Mpeg1, Mup12, Mup16, Cd68, Folr2 
+PC_ 5 
+Positive:  Dcn, Cd5l, Ecm1, Vsig4, C1qc, Clec4f, Fcna, Colec11, Reln, C1qa 
+	   Igfbp7, Tgfbi, Sod3, Ctss, C1qb, Igfbp3, Csf1r, Prelp, Bgn, Lyz2 
+	   Col14a1, Wfdc17, Plvap, Sparc, Tyrobp, Sdc3, Gm26716, Slc40a1, Pth1r, Cfp 
+Negative:  Ifit1, Rsad2, Ifit3, Cmpk2, Ifit3b, Tgtp2, Cxcl9, Tgtp1, Cxcl10, Isg15 
+	   Oasl1, Gbp6, Usp18, Saa2, Gbp2, Igtp, Ifi47, Ifit2, Calhm6, Saa3 
+	   Gbp10, Art3, Ccl5, Saa1, Iigp1, Mt2, Stat1, Rnf213, Mt1, Lcn2 
+Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+To use Python UMAP via reticulate, set umap.method to 'umap-learn' and metric to 'correlation'
+This message will be shown once per session
+06:44:53 UMAP embedding parameters a = 0.9922 b = 1.112
+06:44:53 Read 49747 rows and found 30 numeric columns
+06:44:53 Using Annoy for neighbor search, n_neighbors = 30
+06:44:53 Building Annoy index with metric = cosine, n_trees = 50
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+06:44:57 Writing NN index file to temp file /data/tmp/167889/RtmpKgmLzu/file64a547aa7e21a
+06:44:58 Searching Annoy index using 1 thread, search_k = 3000
+06:45:15 Annoy recall = 100%
+06:45:16 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+06:45:17 Initializing from normalized Laplacian + noise (using irlba)
+06:45:18 Commencing optimization for 200 epochs, with 2393688 positive edges
+Using method 'umap'
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+06:45:44 Optimization finished
+[1] "ProcessingTime: 215.961seconds"
+Performing log-normalization
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Calculating gene variances
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Calculating feature variances of standardized and clipped values
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Centering and scaling data matrix
+  |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================================================| 100%
+PC_ 1 
+Positive:  Mup9, Cyp2e1, Mup17, Mup1, Mup19, Cyp2c29, Oat, Cyp1a2, Mup8, Rgn 
+	   Cyp2c50, Cyp2a5, Aldh1a1, Mgst1, Acaa1b, Slco1b2, Gsta3, Fcho2, Pon1, Mup12 
+	   Cyp2c37, Gstm1, Cyp2c54, Gulo, Car3, Aldh3a2, Cyp3a11, Akr1c6, Lect2, Rnase4 
+Negative:  Alb, Mup3, Cyp2f2, Gls2, Hpx, mt-Cytb, Hal, Pigr, Hsd17b13, Pck1 
+	   Aldob, Mup20, Ass1, Serpina1e, Hsd11b1, Arg1, Cps1, Uox, Hsd17b6, Fbp1 
+	   Serpina12, Ctsc, Rida, Amdhd1, Wfdc21, C9, Mug2, Apoc2, Etnppl, Uroc1 
+PC_ 2 
+Positive:  Mup11, Wfdc21, Hamp, Cps1, Mup16, Serpina1e, Igfbp2, Scd1, C9, Ces1e 
+	   Acox1, Mug2, Mup3, Uox, Mgst1, Ass1, Paqr9, Hsd3b5, Arg1, Sfi1 
+	   Cyp3a11, Rdh16f2, Akr1c6, Aox3, Car3, Hsd3b7, Hsd11b1, Rnase4, Cdo1, Nat8f2 
+Negative:  Gsn, Col3a1, S100a6, Mgp, Igfbp3, Dpt, Spp1, Col1a1, Igfbp7, Col1a2 
+	   Crip1, Timp2, Sparc, Tmsb4x, Fbln5, Bgn, Gas6, Dcn, H2-Eb1, Gm9844 
+	   S100a11, Fmo2, H2-Aa, Vim, Ly6a, Tmsb10, H2-Ab1, Prelp, Serpinh1, Col6a3 
+PC_ 3 
+Positive:  Scd1, Hamp, Igfbp2, Wfdc21, Serpina1e, Cps1, Mup11, Cdo1, Lyz2, Tmsb4x 
+	   Cd5l, C1qc, Ces1e, Paqr9, C1qa, Pon1, Clec4f, Wfdc17, Vsig4, Ctss 
+	   Ces1d, Fcna, C1qb, Tyrobp, Csad, Rnase4, Fabp5, Akr1c6, Cd74, Gsta3 
+Negative:  Mup20, Aldh1b1, Slc1a2, Glul, Hsd17b6, Dct, Ugt2b38, Rhbg, Slc13a3, Cyp2a5 
+	   Serpina7, Mup18, Cyp2a4, Mup4, Sds, Cryl1, Gstm2, Lhpp, Rdh9, Spp1 
+	   Gm13773, Hcrtr2, Oat, Gstm3, Slc22a1, Cib3, Plbd2, Gm35696, Apoa4, Saa1 
+PC_ 4 
+Positive:  Igfbp5, S100a6, Gsn, Slpi, Ap4e1, Igfbp2, Col1a1, Scd1, Hamp, Col3a1 
+	   Dpt, Cps1, Igfbp6, Mgp, Timp2, Upk3b, Wfdc21, Gpx3, Fmo2, Serpina1e 
+	   Col1a2, Ogn, Fmod, Gpm6a, Cav1, Msln, Fbln5, Rbbp8, Cavin1, Cdo1 
+Negative:  Cd5l, C1qc, Vsig4, Clec4f, Tmsb4x, C1qb, Wfdc17, C1qa, Lyz2, Ctss 
+	   Tyrobp, Csf1r, Fcna, Ctsc, Cfp, Fcer1g, Slc1a2, Lpl, Mup18, Lgmn 
+	   Gm26716, Sdc3, Mpeg1, Timd4, Marco, Glul, Cybb, Cd74, Folr2, Cd52 
+PC_ 5 
+Positive:  Ifit1, Rsad2, Ifit3, Cmpk2, Ifit3b, Tgtp2, Tgtp1, Cxcl9, Oasl1, Isg15 
+	   Cxcl10, Gbp6, Usp18, Gbp2, Igtp, Ifi47, Ifit2, Saa2, Gbp10, Calhm6 
+	   Saa3, Ccl5, Art3, Iigp1, Mt2, Saa1, Rnf213, Stat1, Lcn2, Irgm1 
+Negative:  Cd5l, Vsig4, Dcn, C1qc, Clec4f, Fcna, Ecm1, C1qa, Ctss, C1qb 
+	   Csf1r, Lyz2, Wfdc17, Colec11, Igfbp7, Sod3, Tgfbi, Reln, Tyrobp, Tmsb4x 
+	   Sdc3, Igfbp3, Prelp, Gm26716, Lgmn, Cfp, Col14a1, Slc40a1, Bgn, Plvap 
+Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+To use Python UMAP via reticulate, set umap.method to 'umap-learn' and metric to 'correlation'
+This message will be shown once per session
+06:48:05 UMAP embedding parameters a = 0.9922 b = 1.112
+06:48:05 Read 30166 rows and found 30 numeric columns
+06:48:05 Using Annoy for neighbor search, n_neighbors = 30
+06:48:05 Building Annoy index with metric = cosine, n_trees = 50
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+06:48:07 Writing NN index file to temp file /data/tmp/167889/RtmpOuV50t/file64bc227d0d6c1
+06:48:08 Searching Annoy index using 1 thread, search_k = 3000
+06:48:17 Annoy recall = 100%
+06:48:18 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+06:48:19 Initializing from normalized Laplacian + noise (using irlba)
+06:48:20 Commencing optimization for 200 epochs, with 1445526 positive edges
+Using method 'umap'
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+06:48:35 Optimization finished
+[1] "ProcessingTime: 129.984seconds"
+Performing log-normalization
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Calculating gene variances
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Calculating feature variances of standardized and clipped values
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Centering and scaling data matrix
+  |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================================================| 100%
+PC_ 1 
+Positive:  Mup9, Cyp2e1, Mup19, Mup1, Mup17, Cyp2c29, Cyp1a2, Oat, Rgn, Cyp2c50 
+	   Mup8, Aldh1a1, Acaa1b, Cyp2a5, Slco1b2, Mgst1, Gsta3, Fcho2, Gstm1, Cyp2c37 
+	   Cyp2c54, Pon1, Gulo, Mup12, Aldh3a2, Car3, Akr1c6, Lect2, Cyp3a11, Cyb5a 
+Negative:  Alb, Mup3, Cyp2f2, Gls2, Hpx, mt-Cytb, Hal, Pigr, Hsd17b13, Pck1 
+	   Aldob, Ass1, Mup20, Gstp2, Hsd11b1, Serpina1e, Arg1, Uox, Fbp1, Cps1 
+	   Hsd17b6, Orm1, Serpina12, Rida, Ctsc, Amdhd1, C9, Etnppl, Mug2, Apoc2 
+PC_ 2 
+Positive:  Mup11, Wfdc21, Hamp, Cps1, Mup16, Igfbp2, Serpina1e, Scd1, Sult2a8, C9 
+	   Ces1e, Acox1, Paqr9, Mug2, Rdh16f2, Mgst1, Hsd3b5, Mup3, Uox, Ass1 
+	   Arg1, Hsd3b7, Apcs, Gstp2, Akr1c6, Hsd11b1, Cdo1, Elovl2, Aox3, Cyp3a11 
+Negative:  Gsn, Col3a1, Mgp, Dpt, S100a6, Col1a1, Spp1, Igfbp3, Col1a2, Crip1 
+	   Timp2, Fbln5, Igfbp7, Fmo2, Gas6, Bgn, Sparc, S100a11, Gm9844, H2-Eb1 
+	   Tmsb10, Vim, Tmsb4x, Ly6a, Col6a3, Prss23, Dcn, Cavin1, Cd63, H2-Aa 
+PC_ 3 
+Positive:  Mup20, Aldh1b1, Slc1a2, Glul, Ugt2b38, Dct, Slc13a3, Hsd17b6, Rhbg, Serpina7 
+	   Cyp2a5, Mup18, Cyp2a4, Mup4, Cryl1, Hcrtr2, Gm13773, Lhpp, Sds, Rdh9 
+	   Cib3, Gstm2, Apoa4, Gm35696, Plbd2, Gstm3, Slc22a1, Cd36, Oat, Cyp2c38 
+Negative:  Scd1, Hamp, Igfbp2, Wfdc21, Cps1, Serpina1e, Mup11, Cdo1, Ces1e, Lyz2 
+	   Sult2a8, Tmsb4x, Paqr9, Ces1d, Fabp5, Cd5l, C1qc, Pon1, Enho, Csad 
+	   Rnase4, C1qa, Ctss, Wfdc17, Clec4f, Ces1g, Akr1c6, Vsig4, Gsta3, Fcna 
+PC_ 4 
+Positive:  Igfbp5, S100a6, Slpi, Gsn, Ap4e1, Col1a1, Igfbp6, Upk3b, Igfbp2, Msln 
+	   Col3a1, Scd1, Rbbp8, Timp2, Gpm6a, Dpt, Fmod, Ogn, Fmo2, Cav1 
+	   Mgp, Aebp1, Gpx3, Hamp, Cps1, Cavin1, Col1a2, Cpe, Wfdc21, Smoc2 
+Negative:  C1qc, Cd5l, Vsig4, Clec4f, Tmsb4x, C1qb, Lyz2, Wfdc17, C1qa, Ctss 
+	   Fcna, Tyrobp, Csf1r, Cxcl9, Fcer1g, Ctsc, Cfp, Mpeg1, Ifit3, Lgmn 
+	   Sdc3, Gm26716, Timd4, Cd52, Cybb, Marco, Tgtp2, Cd74, Lpl, Tgtp1 
+PC_ 5 
+Positive:  Ifit1, Ifit3, Rsad2, Cmpk2, Ifit3b, Tgtp2, Tgtp1, Oasl1, Isg15, Cxcl9 
+	   Cxcl10, Usp18, Gbp6, Gbp2, Igtp, Ifit2, Ifi47, Gbp10, Saa2, Calhm6 
+	   Art3, Iigp1, Ccl5, Saa3, Stat1, Rnf213, Mt2, Saa1, Gm4841, Gm28347 
+Negative:  Cd5l, C1qc, Vsig4, Clec4f, Dcn, Fcna, Ecm1, C1qa, C1qb, Ctss 
+	   Lyz2, Csf1r, Wfdc17, Tmsb4x, Colec11, Tgfbi, Tyrobp, Reln, Cfp, Igfbp7 
+	   Igfbp3, Sod3, Gm26716, Lgmn, Sdc3, Prelp, Slc40a1, Col14a1, Plvap, Ptgs1 
+Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+To use Python UMAP via reticulate, set umap.method to 'umap-learn' and metric to 'correlation'
+This message will be shown once per session
+06:50:18 UMAP embedding parameters a = 0.9922 b = 1.112
+06:50:18 Read 20222 rows and found 30 numeric columns
+06:50:18 Using Annoy for neighbor search, n_neighbors = 30
+06:50:18 Building Annoy index with metric = cosine, n_trees = 50
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+06:50:19 Writing NN index file to temp file /data/tmp/167889/RtmpVpciub/file64caee6ad3b9
+06:50:20 Searching Annoy index using 1 thread, search_k = 3000
+06:50:26 Annoy recall = 100%
+06:50:26 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+06:50:27 Initializing from normalized Laplacian + noise (using irlba)
+06:50:27 Commencing optimization for 200 epochs, with 961830 positive edges
+Using method 'umap'
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+06:50:38 Optimization finished
+[1] "ProcessingTime: 91.965seconds"
+Performing log-normalization
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Calculating gene variances
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Calculating feature variances of standardized and clipped values
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Centering and scaling data matrix
+  |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================================================| 100%
+PC_ 1 
+Positive:  Cyp2e1, Mup9, Cyp1a2, Mup19, Cyp2c29, Oat, Mup1, Mup17, Rgn, Aldh1a1 
+	   Cyp2c50, Acaa1b, Mup8, Slco1b2, Mgst1, Cyp2a5, Gstm1, Fcho2, Gsta3, Gulo 
+	   Cyp2c54, Cyp2c37, Pon1, Aldh3a2, Car3, Mup12, Lect2, Cyb5a, Akr1c6, Rnase4 
+Negative:  Alb, Mup3, Gls2, Cyp2f2, Hpx, mt-Cytb, Hal, Pigr, Hsd17b13, Pck1 
+	   Aldob, Ass1, Hsd11b1, Gstp2, Mup20, Arg1, Uox, Serpina1e, Fbp1, Orm1 
+	   Gstp1, Hsd17b6, Serpina12, Rida, Amdhd1, Ctsc, Cps1, Etnppl, Apoc2, Uroc1 
+PC_ 2 
+Positive:  Mup11, Wfdc21, Hamp, Igfbp2, Cps1, Scd1, Serpina1e, Mup16, Ces1e, Sult2a8 
+	   Ces1c, C9, Cyp2c70, Paqr9, Lifr, Acox1, Rdh16f2, Hsd3b5, Mug2, Ces1d 
+	   Cdo1, Ces1g, Mgst1, Arg1, Ass1, Hsd3b7, Gstp1, Akr1c6, Gstp2, Uox 
+Negative:  Gsn, Col3a1, Dpt, Mgp, Col1a1, Spp1, S100a6, Igfbp3, Col1a2, Fbln5 
+	   Fmo2, Gas6, Crip1, Timp2, Igfbp7, S100a11, Sparc, Bgn, Tmsb10, Vim 
+	   Gm9844, Ly6a, Cavin1, Prss23, Col6a3, H2-Eb1, Cd63, Vwf, Eln, Gpx3 
+PC_ 3 
+Positive:  Mup20, Aldh1b1, Slc1a2, Glul, Ugt2b38, Dct, Slc13a3, Rhbg, Hsd17b6, Mup18 
+	   Serpina7, Cyp2a4, Gm13773, Mup4, Cyp2a5, Sds, Cryl1, Lhpp, Hcrtr2, Cib3 
+	   Gm35696, Rdh9, Cd36, Mup12, Plbd2, Gstm2, Gstm3, Cyp2c38, Apoa4, Lpl 
+Negative:  Scd1, Hamp, Igfbp2, Wfdc21, Cyp2c70, Ces1c, Cps1, Serpina1e, Cdo1, Ces1e 
+	   Mup11, Sult2a8, Ces1d, Paqr9, Lifr, Lyz2, Tmsb4x, Fabp5, Enho, Pon1 
+	   Csad, Ces1g, Rnase4, Rdh16f2, Cd74, C1qc, Ccnd1, Ces1b, Akr1c6, Gsta3 
+PC_ 4 
+Positive:  Igfbp5, Slpi, Ap4e1, Gsn, S100a6, Upk3b, Igfbp6, Col1a1, Rbbp8, Igfbp2 
+	   Fmod, Gpm6a, Dpt, Fmo2, Msln, Ogn, Col3a1, Aebp1, Timp2, Cav1 
+	   Gpx3, Mgp, Scd1, Fxyd3, Prss23, Cpe, Bcam, Cavin1, Smoc2, Tbce 
+Negative:  C1qc, Cd5l, Tmsb4x, Clec4f, Vsig4, Lyz2, C1qb, C1qa, Wfdc17, Ctss 
+	   Tyrobp, Cxcl9, Fcna, Ifit3, Csf1r, Tgtp2, Mpeg1, Fcer1g, Cfp, Cd52 
+	   Tgtp1, Cd74, Rsad2, Ifit3b, Ifit1, Sdc3, Saa2, Cxcl10, Cmpk2, Gm26716 
+PC_ 5 
+Positive:  Ifit1, Rsad2, Ifit3, Cmpk2, Ifit3b, Tgtp2, Tgtp1, Isg15, Oasl1, Usp18 
+	   Cxcl9, Cxcl10, Gbp6, Ifi47, Igtp, Gbp2, Ifit2, Gbp10, Iigp1, Saa2 
+	   Calhm6, Stat1, Art3, Rnf213, Ccl5, Mt2, Saa3, Saa1, Gbp7, Gm28347 
+Negative:  Cd5l, C1qc, Clec4f, Vsig4, C1qa, Fcna, Ctss, C1qb, Csf1r, Dcn 
+	   Lyz2, Ecm1, Wfdc17, Tmsb4x, Tyrobp, Cfp, Gm26716, Sdc3, Lgmn, Colec11 
+	   Slc40a1, Igfbp3, Sod3, Reln, Tgfbi, Igfbp7, Ptgs1, Prelp, Cd68, Col14a1 
+Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+To use Python UMAP via reticulate, set umap.method to 'umap-learn' and metric to 'correlation'
+This message will be shown once per session
+06:51:57 UMAP embedding parameters a = 0.9922 b = 1.112
+06:51:57 Read 14489 rows and found 30 numeric columns
+06:51:57 Using Annoy for neighbor search, n_neighbors = 30
+06:51:57 Building Annoy index with metric = cosine, n_trees = 50
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+06:51:58 Writing NN index file to temp file /data/tmp/167889/RtmpFapJSq/file64d695eab2c8f
+06:51:58 Searching Annoy index using 1 thread, search_k = 3000
+06:52:02 Annoy recall = 100%
+06:52:02 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+06:52:03 Initializing from normalized Laplacian + noise (using irlba)
+06:52:03 Commencing optimization for 200 epochs, with 684160 positive edges
+Using method 'umap'
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+06:52:11 Optimization finished
+[1] "ProcessingTime: 66.41seconds"
+Performing log-normalization
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Calculating gene variances
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Calculating feature variances of standardized and clipped values
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Centering and scaling data matrix
+  |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================================================| 100%
+PC_ 1 
+Positive:  Cyp1a2, Cyp2e1, Mup9, Aldh1a1, Cyp2c29, Mup19, Oat, Rgn, Mup1, Cyp2c50 
+	   Mup17, Acaa1b, Slco1b2, Gstm1, Gulo, Cyp2c54, Fcho2, Mgst1, Cyp2c37, Mup8 
+	   Aldh3a2, Gsta3, Cyp2a5, Lect2, Cyb5a, Pon1, Car3, Mup12, Akr1c6, Dlec1 
+Negative:  Alb, Mup3, Gls2, Cyp2f2, Hpx, Pigr, Hal, Hsd17b13, mt-Cytb, Pck1 
+	   Aldob, Hsd11b1, Ass1, Uox, Gstp2, Arg1, Fbp1, Orm1, Mup20, Gstp1 
+	   Fgb, Serpina12, Rida, Amdhd1, Hsd17b6, Serpina1e, Etnppl, Ctsc, Uroc1, Apoc2 
+PC_ 2 
+Positive:  Mup11, Wfdc21, Hamp, Igfbp2, Cps1, Scd1, Ces1e, Mup16, Fgl1, Sult2a8 
+	   Serpina1e, Fgb, Cyp2c70, Ces1c, C9, Paqr9, Lifr, Otc, Apcs, Hsd3b5 
+	   Rdh16f2, Acox1, Crot, Ces1g, Ces1d, Mug2, Cdo1, Ces1b, Hsd3b7, Enho 
+Negative:  Gsn, Col3a1, Dpt, Mgp, Col1a1, S100a6, Spp1, Fbln5, Igfbp3, Gas6 
+	   Fmo2, Timp2, Col1a2, Crip1, S100a11, Prss23, Vim, Gm9844, Tmsb10, Ly6a 
+	   Eln, Igfbp7, Bgn, Sparc, Col6a3, Ogn, Cd63, Gpx3, Cavin1, Fmod 
+PC_ 3 
+Positive:  Aldh1b1, Mup20, Slc1a2, Ugt2b38, Glul, Dct, Slc13a3, Rhbg, Hsd17b6, Mup18 
+	   Serpina7, Cyp2a4, Gm13773, Cryl1, Mup4, Sds, Gm35696, Cd36, Cib3, Hcrtr2 
+	   Cyp2a5, Lhpp, Rdh9, Lpl, Plbd2, Fabp4, Apoa4, Ctsc, Saa1, Cyp2c38 
+Negative:  Scd1, Hamp, Igfbp2, Cyp2c70, Wfdc21, Ces1e, Ces1c, Cps1, Serpina1e, Cdo1 
+	   Lifr, Ces1d, Sult2a8, Enho, Fabp5, Fgl1, Paqr9, Mup11, Lyz2, Rdh16f2 
+	   Ccnd1, Fgb, Ces1g, Csad, Tmsb4x, Ces1b, Pon1, Nat8f2, Rnase4, Cd74 
+PC_ 4 
+Positive:  Ifit3, Tgtp2, Cxcl9, Tgtp1, Ifit1, Tmsb4x, C1qc, Rsad2, Ifit3b, Cd5l 
+	   Cmpk2, Gbp6, Isg15, Lyz2, Ifi47, Cxcl10, Wfdc17, Oasl1, C1qb, Vsig4 
+	   Clec4f, Usp18, C1qa, Igtp, Saa2, Ctss, Tyrobp, Gbp2, Gbp10, Saa3 
+Negative:  Igfbp5, Slpi, Ap4e1, Upk3b, S100a6, Igfbp6, Msln, Gsn, Col1a1, Rbbp8 
+	   Gpm6a, Rspo1, Timp2, Aebp1, Cldn15, Gpx3, Ogn, Fmod, Cav1, Col3a1 
+	   Krt7, Fxyd3, Igfbp2, Cpe, Myl7, Cavin1, Smoc2, Dpt, Apoa5, Krt19 
+PC_ 5 
+Positive:  Ifit1, Rsad2, Cmpk2, Ifit3, Ifit3b, Tgtp2, Tgtp1, Isg15, Oasl1, Gbp6 
+	   Usp18, Cxcl10, Ifi47, Igtp, Gbp2, Cxcl9, Gbp10, Iigp1, Ifit2, Igfbp5 
+	   Gm28347, Stat1, Irgm1, Rnf213, Gm4841, Ap4e1, Art3, Calhm6, Mt2, Parp14 
+Negative:  Cd5l, C1qc, Vsig4, Clec4f, C1qb, C1qa, Lyz2, Ctss, Fcna, Csf1r 
+	   Tmsb4x, Wfdc17, Tyrobp, Dcn, Ecm1, Cfp, Sdc3, Lgmn, Gm26716, Slc40a1 
+	   Fcer1g, Sod3, Igfbp3, Colec11, Axl, H2-Aa, Cd74, Cd68, Plvap, Folr2 
+Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+To use Python UMAP via reticulate, set umap.method to 'umap-learn' and metric to 'correlation'
+This message will be shown once per session
+06:53:13 UMAP embedding parameters a = 0.9922 b = 1.112
+06:53:13 Read 8479 rows and found 30 numeric columns
+06:53:13 Using Annoy for neighbor search, n_neighbors = 30
+06:53:13 Building Annoy index with metric = cosine, n_trees = 50
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+06:53:13 Writing NN index file to temp file /data/tmp/167889/RtmpsKRtS2/file64e04376d16e4
+06:53:13 Searching Annoy index using 1 thread, search_k = 3000
+06:53:15 Annoy recall = 100%
+06:53:16 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+06:53:16 Initializing from normalized Laplacian + noise (using irlba)
+06:53:16 Commencing optimization for 500 epochs, with 397766 positive edges
+Using method 'umap'
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+06:53:27 Optimization finished
+[1] "ProcessingTime: 52.298seconds"
+Performing log-normalization
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Calculating gene variances
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Calculating feature variances of standardized and clipped values
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+Centering and scaling data matrix
+  |                                                                              |                                                                      |   0%  |                                                                              |===================================                                   |  50%  |                                                                              |======================================================================| 100%
+PC_ 1 
+Positive:  Aldh1a1, Cyp1a2, Gulo, Gstm1, Aldh3a2, Mup9, Lect2, Oat, Cyb5a, Acaa1b 
+	   Cyp2c54, Mup19, Slco1b2, Cyp2c37, Fcho2, Rgn, Cyp2c29, Cyp2e1, Mup1, Cyp2c40 
+	   Cyp2c50, Mgst1, Mup17, Ank2, Dlec1, Sord, Gsta3, Cyp2a5, Cyp2c67, Ces2c 
+Negative:  Alb, Gls2, Pigr, Hpx, Pck1, Hsd17b13, Hal, Cyp2f2, Aldob, Ccdc152 
+	   Hsd11b1, Fbp1, Uox, mt-Cytb, Orm1, Rida, Ass1, Arg1, Amdhd1, Gstp2 
+	   Serpina12, Selenop, Etnppl, Uroc1, Slc25a47, Apoc2, Gstp1, Ctsc, Gldc, Slc38a3 
+PC_ 2 
+Positive:  Gsn, Col3a1, Dpt, Mgp, Gas6, Col1a1, Fmo2, S100a6, Fbln5, Col1a2 
+	   Timp2, S100a11, Col6a3, Vim, Eln, Prss23, Anxa5, Gm9844, Spp1, Fmod 
+	   Crip1, Cavin1, Timp3, Tmsb10, Bgn, Igfbp3, Gpx3, Adamts2, Ogn, Mfap4 
+Negative:  Hamp, Ces1e, Fgl1, Wfdc21, Mup11, Igfbp2, Scd1, Cps1, Cyp2c70, Sult2a8 
+	   Ces1c, Rdh16f2, Serpina1e, Apcs, Lifr, Enho, Ces1b, Fcna, Ces1d, Hsd3b5 
+	   Paqr9, Mup16, Cd5l, 1810008I18Rik, C9, Fga, Cela1, Otc, Ces1g, Ppp1r3b 
+PC_ 3 
+Positive:  Aldh1b1, Dct, Ugt2b38, Slc1a2, Mup20, Slc13a3, Rhbg, Glul, Cd36, Fabp4 
+	   Sds, Gm35696, Hcrtr2, Cryl1, Sult1a1, Aqp4, Cyp2a4, Cib3, Jam2, Mup4 
+	   Serpina7, Hsd17b6, Cyp4v3, Gm13773, Lpl, Ptgds, Obp2a, Rcan2, Sp5, Mmd2 
+Negative:  Scd1, Hamp, Igfbp2, Cyp2c70, Ces1e, Fgl1, Enho, Lifr, Fabp5, Wfdc21 
+	   Ces1c, Ccnd1, Ces1d, Rdh16f2, Sult2a8, Cdo1, Serpina1e, Cps1, Paqr9, Apcs 
+	   Ces1b, Ces1g, Lyz2, Gm29966, S100a6, Slc17a8, Mup11, Sult1d1, Mpeg1, Upp2 
+PC_ 4 
+Positive:  Igfbp5, Slpi, Upk3b, Ap4e1, Msln, Rbbp8, Igfbp6, Myl7, Gpm6a, Aebp1 
+	   Rspo1, Fmod, Cldn15, S100a6, Col1a1, Camk1d, Gsn, Ogn, Timp2, Cpe 
+	   Prss23, Cav1, Filip1l, Col3a1, Smoc2, Efemp1, Gpx3, Synpr, Col1a2, Htra1 
+Negative:  Ifit3, Tgtp1, Tgtp2, Gbp6, Ifit1, Cmpk2, Rsad2, Isg15, Ifit3b, Igtp 
+	   Ifi47, Cxcl9, Oasl1, Usp18, Gbp10, Stat1, Cxcl10, Rnf213, Iigp1, Gbp7 
+	   Ifit2, Irgm1, Ccl5, Gbp3, Saa2, Samhd1, Gm4841, Ifi205, Calhm6, Gbp9 
+PC_ 5 
+Positive:  Igfbp5, Upk3b, Ap4e1, Slpi, Msln, Igfbp6, Myl7, Rbbp8, Rspo1, Synpr 
+	   Cldn15, Filip1l, Camk1d, Gpm6a, D130009I18Rik, Bst1, Efemp1, Spock2, Adamts12, Aebp1 
+	   Prph, Cyp2s1, Upk1b, Nbl1, S100a6, Ezr, Cpe, Gm8094, Crip1, Chst4 
+Negative:  Cdc20, Ccnb1, Spp1, Myo7a, Tspan2, Gm26713, Ccl21a, Ccnd1, Birc5, Mgp 
+	   Cdk1, Ube2c, ccdc198, Tshz2, Hmmr, Cilp, Ckap2, Gm21541, Kcne3, Spc25 
+	   Tnfrsf8, Cdca3, Gm13304, Mki67, Ccnb2, Ect2, Gm20619, Tspan8, 4930546C10Rik, Prom1 
+Warning: The default method for RunUMAP has changed from calling Python UMAP via reticulate to the R-native UWOT using the cosine metric
+To use Python UMAP via reticulate, set umap.method to 'umap-learn' and metric to 'correlation'
+This message will be shown once per session
+06:54:03 UMAP embedding parameters a = 0.9922 b = 1.112
+06:54:03 Read 2001 rows and found 30 numeric columns
+06:54:03 Using Annoy for neighbor search, n_neighbors = 30
+06:54:03 Building Annoy index with metric = cosine, n_trees = 50
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+06:54:03 Writing NN index file to temp file /data/tmp/167889/RtmpTXALUF/file647a94a3cc73e
+06:54:03 Searching Annoy index using 1 thread, search_k = 3000
+06:54:04 Annoy recall = 100%
+06:54:04 Commencing smooth kNN distance calibration using 1 thread with target n_neighbors = 30
+06:54:04 Initializing from normalized Laplacian + noise (using irlba)
+06:54:04 Commencing optimization for 500 epochs, with 91064 positive edges
+Using method 'umap'
+0%   10   20   30   40   50   60   70   80   90   100%
+[----|----|----|----|----|----|----|----|----|----|
+**************************************************|
+06:54:07 Optimization finished
+[1] "ProcessingTime: 18.795seconds"
+2025-07-19 06:54:17:	done.
+2025-07-19 06:54:17:	Elaseped time: 1228s
+
+2025-07-19 06:54:17:	perl /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/RmdReport -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/scripts/BMK_S3000/config_exp100.txt -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport -c S3000
+2025-07-19 06:54:17:	Start Time :[2025-07-19 06:54:17]
+2025-07-19 06:54:17:	cp /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/r_markdown_report/* /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/
+2025-07-19 06:54:17:	done.
+2025-07-19 06:54:17:	Elaseped time: 0s
+
+2025-07-19 06:54:17:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/01.fastq2BcUmi/exp100_28Feb2025.qual.stat /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/Qual.stat
+2025-07-19 06:54:17:	done.
+2025-07-19 06:54:17:	Elaseped time: 0s
+
+2025-07-19 06:54:17:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/02.Umi2Gene/exp100_28Feb2025.total.stat /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/Map.stat
+2025-07-19 06:54:17:	done.
+2025-07-19 06:54:17:	Elaseped time: 0s
+
+2025-07-19 06:54:17:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/03.LinkBcChip/exp100_28Feb2025.chip_type /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/chip_type.info
+2025-07-19 06:54:17:	done.
+2025-07-19 06:54:17:	Elaseped time: 0s
+
+2025-07-19 06:54:17:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/stat.txt /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/Spot.stat
+2025-07-19 06:54:17:	done.
+2025-07-19 06:54:17:	Elaseped time: 0s
+
+2025-07-19 06:54:17:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/all_level_stat.txt /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/all_level_stat.txt
+2025-07-19 06:54:17:	done.
+2025-07-19 06:54:17:	Elaseped time: 0s
+
+2025-07-19 06:54:17:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/exp100_28Feb2025.sequencing_saturation.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/sequencing_saturation.png
+2025-07-19 06:54:17:	done.
+2025-07-19 06:54:17:	Elaseped time: 0s
+
+2025-07-19 06:54:17:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/04.MatrixMake/exp100_28Feb2025.sequencing_saturation.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/src/images/sequencing_saturation.png
+2025-07-19 06:54:17:	done.
+2025-07-19 06:54:17:	Elaseped time: 0s
+
+2025-07-19 06:54:17:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/he_roi_small.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/
+2025-07-19 06:54:17:	done.
+2025-07-19 06:54:17:	Elaseped time: 0s
+
+2025-07-19 06:54:17:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/allhe/he_roi_small.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/src/images/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 1s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/umi_plot/roi_umi_count_small.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/umi_plot/roi_umi_count_small.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/src/images/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/umi_plot/roi_umi_count_white_small.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/umi_plot/roi_umi_count_white_small.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/src/images/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/umi_plot/all_umi_count_small.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/05.AllheStat/umi_plot/all_umi_count_small.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/src/images/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L18/L18_umap_clstr.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L18/L18_umap_clstr.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/src/images/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L18/L18_umap_clstr_wt.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L18/L18_umap_clstr_wt.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/src/images/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L9/L9_umap_clstr.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L9/L9_umap_clstr.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/src/images/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L9/L9_umap_clstr_wt.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L9/L9_umap_clstr_wt.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/src/images/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L7/L7_umap_clstr.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L7/L7_umap_clstr.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/src/images/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L7/L7_umap_clstr_wt.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L7/L7_umap_clstr_wt.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/src/images/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L5/L5_umap_clstr.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L5/L5_umap_clstr.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/src/images/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L5/L5_umap_clstr_wt.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cp /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/06.Cluster/L5/L5_umap_clstr_wt.png /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/src/images/
+2025-07-19 06:54:18:	done.
+2025-07-19 06:54:18:	Elaseped time: 0s
+
+2025-07-19 06:54:18:	cd /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/ &&  Rscript -e "rmarkdown::render(input = 'report_V2.S3000.Rmd',output_file = 'exp100_28Feb2025.html',encoding='UTF-8')" && mv /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp/exp100_28Feb2025.html /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/ && rm -r /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/Rmdtmp
+
+
+
+processing file: report_V2.S3000.Rmd
+1/23                   
+2/23 [setup]           
+3/23                   
+4/23 [unnamed-chunk-1] 
+5/23                   
+6/23 [unnamed-chunk-2] 
+7/23                   
+8/23 [unnamed-chunk-3] 
+9/23                   
+10/23 [unnamed-chunk-4] 
+11/23                   
+12/23 [unnamed-chunk-5] 
+13/23                   
+14/23 [unnamed-chunk-6] 
+15/23                   
+16/23 [unnamed-chunk-7] 
+17/23                   
+18/23 [unnamed-chunk-8] 
+19/23                   
+20/23 [unnamed-chunk-9] 
+21/23                   
+22/23 [unnamed-chunk-10]
+23/23                   
+output file: report_V2.S3000.knit.md
+
+/home/VIB.LOCAL/julien.mortier/.conda/envs/BSTMAtrix_env/bin/pandoc +RTS -K512m -RTS report_V2.S3000.knit.md --to html4 --from markdown+autolink_bare_uris+tex_math_single_backslash --output exp100_28Feb2025.html --lua-filter /home/VIB.LOCAL/julien.mortier/.conda/envs/BSTMAtrix_env/lib/R/library/rmarkdown/rmarkdown/lua/pagebreak.lua --lua-filter /home/VIB.LOCAL/julien.mortier/.conda/envs/BSTMAtrix_env/lib/R/library/rmarkdown/rmarkdown/lua/latex-div.lua --embed-resources --standalone --variable bs3=TRUE --section-divs --template /home/VIB.LOCAL/julien.mortier/.conda/envs/BSTMAtrix_env/lib/R/library/rmarkdown/rmd/h/default.html --no-highlight --variable highlightjs=1 --variable theme=paper --css index.css --mathjax --variable 'mathjax-url=https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML' --include-in-header /data/tmp/167889/Rtmp0pzTHn/rmarkdown-str64eff37d5153e.html --include-in-header extLogo.html 
+
+Output created: exp100_28Feb2025.html
+2025-07-19 06:54:26:	done.
+2025-07-19 06:54:26:	Elaseped time: 8s
+
+2025-07-19 06:54:26:	End Time :[2025-07-19 06:54:26]
+2025-07-19 06:54:26:	done.
+2025-07-19 06:54:26:	Elaseped time: 9s
+
+2025-07-19 06:54:26:	perl /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/tools/collect_stat_result_v1.3.pl /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/exp100_28Feb2025.filelist /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/exp100_28Feb2025.stat.xls
+2025-07-19 06:54:26:	done.
+2025-07-19 06:54:26:	Elaseped time: 0s
+
+2025-07-19 06:54:26:	perl /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/tools/collect_rs_stat_result.pl /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/scripts/BMK_S3000/config_exp100.txt /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/08.WebReport/exp100_28Feb2025.rs_stat.xls
+2025-07-19 06:54:26:	done.
+2025-07-19 06:54:26:	Elaseped time: 0s
+
+2025-07-19 06:54:26:	cp /home/VIB.LOCAL/julien.mortier/BMK_software/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/BSTMatrix_v2.4.f.2_English/result.txt /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix/readme.txt
+2025-07-19 06:54:26:	done.
+2025-07-19 06:54:26:	Elaseped time: 0s
+
+2025-07-19 06:54:26:	End Time :[2025-07-19 06:54:26]

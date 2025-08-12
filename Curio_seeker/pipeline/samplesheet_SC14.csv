@@ -1,0 +1,2 @@
+sample,experiment_date,barcode_file,fastq_1,fastq_2,genome
+SC14,2025-08-11,/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_056_BeadBarcodes.txt,/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/sequencing/SC14_R1.fastq.gz,/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/sequencing/SC14_R2.fastq.gz,refdata-gex-GRCh38-2020-A
