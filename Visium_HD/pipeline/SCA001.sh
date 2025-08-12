@@ -1,0 +1,20 @@
+#!/bin/bash
+#SBATCH --job-name=SCA001
+#SBATCH --partition=gp_64C_128T_512GB
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=4
+#SBATCH --mem=256G
+#SBATCH --time=48:00:00
+
+spaceranger count --id=SCA001 \
+    --transcriptome=/data/projects/s00/spaceranger/references/refdata-gex-mm10-2020-A \
+    --probe-set=/home/VIB.LOCAL/julien.mortier/spaceranger/spaceranger-3.1.2/probe_sets/Visium_Mouse_Transcriptome_Probe_Set_v2.0_mm10-2020-A.csv \
+    --fastqs=/data/projects/s00/2024-07-UTBenchmark-SpC/data/raw/Visium_HD/1/FASTQ/0-0-Exp4799-POOL_SCC071,/data/projects/s00/2024-07-UTBenchmark-SpC/data/raw/Visium_HD/1/FASTQ/0-0-Exp4823-POOL_SCC076 \
+    --sample=SCA001_GEX \
+    --cytaimage=/data/projects/s00/2024-07-UTBenchmark-SpC/data/raw/Visium_HD/1/IMAGES/SCA001_CytAssist.tif \
+    --image=/data/projects/s00/2024-07-UTBenchmark-SpC/data/raw/Visium_HD/1/IMAGES/SCA001_HE_hires.tif \
+    --slide=H1-626BR2Z \
+    --area=D1 \
+    --create-bam=true \
+    --output-dir=/data/projects/s00/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA001 \
+    --custom-bin-size=32

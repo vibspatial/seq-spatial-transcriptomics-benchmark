@@ -1,0 +1,51 @@
+## Input sequencing data. Supports .gz format. 
+FQ1	/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/BMK_S3000/sequencing/4941_02_Exp100_SC57_SPC_004_R1.fastq.gz
+FQ2	/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/BMK_S3000/sequencing/4941_02_Exp100_SC57_SPC_004_R2.fastq.gz
+
+## Fluorescence decoding file.
+FLU	/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/BMK_S3000/barcode_decoding_files/20241023-DH14DN10F2-A2-20X-V2AB-final_signal.txt
+
+## AllheStat.py & CellSplit, Tissue recognition and cell segmentation
+# H&E image path, and whether to recognise the blank region in the image. 0 is no, and 1 is yes. Default is 0.
+HE	/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BMChiper/exp100/img_dist.tif
+
+#INSIDE	1
+
+#GRAY	200
+
+#Cell segmentation analysis
+
+CellSplit	False
+
+fluorescence	/path/to/fluorescence.tiff
+
+fluorescence_channl	   0 
+
+#FLGRAY	15
+
+#cells_npy	/path/to/cells/npyfile
+
+#YAML	/path/to/cell_split/parameter/file
+
+## Ref genome 
+#GenomeVer	refdata-gex-mm10-2020-A
+INDEX	/data/groups/technologies/spatial.catalyst/Julien/BMK_references/mouse/refdata-gex-mm10-2020-A/star_BSTMatrix
+GFF	/data/groups/technologies/spatial.catalyst/Julien/BMK_references/mouse/refdata-gex-mm10-2020-A/genes/genes.gtf
+FEATURE	/data/groups/technologies/spatial.catalyst/Julien/BMK_references/mouse/refdata-gex-mm10-2020-A/genes/features.tsv
+
+## Output    
+OUTDIR	/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/BSTMAtrix
+PREFIX	exp100_28Feb2025
+
+### Local parameters
+## fastq2BcUmi    barcode version (usually v2) and thread number
+BCType	V2
+BCThreads	24
+
+## Umi2Gene       SART alignment setting (note：too high number of threads used during alignemnt may cause errors during generation of bam files)
+Sjdboverhang	100
+STARThreads	    8
+
+## ENV      path of python and Rscript. If not provided, the system default path will be used. Please add a “#” at the beginning of the lines if not set.
+#PYTHON	/path/to/python/dir/
+#Rscript	/path/to/Rscript/dir/
