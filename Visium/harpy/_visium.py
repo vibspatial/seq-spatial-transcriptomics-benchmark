@@ -6,6 +6,7 @@ import geopandas as gpd
 import pandas as pd
 from spatialdata import SpatialData, read_zarr
 from spatialdata.models import TableModel
+from spatialdata.transformations import get_transformation, remove_transformation, set_transformation
 from spatialdata_io._constants._constants import VisiumKeys
 from spatialdata_io.readers.visium import visium as sdata_visium
 
@@ -92,8 +93,14 @@ def visium(
 
         radius = sdata.shapes[dataset_id]["radius"].mean()
         polygons = sdata.shapes[dataset_id].buffer(radius, cap_style="round")
+        transformations = get_transformation(sdata.shapes[dataset_id], get_all=True)
+        
         sdata = hp.sh.add_shapes_layer(
-            sdata, gpd.GeoDataFrame(geometry=polygons), output_layer=dataset_id, overwrite=True
+            sdata, 
+            gpd.GeoDataFrame(geometry=polygons), 
+            output_layer=dataset_id, 
+            transformations = transformations,
+            overwrite=True
         )
 
         # Create labels layer
