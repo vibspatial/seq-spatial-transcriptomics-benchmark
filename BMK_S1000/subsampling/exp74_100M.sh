@@ -28,7 +28,7 @@ seqtk sample -s$SEED "$INPUT_FILE_R1" $TARGET_READS | gzip > "${OUT_DIR}/${SAMPL
 seqtk sample -s$SEED "$INPUT_FILE_R2" $TARGET_READS | gzip > "${OUT_DIR}/${SAMPLE_NAME}_R2_subsampled.fastq.gz"
 
 # Run BSTMAtrix
-CONFIG=/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/scripts/BMK_S1000/subsampling/config_${EXP}_100M.txt
+CONFIG=/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/scripts/BMK_S1000/subsampling/config_${SAMPLE_NAME}_100M.txt
 echo "Running BSTMatrix..."
 /home/VIB.LOCAL/julien.mortier/BMK_software/S1000_pipeline2/BSTMatrix_v2.3.r_English_new/BSTMatrix -c ${CONFIG} -s 0
 
