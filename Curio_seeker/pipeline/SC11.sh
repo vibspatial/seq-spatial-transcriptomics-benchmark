@@ -3,8 +3,8 @@
 #SBATCH --partition=gp_64C_128T_512GB
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=80
-#SBATCH --mem=75G
-#SBATCH --time=2:00:00
+#SBATCH --mem=256G
+#SBATCH --time=6:00:00
 
 module load Nextflow/22.10.1
 
