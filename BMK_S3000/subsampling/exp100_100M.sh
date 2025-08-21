@@ -4,7 +4,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
 #SBATCH --mem=256G
-#SBATCH --time=48:00:00
+#SBATCH --time=18:00:00
 
 # Load modules
 module load seqtk
