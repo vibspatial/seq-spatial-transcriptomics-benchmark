@@ -18,7 +18,9 @@ from spatialdata.transformations import get_transformation, remove_transformatio
 import harpy as hp
 from harpy.utils._keys import _INSTANCE_KEY, _REGION_KEY
 
-#TODO: Add support for reading in fluorescence image, segmentation, ...
+# TODO: Add support for reading in fluorescence image, segmentation, ...
+# TODO: Spot sizes are not the actual size they should be in micrometer
+# TODO: Match barcode names for all levels
 
 def bmkmanu(
     path: str | Path,
@@ -27,6 +29,7 @@ def bmkmanu(
     add_in_tissue_column: bool = True,
     levels: list[int] | None = None,
     technology: str | None = None,
+    bc_path: str | Path | None = None,
     output: str | Path | None = None,
 ) -> SpatialData:
     """
@@ -49,8 +52,12 @@ def bmkmanu(
         Path to the registered H&E image from BMChiper.
     technology
         Specifies whether BMKGENE S1000 or S3000 was used. Should be set to either 'S1000' or 'S3000'.
+    bc_path
+        Path to .bc file for level 1 (L1) outputted by BSTMAtrix level_bc2bc.pl script. This maps the level names from the data stored in 05.AllheStat/BSTViewer_project/subdata 
+        and 05.AllheStat/BSTViewer_project/level_matrix to the barcode names in the config_prefix folder. This allows us to remove hypothetical spots for level 1 that are not actually 
+        present on the capture slide. If None, hypothetical spots will be kept in.
     output
-        The path where the resulting `SpatialData` object will be backed.
+        The path where the resulting `SpatialData` object will be backed. If None, it will not be backed to a zarr store.
     
     """
     
@@ -103,9 +110,10 @@ def bmkmanu(
             he_width,
             he_height,
             technology,
-            add_in_tissue_column
+            add_in_tissue_column,
+            bc_path,
         )
-
+        
     if output is not None:
         sdata.write(output)
         sdata = read_zarr(sdata.path)
@@ -151,7 +159,7 @@ def _calculate_radius(coordinates, width, height, subset_size=1000):
     radius = (min_distance / 2) * 0.98
     return radius
 
-def _add_BMK_level(sdata, dataset_id, level, level_name, level_path, width, height, technology, add_in_tissue_column):
+def _add_BMK_level(sdata, dataset_id, level, level_name, level_path, width, height, technology, add_in_tissue_column, bc_path):
     # Calculate scaling factor
     scaling_factor = _calculate_scaling_factor(width, height, technology)
 
@@ -175,6 +183,20 @@ def _add_BMK_level(sdata, dataset_id, level, level_name, level_path, width, heig
     barcodes_read = pd.read_csv(barcodes_read_path, compression='gzip', sep='\t', names=["barcode", "read_counts"], header=None).set_index("barcode")
     adata.obs = adata.obs.join(barcodes_read, how="left")
     adata.obs["read_counts"] = adata.obs["read_counts"].fillna(0).astype(int)
+    
+    # Remove hypothetical spots for level 1, if bc_path is given
+    if level == 1 and bc_path is not None:
+        bc = pd.read_csv(bc_path, sep='\t', names=['barcode_name', 'barcode'], header=None)
+
+        adata.obs.index = adata.obs.index.astype(str)
+        bc['barcode'] = bc['barcode'].astype(str)
+
+        valid_barcodes = adata.obs.index.intersection(bc['barcode'])
+        adata = adata[valid_barcodes].copy()
+
+        bc = bc.set_index('barcode')
+        adata.obs['barcode_name'] = adata.obs.index.map(bc['barcode_name'])
+
         
     # Add region key and change indexes
     adata.obs[_REGION_KEY] = f"{dataset_id}_{level_name}_labels"
@@ -183,8 +205,9 @@ def _add_BMK_level(sdata, dataset_id, level, level_name, level_path, width, heig
     adata.obs.index.name = 'cells'
     
     # Add shapes and labels layer based on coordinates
+    coordinates = adata.obsm["spatial"]
     radius = _calculate_radius(coordinates, width, height)
-    radii = np.full(len(adata.obsm['spatial']), radius)
+    radii = np.full(len(coordinates), radius)
     spots = ShapesModel.parse(coordinates, geometry=0, radius=radii)
     spots.index = adata.obs.index
     polygons = spots.buffer(radius, cap_style="round")
