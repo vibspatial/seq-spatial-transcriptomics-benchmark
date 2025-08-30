@@ -80,14 +80,7 @@ lowerfun <- function(data, mapping) {
     geom_point(color = "#AC94C0", size = 0.3, alpha = 0.6, na.rm = TRUE) +
     scale_x_continuous(limits = c(1, 50000)) +
     scale_y_continuous(limits = c(1, 50000)) +
-    geom_smooth(
-      method = "loess",
-      formula = y ~ x,
-      se = FALSE, 
-      color = "red",
-      linetype = "dashed",
-      linewidth = 0.6
-    ) + geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black", linewidth=0.6) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black", linewidth=0.6) +
     theme_bw() +
     theme(panel.grid = element_blank(),
           text = element_text(color = "black", size = 6),
@@ -140,14 +133,6 @@ diagfun_log <- function(data, mapping) {
 lowerfun_log <- function(data, mapping) {
   ggplot(data = data, mapping = mapping) +
     geom_point(color = "#AC94C0", size = 0.3, alpha = 0.6, na.rm = TRUE) +
-    geom_smooth(
-      method = "loess",
-      formula = y ~ x,
-      se = FALSE, 
-      color = "red",
-      linetype = "dashed",
-      linewidth = 0.6
-    ) +
     scale_x_log10(limits = c(1, 50000)) +
     scale_y_log10(limits = c(1, 50000)) +
     geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black", linewidth=0.6) +
