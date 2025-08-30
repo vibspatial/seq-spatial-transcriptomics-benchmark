@@ -16,9 +16,9 @@ library(ggpubr)
 # Read data ---------------------------------------------------------------
 tissue <- 'mouse_lung'
 
-#df_Visium <- read.csv2("E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA013/subsampled_100M/harpy/gene_total_counts.csv", header = TRUE, sep=',') %>%
-#  select(c(total_counts_corrected, gene)) %>%
-#  rename(Visium = total_counts_corrected)
+df_Visium <- read.csv2("E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA013/subsampled_100M/harpy/gene_total_counts.csv", header = TRUE, sep=',') %>%
+  select(c(total_counts_corrected, gene)) %>%
+  rename(Visium = total_counts_corrected)
 
 df_VisiumHD_FFPE <- read.csv2("E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA001/subsampled_100M/harpy/gene_total_counts.csv", header = TRUE, sep=',') %>%
   select(c(total_counts_corrected, gene)) %>%
@@ -37,7 +37,7 @@ df_Curioseeker <- read.csv2("E:/2024-07-UTBenchmark-SpC/data/processed/Curio_see
   rename(Curio_Seeker = total_counts_corrected)
 
 columns = c(
-#  "Visium",
+  "Visium",
   "Visium_HD_FFPE", 
   "Visium_HD_FF", 
   "BMKMANU_S3000", 
@@ -45,7 +45,7 @@ columns = c(
 )
 
 # Combine genes -----------------------------------------------------------
-genes <- rbind(#select(df_Visium, gene),
+genes <- rbind(select(df_Visium, gene),
                select(df_VisiumHD_FFPE, gene),
                select(df_VisiumHD_FF, gene),
                select(df_S3000, gene),
@@ -54,7 +54,7 @@ genes <- unique(genes)
 
 # Append data -------------------------------------------------------------
 correlation <- genes %>%
-#  left_join(df_Visium, by = "gene") %>%
+  left_join(df_Visium, by = "gene") %>%
   left_join(df_VisiumHD_FFPE, by = "gene") %>%
   left_join(df_VisiumHD_FF, by = "gene") %>%
   left_join(df_S3000, by = "gene") %>%
@@ -79,14 +79,7 @@ lowerfun <- function(data, mapping) {
     geom_point(color = "#AC94C0", size = 0.3, alpha = 0.6, na.rm = TRUE) +
     scale_x_continuous(limits = c(1, 50000)) +
     scale_y_continuous(limits = c(1, 50000)) +
-    geom_smooth(
-      method = "loess",
-      formula = y ~ x,
-      se = FALSE, 
-      color = "red",
-      linetype = "dashed",
-      linewidth = 0.6
-    ) + geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black", linewidth=0.6) +
+    geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black", linewidth=0.6) +
     theme_bw() +
     theme(panel.grid = element_blank(),
           text = element_text(color = "black", size = 6),
@@ -139,14 +132,6 @@ diagfun_log <- function(data, mapping) {
 lowerfun_log <- function(data, mapping) {
   ggplot(data = data, mapping = mapping) +
     geom_point(color = "#AC94C0", size = 0.3, alpha = 0.6, na.rm = TRUE) +
-    geom_smooth(
-      method = "loess",
-      formula = y ~ x,
-      se = FALSE, 
-      color = "red",
-      linetype = "dashed",
-      linewidth = 0.6
-    ) +
     scale_x_log10(limits = c(1, 50000)) +
     scale_y_log10(limits = c(1, 50000)) +
     geom_abline(slope = 1, intercept = 0, linetype = "dashed", color = "black", linewidth=0.6) +
