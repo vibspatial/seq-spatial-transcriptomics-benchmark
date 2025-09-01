@@ -4,25 +4,40 @@ import numpy as np
 import random
 import os
 from collections import Counter
+import argparse
 
 # User inputs
-bam_path = "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA013/SpaceRanger/outs/possorted_genome_bam.bam"
-all_barcodes_path = "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA013/harpy/all_barcodes.txt"
-tissue_barcodes_path = "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA013/harpy/barcodes_in_tissue.txt"
-probe_set_path = "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA013/SpaceRanger/outs/probe_set.csv"
-tissue_area_mm2 = 15.46
-step_size = 10_000_000  # 10M read increments per subsample
-output_folder = "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA013/bam_output"
+parser = argparse.ArgumentParser(description="BAM metrics calculation")
+parser.add_argument("--bam_path", required=True, help="Path to BAM file")
+parser.add_argument("--all_barcodes_path", required=True, help="Path to all_barcodes.txt")
+parser.add_argument("--tissue_barcodes_path", required=True, help="Path to tissue_barcodes.txt")
+parser.add_argument("--probe_set_path", required=True, help="Path to probe_set.csv")
+parser.add_argument("--output_path", required=True, help="Output folder for metrics")
+parser.add_argument("--tissue_area_mm2", type=float, required=True, help="Tissue area in mm^2")
+parser.add_argument("--step_size", type=int, default=10_000_000, help="Step size for subsampling reads")
+parser.add_argument("--testing", action='store_true', help="Enable testing mode with smaller BAM")
+
+args = parser.parse_args()
+
+bam_path = args.bam_path
+all_barcodes_path = args.all_barcodes_path
+tissue_barcodes_path = args.tissue_barcodes_path
+probe_set_path = args.probe_set_path
+output_path = args.output_path
+tissue_area_mm2 = args.tissue_area_mm2
+step_size = args.step_size
+testing = args.testing
+
 random.seed(42)
 
 # Create output folders
-os.makedirs(output_folder, exist_ok=True)
-os.makedirs(os.path.join(output_folder, "gene_counts_per_subsample"), exist_ok=True)
+os.makedirs(output_path, exist_ok=True)
+os.makedirs(os.path.join(output_path, "gene_counts_per_subsample"), exist_ok=True)
 
 # Subsample BAM to a smaller size for testing
-testing = True
+testing = testing
 if testing:
-    bam_out = f"{output_folder}/bam_small.bam"
+    bam_out = f"{output_path}/bam_small.bam"
     num_reads = 1_000_000
     step_size = 200_000
     
@@ -184,7 +199,7 @@ for n in subsample_levels:
         {"gene": g, "total_counts": c, "total_counts_corrected": c / tissue_area_mm2}
         for g, c in gene_counts.items()
     ])
-    gene_df.to_csv(os.path.join(output_folder, f"gene_counts_per_subsample/gene_counts_{n}.csv"), index=False)
+    gene_df.to_csv(os.path.join(output_path, f"gene_counts_per_subsample/gene_counts_{n}.csv"), index=False)
     
     # Median & mean UMIs per gene
     median_umis_per_gene = np.median(list(gene_counts.values())) if gene_counts else 0
@@ -225,5 +240,5 @@ for n in subsample_levels:
     rows.append(row)
 
 df = pd.DataFrame(rows)
-df.to_csv(os.path.join(output_folder, "subsample_metrics.csv"), index=False)
-print("Metrics saved to ", os.path.join(output_folder, "subsample_metrics.csv"))
+df.to_csv(os.path.join(output_path, "bam_metrics.csv"), index=False)
+print("Metrics saved to ", os.path.join(output_path, "bam_metrics.csv"))
