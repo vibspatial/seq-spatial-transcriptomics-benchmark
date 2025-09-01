@@ -47,7 +47,7 @@ if testing:
                 if i >= num_reads:
                     break
                 out.write(read)
-    print(f"Written {num_reads} reads to {bam_out}")
+    print(f"Written {num_reads} reads to {bam_out}", flush=True)
     
     bam_path = bam_out
 
@@ -64,10 +64,10 @@ probe_set_df = pd.read_csv(probe_set_path, comment='#')
 included_genes = set(probe_set_df[probe_set_df['included'] == True]['gene_id'])
 
 # Count total reads
-print("Counting total reads...")
+print("Counting total reads...", flush=True)
 with pysam.AlignmentFile(bam_path, "rb") as bam:
     total_reads = sum(1 for _ in bam)
-print(f"Total reads: {total_reads:,}")
+print(f"Total reads: {total_reads:,}", flush=True)
 
 # Define subsample levels
 subsample_levels = list(range(0, total_reads, step_size))
@@ -105,14 +105,14 @@ metrics = {
         "umi_counts_tissue": []
     }
     for n in subsample_levels
-} # TODO: Add mapping metrics
+}
 
 # Get metrics from BAM
-print("Processing BAM...")
+print("Processing BAM...", flush=True)
 with pysam.AlignmentFile(bam_path, "rb") as bam:
     for i, read in enumerate(bam):
         if i % 5_000_000 == 0 and i > 0:
-            print(f"Processed {i:,} reads...")
+            print(f"Processed {i:,} reads...", flush=True)
 
         r = random.random()  # assign random number to this read
 
@@ -194,17 +194,46 @@ for n in subsample_levels:
     def safe_div(a, b): return a / b if b > 0 else 0
     
     # Per-gene UMIs in tissue
-    gene_counts = m["tissue"]["gene_counts"]
-    gene_df = pd.DataFrame([
-        {"gene": g, "total_counts": c, "total_counts_corrected": c / tissue_area_mm2}
-        for g, c in gene_counts.items()
-    ])
-    gene_df.to_csv(os.path.join(output_path, f"gene_counts_per_subsample/gene_counts_{n}.csv"), index=False)
-    
-    # Median & mean UMIs per gene
-    median_umis_per_gene = np.median(list(gene_counts.values())) if gene_counts else 0
-    mean_umis_per_gene = np.mean(list(gene_counts.values())) if gene_counts else 0
+    total_gene_counts = m["tissue"]["gene_counts"]
+    unique_gene_counts = Counter([g for (_, _, g) in m["tissue"]["unique_umis"]])
 
+    gene_df = pd.DataFrame([
+        {
+            "gene": g,
+            "total_counts": total_gene_counts.get(g, 0),
+            "unique_counts": unique_gene_counts.get(g, 0),
+            "total_counts_corrected": total_gene_counts.get(g, 0) / tissue_area_mm2,
+            "unique_counts_corrected": unique_gene_counts.get(g, 0) / tissue_area_mm2
+        }
+        for g in sorted(set(total_gene_counts.keys()) | set(unique_gene_counts.keys()))
+    ])
+
+    gene_df.to_csv(os.path.join(output_path, f"gene_counts_per_subsample/gene_counts_{n}.csv"), index=False)
+
+    # Median & Mean UMIs per gene
+    median_umis_per_gene = np.median(list(total_gene_counts.values())) if total_gene_counts else 0
+    mean_umis_per_gene = np.mean(list(total_gene_counts.values())) if total_gene_counts else 0
+
+    median_unique_umis_per_gene = np.median(list(unique_gene_counts.values())) if unique_gene_counts else 0
+    mean_unique_umis_per_gene = np.mean(list(unique_gene_counts.values())) if unique_gene_counts else 0
+
+    # Median reads per unique UMI
+    reads_per_unique_umi = Counter()
+    for (barcode, umi, gene) in m["unique_umis"]:
+        reads_per_unique_umi[(barcode, umi, gene)] = sum(
+            1 for u in m["umi_counts"] if u == umi
+        )
+
+    reads_per_unique_umi_tissue = Counter()
+    for (barcode, umi, gene) in m["tissue"]["unique_umis"]:
+        reads_per_unique_umi_tissue[(barcode, umi, gene)] = sum(
+            1 for u in m["umi_counts_tissue"] if u == umi
+        )
+
+    median_reads_per_unique_umi = np.median(list(reads_per_unique_umi.values())) if reads_per_unique_umi else 0
+    median_reads_per_unique_umi_in_tissue = np.median(list(reads_per_unique_umi_tissue.values())) if reads_per_unique_umi_tissue else 0
+
+    # Create dataframe
     row = {
         "Q30_bases_read": (safe_div(m["q30_read_bases"], m["q30_read_total"])) * 100,
         "Q30_bases_spatial_barcode": (safe_div(m["q30_barcode_bases"], m["q30_barcode_total"])) * 100,
@@ -225,20 +254,24 @@ for n in subsample_levels:
         "number_of_unique_UMIs_in_tissue": tissue_unique_umis,
         "percentage_of_genes_in_tissue": (safe_div(len(m["tissue"]["genes"]), len(m["genes"]))) * 100,
         "percentage_of_unique_UMIs_in_tissue": (safe_div(tissue_unique_umis, unique_umis)) * 100,
-        "sequencing_saturation_reads": (1 - safe_div(unique_umis, total_umis)) * 100,
-        "sequencing_saturation_umis": (1 - safe_div(unique_umis, m["total_reads"])) * 100,
+        "sequencing_saturation_reads": (1 - safe_div(unique_umis, m["total_reads"])) * 100,
+        "sequencing_saturation_umis": (1 - safe_div(unique_umis, total_umis)) * 100,
         "unique_UMIs_per_mm2_in_tissue": (safe_div(tissue_unique_umis, tissue_area_mm2)) * 100,
         "median_UMIs_per_gene": median_umis_per_gene,
         "median_UMIs_per_gene_per_mm2": safe_div(median_umis_per_gene, tissue_area_mm2),
+        "median_unique_UMIs_per_gene": median_unique_umis_per_gene,
+        "median_unique_UMIs_per_gene_per_mm2": safe_div(median_unique_umis_per_gene, tissue_area_mm2),
         "mean_UMIs_per_gene": mean_umis_per_gene,
         "mean_UMIs_per_gene_per_mm2": safe_div(mean_umis_per_gene, tissue_area_mm2),
+        "mean_unique_UMIs_per_gene": mean_unique_umis_per_gene,
+        "mean_unique_UMIs_per_gene_per_mm2": safe_div(mean_unique_umis_per_gene, tissue_area_mm2),
         "percentage_of_reads_with_usable_UMI": (safe_div(total_umis, m["total_reads"])) * 100,
         "ratio_reads_per_unique_UMI": safe_div(m["total_reads"], unique_umis),
-        "median_reads_per_UMI": np.median(list(Counter(m["umi_counts"]).values())) if Counter(m["umi_counts"]) else 0,
-        "median_reads_per_UMI_in_tissue": np.median(list(Counter(m["umi_counts_tissue"]).values())) if Counter(m["umi_counts_tissue"]) else 0
+        "median_reads_per_unique_UMI": median_reads_per_unique_umi,
+        "median_reads_per_unique_UMI_in_tissue": median_reads_per_unique_umi_in_tissue
     }
     rows.append(row)
 
 df = pd.DataFrame(rows)
 df.to_csv(os.path.join(output_path, "bam_metrics.csv"), index=False)
-print("Metrics saved to ", os.path.join(output_path, "bam_metrics.csv"))
+print("Metrics saved to ", os.path.join(output_path, "bam_metrics.csv"), flush=True)
