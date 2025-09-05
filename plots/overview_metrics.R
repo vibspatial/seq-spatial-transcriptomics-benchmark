@@ -1,5 +1,5 @@
 # Working directory -------------------------------------------------------
-setwd("E:/2024-07-UTBenchmark-SpC/data/processed/plots/overview_metrics")
+setwd("E:/2024-07-UTBenchmark-SpC")
 
 # Import libraries --------------------------------------------------------
 library(readr)
@@ -10,7 +10,8 @@ library(scales)
 
 # Read data ---------------------------------------------------------------
 df <- read.csv("E:/2024-07-UTBenchmark-SpC/data/processed/plots/overview_metrics/Overview.csv", header = TRUE, sep=',') %>%
-  filter(Sample != "Mouse_colon")
+  filter(Sample != "Mouse_colon") %>%
+  filter(Technology != "BMKMANU_S1000")
 
 # Exclude 'Sample' and 'Technology' columns
 cols_to_plot <- setdiff(names(df), c("Sample", "Technology"))
@@ -71,7 +72,8 @@ make_bar_plot <- function(df, ycol) {
       plot.margin = margin(10, 20, 10, 10)
     ) +
     labs(title = ycol, y = NULL, x = NULL, fill = "Technology") +
-    scale_fill_manual(values = tech_colors)
+    scale_fill_manual(values = tech_colors) +
+    guides(fill = guide_legend(reverse = TRUE))
   
   p <- p + scale_y_continuous(
     breaks = if (percentage) seq(0, 101, by = 10) else pretty_breaks(n = 8),

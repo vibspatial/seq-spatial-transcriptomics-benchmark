@@ -3,8 +3,12 @@
 #SBATCH --partition=gp_64C_128T_512GB
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --mem=256G
-#SBATCH --time=24:00:00
+#SBATCH --mem=500G
+#SBATCH --time=48:00:00
+
+ml SAMtools
+source ~/.bashrc
+conda activate bamtools
 
 BAM_PATH="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA002/SpaceRanger/outs/possorted_genome_bam.bam"
 ALL_BARCODES_PATH="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA002/harpy/all_barcodes.txt"

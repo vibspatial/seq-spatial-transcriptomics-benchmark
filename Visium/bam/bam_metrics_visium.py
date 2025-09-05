@@ -5,6 +5,11 @@ import random
 import os
 from collections import Counter
 import argparse
+import subprocess
+import gc
+import glob
+import pyarrow.parquet as pq
+import pyarrow as pa
 
 # User inputs
 parser = argparse.ArgumentParser(description="BAM metrics calculation")
@@ -33,9 +38,9 @@ random.seed(42)
 # Create output folders
 os.makedirs(output_path, exist_ok=True)
 os.makedirs(os.path.join(output_path, "gene_counts_per_subsample"), exist_ok=True)
+os.makedirs(os.path.join(output_path, "batches_tmp"), exist_ok=True)
 
 # Subsample BAM to a smaller size for testing
-testing = testing
 if testing:
     bam_out = f"{output_path}/bam_small.bam"
     num_reads = 1_000_000
@@ -65,24 +70,22 @@ included_genes = set(probe_set_df[probe_set_df['included'] == True]['gene_id'])
 
 # Count total reads
 print("Counting total reads...", flush=True)
-with pysam.AlignmentFile(bam_path, "rb") as bam:
-    total_reads = sum(1 for _ in bam)
+total_reads = int(subprocess.check_output(["samtools", "view", "-c", bam_path]))
 print(f"Total reads: {total_reads:,}", flush=True)
 
 # Define subsample levels
-subsample_levels = list(range(0, total_reads, step_size))
+subsample_levels = list(range(step_size, total_reads, step_size))
 if subsample_levels[-1] != total_reads:
     subsample_levels.append(total_reads)
-fractions = {n: n / total_reads for n in subsample_levels if n > 0}
+fractions = {n: n / total_reads for n in subsample_levels}
 
 # Initialize metrics
+all_umis = []
+batch_index = 0
+
 metrics = {
     n: {
         "total_reads": 0,
-        "total_umis": 0,
-        "unique_umis": set(),
-        "genes": set(),
-        "barcodes": set(),
         "q30_read_bases": 0,
         "q30_read_total": 0,
         "q30_barcode_bases": 0,
@@ -94,15 +97,6 @@ metrics = {
         "reads_confident_filtered": 0,
         "reads_half_mapped": 0,
         "reads_split_mapped": 0,
-        "tissue": {
-            "umis": 0,
-            "unique_umis": set(),
-            "genes": set(),
-            "barcodes": set(),
-            "gene_counts": {}
-        },
-        "umi_counts": [],
-        "umi_counts_tissue": []
     }
     for n in subsample_levels
 }
@@ -111,13 +105,34 @@ metrics = {
 print("Processing BAM...", flush=True)
 with pysam.AlignmentFile(bam_path, "rb") as bam:
     for i, read in enumerate(bam):
+        # Assign random number to this read
+        r = random.random()  
+                    
+        # Get UMI (if applicable)
+        mapq = read.mapping_quality
+        if mapq == 255 and read.has_tag("CB") and read.has_tag("UB") and read.has_tag("GN"):
+            if read.has_tag("GX") and read.get_tag("GX") in included_genes:
+                barcode = read.get_tag("CB")
+                umi = read.get_tag("UB")
+                gene = read.get_tag("GN")
+                min_subsample = next((n for n in subsample_levels if r <= fractions[n]), subsample_levels[-1])
+
+                all_umis.append((barcode, umi, gene, min_subsample))
+        
+        # Save to disk every 5 million reads
         if i % 5_000_000 == 0 and i > 0:
             print(f"Processed {i:,} reads...", flush=True)
-
-        r = random.random()  # assign random number to this read
-
+            gc_return = gc.collect()
+            
+            df = pd.DataFrame(all_umis, columns=["barcode", "umi", "gene", "min_subsample"])
+            df.to_parquet(os.path.join(output_path, "batches_tmp", f"batch_{batch_index}.parquet"), index=False, compression="snappy")
+            print(f"Saved batch {batch_index} ({len(all_umis)} UMIs)", flush=True)
+            batch_index += 1
+            all_umis = []
+                
+        # Get per-read metrics
         for n in subsample_levels:
-            if n == 0 or r > fractions.get(n, 1):
+            if r > fractions.get(n, 1):
                 continue
 
             m = metrics[n]
@@ -131,107 +146,114 @@ with pysam.AlignmentFile(bam_path, "rb") as bam:
                 m["q30_read_total"] += sum(q > 2 for q in read.query_qualities)
 
             if read.has_tag("CY"):
-                q_barcode = read.get_tag("CY")
-                q_barcode_scores = [ord(c) - 33 for c in q_barcode]
+                q_barcode_scores = [ord(c) - 33 for c in read.get_tag("CY")]
                 m["q30_barcode_bases"] += sum(q >= 30 for q in q_barcode_scores if q > 2)
                 m["q30_barcode_total"] += sum(q > 2 for q in q_barcode_scores)
 
             if read.has_tag("UY"):
-                q_umi = read.get_tag("UY")
-                q_umi_scores = [ord(c) - 33 for c in q_umi]
+                q_umi_scores = [ord(c) - 33 for c in read.get_tag("UY")]
                 m["q30_umi_bases"] += sum(q >= 30 for q in q_umi_scores if q > 2)
                 m["q30_umi_total"] += sum(q > 2 for q in q_umi_scores)
 
-                
-            # Mapping quality metrics   
-            UMI_count = False 
-            mapq = read.mapping_quality 
+            # Mapping quality metrics    
             if mapq > 0:
                 m["reads_mapped"] += 1
             if mapq == 255:
                 m["reads_confident"] += 1
                 if read.has_tag("GX") and read.get_tag("GX") in included_genes:
                     m["reads_confident_filtered"] += 1
-                    UMI_count = True
             if mapq == 1:
                 m["reads_half_mapped"] += 1
             if mapq == 3:
                 m["reads_split_mapped"] += 1
-                
-            # Barcodes, UMIs, Genes
-            if UMI_count and read.has_tag("CB") and read.has_tag("UB") and read.has_tag("GN"):
-                barcode = read.get_tag("CB")
-                umi = read.get_tag("UB")
-                gene = read.get_tag("GN")
+            
+# Save remaining UMIs
+if all_umis:
+    print(f"Processed {total_reads} reads...", flush=True)
+    df = pd.DataFrame(all_umis, columns=["barcode", "umi", "gene", "min_subsample"])
+    df.to_parquet(os.path.join(output_path, "batches_tmp", f"batch_{batch_index}.parquet"), index=False, compression="snappy")
+    print(f"Saved batch {batch_index} ({len(all_umis)} UMIs)", flush=True)
 
-                m["total_umis"] += 1
-                m["unique_umis"].add((barcode, umi, gene))
-                m["genes"].add(gene)
-                m["barcodes"].add(barcode)
-
-                # Count per-UMI reads
-                m["umi_counts"].append(umi)
-
-                # Tissue-specific metrics
-                if barcode in tissue_barcodes:
-                    m["tissue"]["umis"] += 1
-                    m["tissue"]["unique_umis"].add((barcode, umi, gene))
-                    m["tissue"]["genes"].add(gene)
-                    m["tissue"]["barcodes"].add(barcode)
-                    m["umi_counts_tissue"].append(umi)
-                    m["tissue"]["gene_counts"][gene] = m["tissue"]["gene_counts"].get(gene, 0) + 1
+# Get all batch files
+batch_files = glob.glob(os.path.join(output_path, "batches_tmp", "*.parquet"))
 
 # Compute final metrics
 rows = []
-for n in subsample_levels:
+
+def safe_div(a, b): return a / b if b > 0 else 0
+
+for i, n in enumerate(subsample_levels):
+    gc_return = gc.collect()
+    
+    print(f"Computing metrics for subsample {i+1}/{len(subsample_levels)}.", flush=True)
     m = metrics[n]
-
-    total_umis = m["total_umis"]
-    unique_umis = len(m["unique_umis"])
-    tissue_umis = m["tissue"]["umis"]
-    tissue_unique_umis = len(m["tissue"]["unique_umis"])
-
-    def safe_div(a, b): return a / b if b > 0 else 0
+    
+    # Subsample UMIs
+    unique_umis_n = Counter()
+    
+    for f in batch_files:
+        table = pq.read_table(f, columns=["barcode", "umi", "gene", "min_subsample"])
+        filtered_table = table.filter(pa.compute.less_equal(table["min_subsample"], n))
+        for b, u, g in zip(filtered_table["barcode"].to_pylist(),
+                            filtered_table["umi"].to_pylist(),
+                            filtered_table["gene"].to_pylist()):
+            unique_umis_n[(b,u,g)] += 1
+        
+    # Count UMIs
+    total_umis = sum(unique_umis_n.values())
+    unique_umis = len(unique_umis_n)
+    
+    tissue_unique_umis_n = Counter()
+    for (barcode, umi, gene), count in unique_umis_n.items():
+        if barcode in tissue_barcodes:
+            tissue_unique_umis_n[(barcode, umi, gene)] = count
+            
+    tissue_unique_umis = len(tissue_unique_umis_n)
     
     # Per-gene UMIs in tissue
-    total_gene_counts = m["tissue"]["gene_counts"]
-    unique_gene_counts = Counter([g for (_, _, g) in m["tissue"]["unique_umis"]])
+    gene_counts = Counter()
+    tissue_gene_counts = Counter()
+    unique_gene_counts = Counter()
+    unique_gene_counts_tissue = Counter()
+
+    for (barcode, umi, gene), count in unique_umis_n.items():
+        gene_counts[gene] += count
+        unique_gene_counts[gene] += 1
+        if barcode in tissue_barcodes:
+            tissue_gene_counts[gene] += count
+            unique_gene_counts_tissue[gene] += 1
+    
+    all_genes = sorted(
+        set(gene_counts.keys()) |
+        set(tissue_gene_counts.keys()) |
+        set(unique_gene_counts.keys()) |
+        set(unique_gene_counts_tissue.keys()))
 
     gene_df = pd.DataFrame([
         {
             "gene": g,
-            "total_counts": total_gene_counts.get(g, 0),
+            "total_counts": gene_counts.get(g, 0),
+            "total_counts_in_tissue": tissue_gene_counts.get(g, 0),
             "unique_counts": unique_gene_counts.get(g, 0),
-            "total_counts_corrected": total_gene_counts.get(g, 0) / tissue_area_mm2,
-            "unique_counts_corrected": unique_gene_counts.get(g, 0) / tissue_area_mm2
+            "unique_counts_in_tissue": unique_gene_counts_tissue.get(g, 0),
+            "total_counts_corrected": safe_div(gene_counts.get(g, 0), tissue_area_mm2),
+            "total_counts_in_tissue_corrected": safe_div(tissue_gene_counts.get(g, 0), tissue_area_mm2),
+            "unique_counts_corrected": safe_div(unique_gene_counts.get(g, 0), tissue_area_mm2),
+            "unique_counts_in_tissue_corrected": safe_div(unique_gene_counts_tissue.get(g, 0), tissue_area_mm2)
         }
-        for g in sorted(set(total_gene_counts.keys()) | set(unique_gene_counts.keys()))
+        for g in all_genes
     ])
-
     gene_df.to_csv(os.path.join(output_path, f"gene_counts_per_subsample/gene_counts_{n}.csv"), index=False)
 
-    # Median & Mean UMIs per gene
-    median_umis_per_gene = np.median(list(total_gene_counts.values())) if total_gene_counts else 0
-    mean_umis_per_gene = np.mean(list(total_gene_counts.values())) if total_gene_counts else 0
-
+    # Median UMIs per gene
+    median_umis_per_gene = np.median(list(gene_counts.values())) if gene_counts else 0
+    median_tissue_umis_per_gene = np.median(list(tissue_gene_counts.values())) if tissue_gene_counts else 0
     median_unique_umis_per_gene = np.median(list(unique_gene_counts.values())) if unique_gene_counts else 0
-    mean_unique_umis_per_gene = np.mean(list(unique_gene_counts.values())) if unique_gene_counts else 0
+    median_unique_umis_per_gene_tissue = np.median(list(unique_gene_counts_tissue.values())) if unique_gene_counts_tissue else 0
 
     # Median reads per unique UMI
-    reads_per_unique_umi = Counter()
-    for (barcode, umi, gene) in m["unique_umis"]:
-        reads_per_unique_umi[(barcode, umi, gene)] = sum(
-            1 for u in m["umi_counts"] if u == umi
-        )
-
-    reads_per_unique_umi_tissue = Counter()
-    for (barcode, umi, gene) in m["tissue"]["unique_umis"]:
-        reads_per_unique_umi_tissue[(barcode, umi, gene)] = sum(
-            1 for u in m["umi_counts_tissue"] if u == umi
-        )
-
-    median_reads_per_unique_umi = np.median(list(reads_per_unique_umi.values())) if reads_per_unique_umi else 0
-    median_reads_per_unique_umi_in_tissue = np.median(list(reads_per_unique_umi_tissue.values())) if reads_per_unique_umi_tissue else 0
+    median_reads_per_unique_umi = np.median(list(unique_umis_n.values())) if unique_umis else 0
+    median_reads_per_unique_umi_tissue = np.median(list(tissue_unique_umis_n.values())) if tissue_unique_umis_n else 0
 
     # Create dataframe
     row = {
@@ -243,32 +265,30 @@ for n in subsample_levels:
         "reads_mapped_confidently_to_filtered": (safe_div(m["reads_confident_filtered"], m["total_reads"])) * 100,
         "reads_half_mapped": (safe_div(m["reads_half_mapped"], m["total_reads"])) * 100,
         "reads_split_mapped": (safe_div(m["reads_split_mapped"], m["total_reads"])) * 100,
-        "number_of_spots_with_at_least_1_UMI_in_tissue": len({b for b,_,_ in m["tissue"]["unique_umis"]}),
-        "percentage_spots_recovered": (safe_div(len(m["tissue"]["barcodes"]), len(tissue_barcodes))) * 100,
+        "number_of_spots_with_at_least_1_UMI_in_tissue": len({b for b, _, _ in tissue_unique_umis_n}),
+        "percentage_spots_recovered": safe_div(len({b for b, _, _ in tissue_unique_umis_n}), len(tissue_barcodes)) * 100,
         "total_number_of_reads": m["total_reads"],
         "total_number_of_reads_target": n,
-        "total_number_of_genes": len(m["genes"]),
+        "total_number_of_genes": len(gene_counts),
         "total_number_of_UMIs": total_umis,
         "total_number_of_unique_UMIs": unique_umis,
-        "number_of_genes_in_tissue": len(m["tissue"]["genes"]),
+        "number_of_genes_in_tissue": len(tissue_gene_counts),
         "number_of_unique_UMIs_in_tissue": tissue_unique_umis,
-        "percentage_of_genes_in_tissue": (safe_div(len(m["tissue"]["genes"]), len(m["genes"]))) * 100,
-        "percentage_of_unique_UMIs_in_tissue": (safe_div(tissue_unique_umis, unique_umis)) * 100,
-        "sequencing_saturation_reads": (1 - safe_div(unique_umis, m["total_reads"])) * 100,
-        "sequencing_saturation_umis": (1 - safe_div(unique_umis, total_umis)) * 100,
-        "unique_UMIs_per_mm2_in_tissue": (safe_div(tissue_unique_umis, tissue_area_mm2)) * 100,
+        "percentage_of_genes_in_tissue": safe_div(len(tissue_gene_counts), len(gene_counts)) * 100 if gene_counts else 0,
+        "percentage_of_unique_UMIs_in_tissue": safe_div(tissue_unique_umis, unique_umis) * 100 if unique_umis else 0,
+        "sequencing_saturation_reads": (1 - safe_div(unique_umis, m["total_reads"])) * 100 if m["total_reads"] > 0 else 0,
+        "sequencing_saturation_umis": (1 - safe_div(unique_umis, total_umis)) * 100 if total_umis > 0 else 0,
+        "unique_UMIs_per_mm2_in_tissue": safe_div(tissue_unique_umis, tissue_area_mm2),
         "median_UMIs_per_gene": median_umis_per_gene,
         "median_UMIs_per_gene_per_mm2": safe_div(median_umis_per_gene, tissue_area_mm2),
         "median_unique_UMIs_per_gene": median_unique_umis_per_gene,
         "median_unique_UMIs_per_gene_per_mm2": safe_div(median_unique_umis_per_gene, tissue_area_mm2),
-        "mean_UMIs_per_gene": mean_umis_per_gene,
-        "mean_UMIs_per_gene_per_mm2": safe_div(mean_umis_per_gene, tissue_area_mm2),
-        "mean_unique_UMIs_per_gene": mean_unique_umis_per_gene,
-        "mean_unique_UMIs_per_gene_per_mm2": safe_div(mean_unique_umis_per_gene, tissue_area_mm2),
+        "median_unique_UMIs_per_gene_in_tissue": median_unique_umis_per_gene_tissue,
+        "median_unique_UMIs_per_gene_in_tissue_per_mm2": safe_div(median_unique_umis_per_gene_tissue, tissue_area_mm2),
         "percentage_of_reads_with_usable_UMI": (safe_div(total_umis, m["total_reads"])) * 100,
         "ratio_reads_per_unique_UMI": safe_div(m["total_reads"], unique_umis),
         "median_reads_per_unique_UMI": median_reads_per_unique_umi,
-        "median_reads_per_unique_UMI_in_tissue": median_reads_per_unique_umi_in_tissue
+        "median_reads_per_unique_UMI_in_tissue": median_reads_per_unique_umi_tissue
     }
     rows.append(row)
 
