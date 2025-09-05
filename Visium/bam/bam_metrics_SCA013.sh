@@ -6,6 +6,10 @@
 #SBATCH --mem=256G
 #SBATCH --time=12:00:00
 
+ml SAMtools
+source ~/.bashrc
+conda activate bamtools
+
 BAM_PATH="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA013/SpaceRanger/outs/possorted_genome_bam.bam"
 ALL_BARCODES_PATH="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA013/harpy/all_barcodes.txt"
 TISSUE_BARCODES_PATH="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA013/harpy/barcodes_in_tissue.txt"
