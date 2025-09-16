@@ -23,4 +23,6 @@ nextflow run ${CURIO_SEEKER}/main.nf \
         -work-dir ${OUTPUT_DIR}/work/ \
         --igenomes_base ${GENOMES_DIR} \
         -resume \
-        -profile singularity
+        -profile singularity \
+        --clean_work false
+        

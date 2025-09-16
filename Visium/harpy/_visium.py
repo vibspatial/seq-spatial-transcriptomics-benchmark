@@ -38,7 +38,7 @@ def visium(
         Unique identifier of the dataset. If `None`, it tries to infer it from the file name of the feature slice file.
     counts_file
         Name of the counts file, defaults to `'filtered_feature_bc_matrix.h5'`; a common alternative is
-        `'raw_feature_bc_matrix.h5'`.
+        `'raw_feature_bc_matrix.h5'`, but `raw_probe_bc_matrix.h5` also works.
     fullres_image_file
         Path to the full-resolution image.
     output
