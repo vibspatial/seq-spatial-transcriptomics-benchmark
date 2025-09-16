@@ -10,6 +10,8 @@ from spatialdata.transformations import set_transformation, get_transformation, 
 
 from harpy.utils._keys import _INSTANCE_KEY, _REGION_KEY
 
+# TODO: Add suport for raw_probe_bc_matrix.h5 in spatialdata-io. Only possible for bin size 2. 
+# Ideally, we could just add this to the sdata and can have both datasets.
 
 def visium_hd(
     path: str | Path,

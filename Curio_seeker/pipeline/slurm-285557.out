@@ -1,0 +1,791 @@
+N E X T F L O W  ~  version 22.10.1
+Launching `/data/groups/technologies/spatial.catalyst/Julien/curioseeker/curioseeker-v3.0.0/main.nf` [elated_hamilton] DSL2 - revision: c952ee194b
+
+WARN: Found unexpected parameters:
+* --star_ignore_sjdbgtf: false
+* --supply_sjdb_gtf_file: true
+* --build_star_index: false
+* --site_yml_file: /data/groups/technologies/spatial.catalyst/Julien/curioseeker/curioseeker-v3.0.0/bin/_site.yml
+* --style_css_file: /data/groups/technologies/spatial.catalyst/Julien/curioseeker/curioseeker-v3.0.0/bin/style.css
+* --rep_file_ext: /data/groups/technologies/spatial.catalyst/Julien/curioseeker/curioseeker-v3.0.0/bin/htmlrender_extended.Rmd
+* --rep_file: /data/groups/technologies/spatial.catalyst/Julien/curioseeker/curioseeker-v3.0.0/bin/htmlrender.Rmd
+- Ignore this warning: params.schema_ignore_params = "star_ignore_sjdbgtf,supply_sjdb_gtf_file,build_star_index,site_yml_file,style_css_file,rep_file_ext,rep_file" 
+
+
+
+------------------------------------------------------
+                                        ,--./,-.
+        ___     __   __   __   ___     /,-._.--~'
+  |\ | |__  __ /  ` /  \ |__) |__         }  {
+  | \| |       \__, \__/ |  \ |___     \`-._,-`-,
+                                        `._,._,'
+  nf-core/curioseeker v3.0.0
+------------------------------------------------------
+Core Nextflow options
+  runName                 : elated_hamilton
+  containerEngine         : singularity
+  launchDir               : /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/scripts/Curio_seeker/pipeline
+  workDir                 : /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work
+  projectDir              : /data/groups/technologies/spatial.catalyst/Julien/curioseeker/curioseeker-v3.0.0
+  userName                : julien.mortier
+  profile                 : singularity
+  configFiles             : /data/groups/technologies/spatial.catalyst/Julien/curioseeker/curioseeker-v3.0.0/nextflow.config
+
+Input/output options
+  input                   : /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/scripts/Curio_seeker/pipeline/samplesheet_SC11.csv
+  outdir                  : /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/results/
+
+Curio Seeker Parameter Options
+  barcode_chunk_size      : 100000
+
+Curio Seeker Pipeline Source Options
+  curio_seeker_singularity: file:////data/groups/technologies/spatial.catalyst/Julien/curioseeker/curioseeker-v3.0.0/.singularity/curio-seeker-singularity-v3.0.0.sif
+  curio_seeker_docker     : docker.io/curiobioinformatics/curio-seeker-pipeline:v3.0.0
+
+Reference genome options
+  igenomes_base           : /data/groups/technologies/spatial.catalyst/Julien/curioseeker_references
+
+Cleanup Temporary Working Files
+  run_file_cleanup        : false
+
+AWS Omics Variables
+  omics_results_dir       : null
+
+Generic options
+  validate_params         : true
+
+Other parameters
+  supply_sjdb_gtf_file    : true
+
+!! Only displaying parameters that differ from the pipeline defaults !!
+------------------------------------------------------
+If you use nf-core/curioseeker for your analysis please cite:
+
+* The nf-core framework
+  https://doi.org/10.1038/s41587-020-0439-x
+
+* Software dependencies
+  https://github.com/nf-core/curioseeker/blob/master/CITATIONS.md
+------------------------------------------------------
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+[ READ2_INPUTS ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], [/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/sequencing/SC11_R2.fastq.gz, /data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, /data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex]]
+
+
+[ SECONDARY_INPUTS ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], [/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, /data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes]]
+
+
+[ READ1_INPUTS ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], [/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/sequencing/SC11_R1.fastq.gz, /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt]]
+
+Pulling Singularity image docker://quay.io/biocontainers/star:2.6.1d--0 [cache /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/singularity/quay.io-biocontainers-star-2.6.1d--0.img]
+WARN: Singularity cache directory has not been defined -- Remote image will be stored in the path: /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/singularity -- Use env variable NXF_SINGULARITY_CACHEDIR to specify a different location
+
+executor >  local (1)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+[ READ2_INPUTS ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], [/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/sequencing/SC11_R2.fastq.gz, /data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, /data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex]]
+
+
+[ SECONDARY_INPUTS ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], [/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, /data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes]]
+
+
+[ READ1_INPUTS ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], [/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/sequencing/SC11_R1.fastq.gz, /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt]]
+
+Pulling Singularity image docker://quay.io/biocontainers/star:2.6.1d--0 [cache /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/singularity/quay.io-biocontainers-star-2.6.1d--0.img]
+WARN: Singularity cache directory has not been defined -- Remote image will be stored in the path: /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/singularity -- Use env variable NXF_SINGULARITY_CACHEDIR to specify a different location
+
+executor >  local (2)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+[ READ2_INPUTS ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], [/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/sequencing/SC11_R2.fastq.gz, /data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, /data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex]]
+
+
+[ SECONDARY_INPUTS ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], [/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, /data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes]]
+
+
+[ READ1_INPUTS ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], [/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/sequencing/SC11_R1.fastq.gz, /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt]]
+
+Pulling Singularity image docker://quay.io/biocontainers/star:2.6.1d--0 [cache /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/singularity/quay.io-biocontainers-star-2.6.1d--0.img]
+WARN: Singularity cache directory has not been defined -- Remote image will be stored in the path: /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/singularity -- Use env variable NXF_SINGULARITY_CACHEDIR to specify a different location
+
+executor >  local (2)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+[ READ2_INPUTS ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], [/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/sequencing/SC11_R2.fastq.gz, /data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, /data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex]]
+
+
+[ SECONDARY_INPUTS ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], [/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, /data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes]]
+
+
+[ READ1_INPUTS ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], [/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/sequencing/SC11_R1.fastq.gz, /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt]]
+
+Pulling Singularity image docker://quay.io/biocontainers/star:2.6.1d--0 [cache /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/singularity/quay.io-biocontainers-star-2.6.1d--0.img]
+WARN: Singularity cache directory has not been defined -- Remote image will be stored in the path: /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/singularity -- Use env variable NXF_SINGULARITY_CACHEDIR to specify a different location
+
+executor >  local (3)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+[ BARCODE_MATCHING_INPUT ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/b1/16e9d39dd1401b77e48af7359e8cd2/SC11-r1-cellular-barcodes-top-bb, /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/b1/16e9d39dd1401b77e48af7359e8cd2/SC11-r1-unique-cellular-barcodes, /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt]
+
+
+
+
+
+
+
+
+
+
+
+
+
+executor >  local (3)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+[ BARCODE_MATCHING_INPUT ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/b1/16e9d39dd1401b77e48af7359e8cd2/SC11-r1-cellular-barcodes-top-bb, /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/b1/16e9d39dd1401b77e48af7359e8cd2/SC11-r1-unique-cellular-barcodes, /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt]
+
+
+
+
+
+
+
+
+
+
+
+
+
+executor >  local (3)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+[ FEATURE_COUNTS_INPUT ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], [/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/44/095bbf1a6393adef16ba813870e1dc/SC11.SortedByCoordinate.bam, /data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf]]
+
+Pulling Singularity image https://depot.galaxyproject.org/singularity/subread:2.0.1--hed695b0_0 [cache /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/singularity/depot.galaxyproject.org-singularity-subread-2.0.1--hed695b0_0.img]
+
+
+
+WARN: Singularity cache directory has not been defined -- Remote image will be stored in the path: /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/singularity -- Use env variable NXF_SINGULARITY_CACHEDIR to specify a different location
+
+executor >  local (4)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+[ FEATURE_COUNTS_INPUT ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], [/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/44/095bbf1a6393adef16ba813870e1dc/SC11.SortedByCoordinate.bam, /data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf]]
+
+Pulling Singularity image https://depot.galaxyproject.org/singularity/subread:2.0.1--hed695b0_0 [cache /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/singularity/depot.galaxyproject.org-singularity-subread-2.0.1--hed695b0_0.img]
+WARN: Singularity cache directory has not been defined -- Remote image will be stored in the path: /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/singularity -- Use env variable NXF_SINGULARITY_CACHEDIR to specify a different location
+
+
+
+
+executor >  local (4)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+
+
+
+
+
+executor >  local (4)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+Pulling Singularity image https://depot.galaxyproject.org/singularity/samtools:1.15.1--h1170115_0 [cache /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/singularity/depot.galaxyproject.org-singularity-samtools-1.15.1--h1170115_0.img]
+WARN: Singularity cache directory has not been defined -- Remote image will be stored in the path: /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/singularity -- Use env variable NXF_SINGULARITY_CACHEDIR to specify a different location
+
+
+
+
+executor >  local (5)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+Pulling Singularity image https://depot.galaxyproject.org/singularity/samtools:1.15.1--h1170115_0 [cache /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/singularity/depot.galaxyproject.org-singularity-samtools-1.15.1--h1170115_0.img]
+WARN: Singularity cache directory has not been defined -- Remote image will be stored in the path: /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/singularity -- Use env variable NXF_SINGULARITY_CACHEDIR to specify a different location
+
+executor >  local (6)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+
+
+executor >  local (6)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+
+
+executor >  local (7)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+executor >  local (8)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_READ... -
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[d3/19d9ab] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+executor >  local (9)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[ee/0bf099] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[d3/19d9ab] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+[ READ1_DB ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/2c/2531df86bdd8c0aa112df56e5cedee/SC11-r1-db]
+
+
+executor >  local (9)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[ee/0bf099] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[d3/19d9ab] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+[ READ1_DB ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/2c/2531df86bdd8c0aa112df56e5cedee/SC11-r1-db]
+
+
+executor >  local (9)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[ee/0bf099] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[d3/19d9ab] process > NF:CURIOSEEKER:PRIMARY_READ... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+[ READ1_DB ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/2c/2531df86bdd8c0aa112df56e5cedee/SC11-r1-db]
+
+
+executor >  local (10)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[ee/0bf099] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[d3/19d9ab] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[da/204e59] process > NF:CURIOSEEKER:PRIMARY_JOIN... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+[ READ2_DB ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/d3/19d9ab9ed2f61118a2148e5790b4dd/SC11-r2-db]
+
+
+
+
+
+executor >  local (10)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[ee/0bf099] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[d3/19d9ab] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[da/204e59] process > NF:CURIOSEEKER:PRIMARY_JOIN... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:PRIMARY_JOIN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:RE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+[ READ2_DB ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/d3/19d9ab9ed2f61118a2148e5790b4dd/SC11-r2-db]
+
+
+
+
+
+executor >  local (12)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[ee/0bf099] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[d3/19d9ab] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[da/204e59] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[c6/d23248] process > NF:CURIOSEEKER:PRIMARY_JOIN... [  0%] 0 of 1
+[b6/8127de] process > NF:CURIOSEEKER:SECONDARY:RE... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+
+
+
+executor >  local (12)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[ee/0bf099] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[d3/19d9ab] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[da/204e59] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[c6/d23248] process > NF:CURIOSEEKER:PRIMARY_JOIN... [  0%] 0 of 1
+[b6/8127de] process > NF:CURIOSEEKER:SECONDARY:RE... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+
+
+
+executor >  local (12)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[ee/0bf099] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[d3/19d9ab] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[da/204e59] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[c6/d23248] process > NF:CURIOSEEKER:PRIMARY_JOIN... [  0%] 0 of 1
+[b6/8127de] process > NF:CURIOSEEKER:SECONDARY:RE... [100%] 1 of 1 ✔
+[-        ] process > NF:CURIOSEEKER:SECONDARY:FO... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+executor >  local (13)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[ee/0bf099] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[d3/19d9ab] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[da/204e59] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[c6/d23248] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[b6/8127de] process > NF:CURIOSEEKER:SECONDARY:RE... [100%] 1 of 1 ✔
+[ea/915c72] process > NF:CURIOSEEKER:SECONDARY:FO... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:SECONDARY:AN... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+[ COUNTS: FORMAT_CLEANUP_INPUT ]: [[id:SC11, sample:SC11, experiment_date:2025-08-13, barcode_file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, single_end:false, genome:refdata-gex-mm10-2020-A, gtf:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes/genes.gtf, star_index:/data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Sequence/STARIndex/, report:b], [/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Curio_seeker/barcode_decoding_files/A0080_051_BeadBarcodes.txt, /data/groups/technologies/spatial.catalyst/Julien/curioseeker_references/Mus_musculus/Ensembl/refdata-gex-mm10-2020-A/Annotation/Genes, /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/c6/d23248007218ded27276d2bdcc1f36/SC11-wide-cell-counts, /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/curioseeker/work/b6/8127de4bf7c70b7db44d2c041c7886/SC11.numReads_perBM]]
+
+
+executor >  local (15)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[ee/0bf099] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[d3/19d9ab] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[da/204e59] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[c6/d23248] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[b6/8127de] process > NF:CURIOSEEKER:SECONDARY:RE... [100%] 1 of 1 ✔
+[ea/915c72] process > NF:CURIOSEEKER:SECONDARY:FO... [100%] 1 of 1 ✔
+[e6/86fe8a] process > NF:CURIOSEEKER:SECONDARY:AN... [  0%] 0 of 1
+[58/0ae36c] process > NF:CURIOSEEKER:SECONDARY:GE... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+
+
+
+executor >  local (15)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[ee/0bf099] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[d3/19d9ab] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[da/204e59] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[c6/d23248] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[b6/8127de] process > NF:CURIOSEEKER:SECONDARY:RE... [100%] 1 of 1 ✔
+[ea/915c72] process > NF:CURIOSEEKER:SECONDARY:FO... [100%] 1 of 1 ✔
+[e6/86fe8a] process > NF:CURIOSEEKER:SECONDARY:AN... [  0%] 0 of 1
+[58/0ae36c] process > NF:CURIOSEEKER:SECONDARY:GE... [  0%] 0 of 1
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+
+
+
+executor >  local (15)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[ee/0bf099] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[d3/19d9ab] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[da/204e59] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[c6/d23248] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[b6/8127de] process > NF:CURIOSEEKER:SECONDARY:RE... [100%] 1 of 1 ✔
+[ea/915c72] process > NF:CURIOSEEKER:SECONDARY:FO... [100%] 1 of 1 ✔
+[e6/86fe8a] process > NF:CURIOSEEKER:SECONDARY:AN... [  0%] 0 of 1
+[58/0ae36c] process > NF:CURIOSEEKER:SECONDARY:GE... [100%] 1 of 1 ✔
+[-        ] process > NF:CURIOSEEKER:SECONDARY:GE... -
+
+executor >  local (16)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[ee/0bf099] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[d3/19d9ab] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[da/204e59] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[c6/d23248] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[b6/8127de] process > NF:CURIOSEEKER:SECONDARY:RE... [100%] 1 of 1 ✔
+[ea/915c72] process > NF:CURIOSEEKER:SECONDARY:FO... [100%] 1 of 1 ✔
+[e6/86fe8a] process > NF:CURIOSEEKER:SECONDARY:AN... [100%] 1 of 1 ✔
+[58/0ae36c] process > NF:CURIOSEEKER:SECONDARY:GE... [100%] 1 of 1 ✔
+[b7/d834b7] process > NF:CURIOSEEKER:SECONDARY:GE... [  0%] 0 of 1
+
+executor >  local (16)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[ee/0bf099] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[d3/19d9ab] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[da/204e59] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[c6/d23248] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[b6/8127de] process > NF:CURIOSEEKER:SECONDARY:RE... [100%] 1 of 1 ✔
+[ea/915c72] process > NF:CURIOSEEKER:SECONDARY:FO... [100%] 1 of 1 ✔
+[e6/86fe8a] process > NF:CURIOSEEKER:SECONDARY:AN... [100%] 1 of 1 ✔
+[58/0ae36c] process > NF:CURIOSEEKER:SECONDARY:GE... [100%] 1 of 1 ✔
+[b7/d834b7] process > NF:CURIOSEEKER:SECONDARY:GE... [  0%] 0 of 1
+
+executor >  local (16)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[ee/0bf099] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[d3/19d9ab] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[da/204e59] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[c6/d23248] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[b6/8127de] process > NF:CURIOSEEKER:SECONDARY:RE... [100%] 1 of 1 ✔
+[ea/915c72] process > NF:CURIOSEEKER:SECONDARY:FO... [100%] 1 of 1 ✔
+[e6/86fe8a] process > NF:CURIOSEEKER:SECONDARY:AN... [100%] 1 of 1 ✔
+[58/0ae36c] process > NF:CURIOSEEKER:SECONDARY:GE... [100%] 1 of 1 ✔
+[b7/d834b7] process > NF:CURIOSEEKER:SECONDARY:GE... [100%] 1 of 1 ✔
+-[nf-core/curioseeker] Pipeline completed successfully-
+
+executor >  local (16)
+[b1/16e9d3] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[e0/f17092] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[2c/2531df] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[ee/0bf099] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[44/095bbf] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[6f/26432d] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[3a/6ba718] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[5f/7cc694] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[d3/19d9ab] process > NF:CURIOSEEKER:PRIMARY_READ... [100%] 1 of 1 ✔
+[da/204e59] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[c6/d23248] process > NF:CURIOSEEKER:PRIMARY_JOIN... [100%] 1 of 1 ✔
+[b6/8127de] process > NF:CURIOSEEKER:SECONDARY:RE... [100%] 1 of 1 ✔
+[ea/915c72] process > NF:CURIOSEEKER:SECONDARY:FO... [100%] 1 of 1 ✔
+[e6/86fe8a] process > NF:CURIOSEEKER:SECONDARY:AN... [100%] 1 of 1 ✔
+[58/0ae36c] process > NF:CURIOSEEKER:SECONDARY:GE... [100%] 1 of 1 ✔
+[b7/d834b7] process > NF:CURIOSEEKER:SECONDARY:GE... [100%] 1 of 1 ✔
+-[nf-core/curioseeker] Pipeline completed successfully-
+WARN: Graphviz is required to render the execution DAG in the given format -- See http://www.graphviz.org for more info.
+Completed at: 21-Aug-2025 01:49:10
+Duration    : 1h 8m 26s
+CPU hours   : 26.4
+Succeeded   : 16
+
+

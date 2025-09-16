@@ -1,0 +1,490 @@
+2025-09-16 10:55:22,188[0m | merge-r1-r2[0m | [32mINFO    [0m | Found 37 read1 parquet files[0m
+2025-09-16 10:55:22,198[0m | merge-r1-r2[0m | [32mINFO    [0m | Beginning Join:
+    Total Reads Read1 DB: 183123078
+    Total Reads Read2 DB: 160481238
+    Total Chunks:         37
+    [0m
+2025-09-16 10:55:37,980[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5766158[0m
+2025-09-16 10:55:47,580[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 0 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 25.38 seconds
+        Elapsed Time Per Chunk: 25.38 seconds
+        Elapsed Time This Chunk: 25.38 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 2.7
+        Estimated processessing time: 15 minutes and 39.1 seconds
+        [0m
+2025-09-16 10:55:59,413[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 6175110[0m
+2025-09-16 10:56:09,843[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 1 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 47.64 seconds
+        Elapsed Time Per Chunk: 23.82 seconds
+        Elapsed Time This Chunk: 22.26 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 5.41
+        Estimated processessing time: 14 minutes and 41.4 seconds
+        [0m
+2025-09-16 10:56:19,180[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 6177301[0m
+2025-09-16 10:56:30,298[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 2 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 1 minute and 8.10 seconds
+        Elapsed Time Per Chunk: 22.70 seconds
+        Elapsed Time This Chunk: 20.45 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 8.11
+        Estimated processessing time: 13 minutes and 59.9 seconds
+        [0m
+2025-09-16 10:56:38,830[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5743158[0m
+2025-09-16 10:56:47,675[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 3 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 1 minute and 25.48 seconds
+        Elapsed Time Per Chunk: 21.37 seconds
+        Elapsed Time This Chunk: 17.37 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 10.81
+        Estimated processessing time: 13 minutes and 10.7 seconds
+        [0m
+2025-09-16 10:56:55,959[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 6174737[0m
+2025-09-16 10:57:06,704[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 4 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 1 minute and 44.51 seconds
+        Elapsed Time Per Chunk: 20.90 seconds
+        Elapsed Time This Chunk: 19.03 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 13.51
+        Estimated processessing time: 12 minutes and 53.3 seconds
+        [0m
+2025-09-16 10:57:15,685[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5747227[0m
+2025-09-16 10:57:24,637[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 5 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 2 minutes and 2.44 seconds
+        Elapsed Time Per Chunk: 20.41 seconds
+        Elapsed Time This Chunk: 17.93 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 16.22
+        Estimated processessing time: 12 minutes and 35.0 seconds
+        [0m
+2025-09-16 10:57:33,491[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 6217276[0m
+2025-09-16 10:57:44,096[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 6 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 2 minutes and 21.90 seconds
+        Elapsed Time Per Chunk: 20.27 seconds
+        Elapsed Time This Chunk: 19.46 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 18.92
+        Estimated processessing time: 12 minutes and 30.0 seconds
+        [0m
+2025-09-16 10:57:52,563[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5763002[0m
+2025-09-16 10:58:01,081[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 7 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 2 minutes and 38.88 seconds
+        Elapsed Time Per Chunk: 19.86 seconds
+        Elapsed Time This Chunk: 16.98 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 21.62
+        Estimated processessing time: 12 minutes and 14.8 seconds
+        [0m
+2025-09-16 10:58:09,830[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5817168[0m
+2025-09-16 10:58:18,431[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 8 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 2 minutes and 56.23 seconds
+        Elapsed Time Per Chunk: 19.58 seconds
+        Elapsed Time This Chunk: 17.35 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 24.32
+        Estimated processessing time: 12 minutes and 4.5 seconds
+        [0m
+2025-09-16 10:58:26,969[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5901400[0m
+2025-09-16 10:58:36,428[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 9 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 3 minutes and 14.23 seconds
+        Elapsed Time Per Chunk: 19.42 seconds
+        Elapsed Time This Chunk: 17.99 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 27.03
+        Estimated processessing time: 11 minutes and 58.6 seconds
+        [0m
+2025-09-16 10:58:44,845[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 6005902[0m
+2025-09-16 10:58:54,159[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 10 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 3 minutes and 31.96 seconds
+        Elapsed Time Per Chunk: 19.27 seconds
+        Elapsed Time This Chunk: 17.73 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 29.73
+        Estimated processessing time: 11 minutes and 53.0 seconds
+        [0m
+2025-09-16 10:59:02,508[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5819764[0m
+2025-09-16 10:59:11,409[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 11 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 3 minutes and 49.21 seconds
+        Elapsed Time Per Chunk: 19.10 seconds
+        Elapsed Time This Chunk: 17.25 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 32.43
+        Estimated processessing time: 11 minutes and 46.7 seconds
+        [0m
+2025-09-16 10:59:20,302[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 6232513[0m
+2025-09-16 10:59:30,548[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 12 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 4 minutes and 8.35 seconds
+        Elapsed Time Per Chunk: 19.10 seconds
+        Elapsed Time This Chunk: 19.14 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 35.14
+        Estimated processessing time: 11 minutes and 46.8 seconds
+        [0m
+2025-09-16 10:59:39,216[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 6236325[0m
+2025-09-16 10:59:49,375[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 13 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 4 minutes and 27.18 seconds
+        Elapsed Time Per Chunk: 19.08 seconds
+        Elapsed Time This Chunk: 18.82 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 37.84
+        Estimated processessing time: 11 minutes and 46.1 seconds
+        [0m
+2025-09-16 10:59:58,143[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 6173444[0m
+2025-09-16 11:00:08,911[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 14 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 4 minutes and 46.71 seconds
+        Elapsed Time Per Chunk: 19.11 seconds
+        Elapsed Time This Chunk: 19.53 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 40.54
+        Estimated processessing time: 11 minutes and 47.2 seconds
+        [0m
+2025-09-16 11:00:17,957[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 6170847[0m
+2025-09-16 11:00:29,191[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 15 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 5 minutes and 6.99 seconds
+        Elapsed Time Per Chunk: 19.19 seconds
+        Elapsed Time This Chunk: 20.27 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 43.24
+        Estimated processessing time: 11 minutes and 49.9 seconds
+        [0m
+2025-09-16 11:00:39,165[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 6229305[0m
+2025-09-16 11:00:48,626[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 16 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 5 minutes and 26.43 seconds
+        Elapsed Time Per Chunk: 19.20 seconds
+        Elapsed Time This Chunk: 19.43 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 45.95
+        Estimated processessing time: 11 minutes and 50.5 seconds
+        [0m
+2025-09-16 11:00:57,060[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5767276[0m
+2025-09-16 11:01:05,514[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 17 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 5 minutes and 43.32 seconds
+        Elapsed Time Per Chunk: 19.07 seconds
+        Elapsed Time This Chunk: 16.88 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 48.65
+        Estimated processessing time: 11 minutes and 45.7 seconds
+        [0m
+2025-09-16 11:01:14,017[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5826952[0m
+2025-09-16 11:01:22,969[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 18 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 6 minutes and 0.77 seconds
+        Elapsed Time Per Chunk: 18.99 seconds
+        Elapsed Time This Chunk: 17.45 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 51.35
+        Estimated processessing time: 11 minutes and 42.6 seconds
+        [0m
+2025-09-16 11:01:32,157[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 6156992[0m
+2025-09-16 11:01:42,664[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 19 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 6 minutes and 20.47 seconds
+        Elapsed Time Per Chunk: 19.02 seconds
+        Elapsed Time This Chunk: 19.69 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 54.05
+        Estimated processessing time: 11 minutes and 43.9 seconds
+        [0m
+2025-09-16 11:01:51,198[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5824778[0m
+2025-09-16 11:02:00,473[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 20 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 6 minutes and 38.27 seconds
+        Elapsed Time Per Chunk: 18.97 seconds
+        Elapsed Time This Chunk: 17.81 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 56.76
+        Estimated processessing time: 11 minutes and 41.7 seconds
+        [0m
+2025-09-16 11:02:08,688[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 6231804[0m
+2025-09-16 11:02:19,305[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 21 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 6 minutes and 57.11 seconds
+        Elapsed Time Per Chunk: 18.96 seconds
+        Elapsed Time This Chunk: 18.83 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 59.46
+        Estimated processessing time: 11 minutes and 41.5 seconds
+        [0m
+2025-09-16 11:02:27,671[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5724973[0m
+2025-09-16 11:02:36,121[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 22 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 7 minutes and 13.92 seconds
+        Elapsed Time Per Chunk: 18.87 seconds
+        Elapsed Time This Chunk: 16.81 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 62.16
+        Estimated processessing time: 11 minutes and 38.0 seconds
+        [0m
+2025-09-16 11:02:44,768[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 6234224[0m
+2025-09-16 11:02:55,947[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 23 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 7 minutes and 33.75 seconds
+        Elapsed Time Per Chunk: 18.91 seconds
+        Elapsed Time This Chunk: 19.82 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 64.86
+        Estimated processessing time: 11 minutes and 39.5 seconds
+        [0m
+2025-09-16 11:03:04,914[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5837245[0m
+2025-09-16 11:03:14,087[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 24 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 7 minutes and 51.89 seconds
+        Elapsed Time Per Chunk: 18.88 seconds
+        Elapsed Time This Chunk: 18.14 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 67.57
+        Estimated processessing time: 11 minutes and 38.4 seconds
+        [0m
+2025-09-16 11:03:22,147[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5830783[0m
+2025-09-16 11:03:31,317[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 25 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 8 minutes and 9.12 seconds
+        Elapsed Time Per Chunk: 18.81 seconds
+        Elapsed Time This Chunk: 17.23 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 70.27
+        Estimated processessing time: 11 minutes and 36.1 seconds
+        [0m
+2025-09-16 11:03:39,993[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 6230126[0m
+2025-09-16 11:03:51,093[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 26 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 8 minutes and 28.89 seconds
+        Elapsed Time Per Chunk: 18.85 seconds
+        Elapsed Time This Chunk: 19.77 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 72.97
+        Estimated processessing time: 11 minutes and 37.4 seconds
+        [0m
+2025-09-16 11:03:59,758[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5819335[0m
+2025-09-16 11:04:09,177[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 27 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 8 minutes and 46.98 seconds
+        Elapsed Time Per Chunk: 18.82 seconds
+        Elapsed Time This Chunk: 18.08 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 75.68
+        Estimated processessing time: 11 minutes and 36.4 seconds
+        [0m
+2025-09-16 11:04:17,978[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5819059[0m
+2025-09-16 11:04:26,755[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 28 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 9 minutes and 4.56 seconds
+        Elapsed Time Per Chunk: 18.78 seconds
+        Elapsed Time This Chunk: 17.58 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 78.38
+        Estimated processessing time: 11 minutes and 34.8 seconds
+        [0m
+2025-09-16 11:04:34,869[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5796263[0m
+2025-09-16 11:04:44,379[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 29 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 9 minutes and 22.18 seconds
+        Elapsed Time Per Chunk: 18.74 seconds
+        Elapsed Time This Chunk: 17.62 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 81.08
+        Estimated processessing time: 11 minutes and 33.4 seconds
+        [0m
+2025-09-16 11:04:52,829[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5734816[0m
+2025-09-16 11:05:01,546[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 30 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 9 minutes and 39.35 seconds
+        Elapsed Time Per Chunk: 18.69 seconds
+        Elapsed Time This Chunk: 17.16 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 83.78
+        Estimated processessing time: 11 minutes and 31.5 seconds
+        [0m
+2025-09-16 11:05:08,591[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 3835900[0m
+2025-09-16 11:05:15,403[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 31 of 37
+        N Chunk Reads: 3123078
+        Total Elapsed Time: 9 minutes and 53.20 seconds
+        Elapsed Time Per Chunk: 18.54 seconds
+        Elapsed Time This Chunk: 13.85 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 86.49
+        Estimated processessing time: 11 minutes and 25.9 seconds
+        [0m
+2025-09-16 11:05:23,575[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5739150[0m
+2025-09-16 11:05:31,919[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 32 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 10 minutes and 9.72 seconds
+        Elapsed Time Per Chunk: 18.48 seconds
+        Elapsed Time This Chunk: 16.51 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 89.19
+        Estimated processessing time: 11 minutes and 23.6 seconds
+        [0m
+2025-09-16 11:05:40,884[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 6170795[0m
+2025-09-16 11:05:52,142[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 33 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 10 minutes and 29.94 seconds
+        Elapsed Time Per Chunk: 18.53 seconds
+        Elapsed Time This Chunk: 20.22 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 91.89
+        Estimated processessing time: 11 minutes and 25.5 seconds
+        [0m
+2025-09-16 11:06:00,949[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 6169772[0m
+2025-09-16 11:06:10,874[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 34 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 10 minutes and 48.68 seconds
+        Elapsed Time Per Chunk: 18.53 seconds
+        Elapsed Time This Chunk: 18.73 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 94.59
+        Estimated processessing time: 11 minutes and 25.7 seconds
+        [0m
+2025-09-16 11:06:19,371[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 5759591[0m
+2025-09-16 11:06:28,507[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 35 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 11 minutes and 6.31 seconds
+        Elapsed Time Per Chunk: 18.51 seconds
+        Elapsed Time This Chunk: 17.63 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 97.3
+        Estimated processessing time: 11 minutes and 24.8 seconds
+        [0m
+2025-09-16 11:06:37,117[0m | merge-r1-r2[0m | [32mINFO    [0m | Merged subset reads df: 6236926[0m
+2025-09-16 11:06:47,071[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete: Chunk I: 36 of 37
+        N Chunk Reads: 5000000
+        Total Elapsed Time: 11 minutes and 24.87 seconds
+        Elapsed Time Per Chunk: 18.51 seconds
+        Elapsed Time This Chunk: 18.56 seconds
+        Total Reads Processed: 0 of 183123078
+        Perc Complete: 100.0
+        Estimated processessing time: 11 minutes and 24.9 seconds
+        [0m
+2025-09-16 11:06:47,075[0m | merge-r1-r2[0m | [32mINFO    [0m | Complete Joining Read1/Read2[0m
+2025-09-16 11:06:47,075[0m | merge-r1-r2[0m | [32mINFO    [0m | Beginning Count Assigned Reads[0m
+    8.61 s in subset-read2-db
+    6.24 s in merge-read1-read2
+    9.60 s in write-barcode-umi-table
+    5.88 s in subset-read2-db
+    5.38 s in merge-read1-read2
+   10.43 s in write-barcode-umi-table
+    5.58 s in subset-read2-db
+    3.24 s in merge-read1-read2
+   11.12 s in write-barcode-umi-table
+    5.37 s in subset-read2-db
+    2.66 s in merge-read1-read2
+    8.84 s in write-barcode-umi-table
+    4.96 s in subset-read2-db
+    2.84 s in merge-read1-read2
+   10.74 s in write-barcode-umi-table
+    5.56 s in subset-read2-db
+    2.95 s in merge-read1-read2
+    8.95 s in write-barcode-umi-table
+    5.47 s in subset-read2-db
+    2.84 s in merge-read1-read2
+   10.60 s in write-barcode-umi-table
+    5.47 s in subset-read2-db
+    2.46 s in merge-read1-read2
+    8.52 s in write-barcode-umi-table
+    5.49 s in subset-read2-db
+    2.81 s in merge-read1-read2
+    8.60 s in write-barcode-umi-table
+    5.33 s in subset-read2-db
+    2.81 s in merge-read1-read2
+    9.46 s in write-barcode-umi-table
+    5.66 s in subset-read2-db
+    2.30 s in merge-read1-read2
+    9.31 s in write-barcode-umi-table
+    5.36 s in subset-read2-db
+    2.50 s in merge-read1-read2
+    8.90 s in write-barcode-umi-table
+    5.45 s in subset-read2-db
+    3.00 s in merge-read1-read2
+   10.24 s in write-barcode-umi-table
+    5.43 s in subset-read2-db
+    2.71 s in merge-read1-read2
+   10.16 s in write-barcode-umi-table
+    5.42 s in subset-read2-db
+    2.93 s in merge-read1-read2
+   10.77 s in write-barcode-umi-table
+    5.88 s in subset-read2-db
+    2.70 s in merge-read1-read2
+   11.23 s in write-barcode-umi-table
+    5.83 s in subset-read2-db
+    3.68 s in merge-read1-read2
+    9.46 s in write-barcode-umi-table
+    5.55 s in subset-read2-db
+    2.49 s in merge-read1-read2
+    8.45 s in write-barcode-umi-table
+    5.18 s in subset-read2-db
+    2.90 s in merge-read1-read2
+    8.95 s in write-barcode-umi-table
+    5.90 s in subset-read2-db
+    2.85 s in merge-read1-read2
+   10.51 s in write-barcode-umi-table
+    5.49 s in subset-read2-db
+    2.55 s in merge-read1-read2
+    9.27 s in write-barcode-umi-table
+    4.95 s in subset-read2-db
+    2.80 s in merge-read1-read2
+   10.62 s in write-barcode-umi-table
+    5.58 s in subset-read2-db
+    2.32 s in merge-read1-read2
+    8.45 s in write-barcode-umi-table
+    5.40 s in subset-read2-db
+    2.79 s in merge-read1-read2
+   11.18 s in write-barcode-umi-table
+    5.74 s in subset-read2-db
+    2.75 s in merge-read1-read2
+    9.17 s in write-barcode-umi-table
+    5.11 s in subset-read2-db
+    2.56 s in merge-read1-read2
+    9.17 s in write-barcode-umi-table
+    5.45 s in subset-read2-db
+    2.79 s in merge-read1-read2
+   11.10 s in write-barcode-umi-table
+    5.62 s in subset-read2-db
+    2.55 s in merge-read1-read2
+    9.42 s in write-barcode-umi-table
+    5.73 s in subset-read2-db
+    2.69 s in merge-read1-read2
+    8.77 s in write-barcode-umi-table
+    5.39 s in subset-read2-db
+    2.37 s in merge-read1-read2
+    9.51 s in write-barcode-umi-table
+    5.50 s in subset-read2-db
+    2.53 s in merge-read1-read2
+    8.72 s in write-barcode-umi-table
+    4.19 s in subset-read2-db
+    2.53 s in merge-read1-read2
+    6.81 s in write-barcode-umi-table
+    5.45 s in subset-read2-db
+    2.29 s in merge-read1-read2
+    8.34 s in write-barcode-umi-table
+    5.57 s in subset-read2-db
+    2.93 s in merge-read1-read2
+   11.26 s in write-barcode-umi-table
+    5.51 s in subset-read2-db
+    2.86 s in merge-read1-read2
+    9.92 s in write-barcode-umi-table
+    5.41 s in subset-read2-db
+    2.61 s in merge-read1-read2
+    9.14 s in write-barcode-umi-table
+    5.28 s in subset-read2-db
+    2.88 s in merge-read1-read2
+    9.95 s in write-barcode-umi-table
+    5.62 s in get-assigned-reads
