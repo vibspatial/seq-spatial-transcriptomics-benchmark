@@ -1,0 +1,15 @@
+name: bam_env
+channels:
+  - bioconda
+  - conda-forge
+dependencies:
+  - pysam
+  - pandas
+  - pip
+  - pip:
+      - dask
+      - pyarrow
+      - ipython
+      - ipykernel
+
+#CONDA_CHANNEL_PRIORITY=strict conda env create -f environment.yml
