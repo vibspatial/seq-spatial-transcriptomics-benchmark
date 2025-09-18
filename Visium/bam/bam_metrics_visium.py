@@ -66,7 +66,7 @@ with open(tissue_barcodes_path) as f:
     
 # Get included genes from probe set
 probe_set_df = pd.read_csv(probe_set_path, comment='#')
-included_genes = set(probe_set_df[probe_set_df['included'] == True]['gene_id'])
+included_genes = set(probe_set_df[probe_set_df['included']]['gene_id'])
 
 # Count total reads
 print("Counting total reads...", flush=True)
