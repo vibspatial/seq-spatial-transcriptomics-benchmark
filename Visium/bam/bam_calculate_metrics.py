@@ -243,8 +243,9 @@ def calculate_metrics(
         os.path.join( output_dir, f"metrics_{sample_size}.csv" ),
         index=False,
         )
-    print( "\n\n" )
     print( "Finished." )
+    print( "\n\n" )
+
 
 if __name__ == "__main__":
 
