@@ -44,7 +44,7 @@ def calculate_metrics_all(
     )
 
     total_size = len( df )
-    print( "Total size:", total_size )
+    print( "Total size:", total_size, flush=True )
 
     sample_sizes = []
     for i in range(1, len( df )//step_size+1 ):
@@ -52,10 +52,10 @@ def calculate_metrics_all(
 
     if total_size not in sample_sizes:
         sample_sizes.append( total_size )
-    print( "All sample sizes:", sample_sizes )
+    print( "All sample sizes:", sample_sizes, flush=True )
 
     for _sample_size in sample_sizes:
-        print( f"Processing sample size {_sample_size}." )
+        print( f"Processing sample size {_sample_size}.", flush=True )
         _output_dir_sample_size = os.path.join( output_dir, f"sample_size_{_sample_size}" )
         os.makedirs( _output_dir_sample_size )
         if _sample_size == total_size:
@@ -87,58 +87,58 @@ def calculate_metrics(
     if sample_size:
         start = time.time()
         frac = sample_size / len( df )
-        print( f"Start sampling {sample_size} reads.")
+        print( f"Start sampling {sample_size} reads.", flush=True)
         df=df.sample( frac=frac )
         _parquet_path = os.path.join( output_dir, f"sample_{uuid.uuid4()}.parquet"  )
         df.to_parquet( _parquet_path )
         # read back lazy
         df=dd.read_parquet( _parquet_path )
-        print("End sampling.")
-        print( f"took: {time.time() - start} seconds" )
+        print("End sampling.", flush=True)
+        print( f"took: {time.time() - start} seconds", flush=True )
         
 
     # compute metrics
     df_included=df[ df[ "included" ] ]
-    print( "Start grouping UMIs:" )
+    print( "Start grouping UMIs:", flush=True  )
     start=time.time()
     df_included_grouped=df_included.groupby( [ "barcode", "umi", "gene" ] ).size().compute()
-    print( "End grouping UMIs." )
+    print( "End grouping UMIs.", flush=True )
     print( f"took: {time.time() - start} seconds" )
-    print( "Calculate total UMIs." )
+    print( "Calculate total UMIs.", flush=True )
     total_umis=df_included_grouped.sum()
-    print( "Calculate unique UMIs" )
+    print( "Calculate unique UMIs", flush=True )
     unique_umis=len(df_included_grouped)
 
-    print( "total UMIs:", total_umis )
-    print( "total unique UMIs:", unique_umis )
+    print( "total UMIs:", total_umis , flush=True)
+    print( "total unique UMIs:", unique_umis , flush=True)
 
 
     df_included_tissue = df[df[ "included_tissue" ]]
-    print( "Start grouping UMIs in tissue." )
+    print( "Start grouping UMIs in tissue.", flush=True )
     start = time.time()
     df_included_tissue_grouped=df_included_tissue.groupby( [ "barcode", "umi", "gene" ] ).size().compute()
-    print("End grouping UMIs in tissue." )
-    print( f"took: {time.time() - start} seconds" )
-    print( "Calculate total unique UMIs in tissue." )
+    print("End grouping UMIs in tissue.", flush=True )
+    print( f"took: {time.time() - start} seconds", flush=True )
+    print( "Calculate total unique UMIs in tissue.", flush=True )
     tissue_unique_umis = len( df_included_tissue_grouped )
 
-    print( "total unique UMIs in tissue:", tissue_unique_umis  )
+    print( "total unique UMIs in tissue:", tissue_unique_umis, flush=True  )
 
 
-    print( "Start calculating gene counts." )
+    print( "Start calculating gene counts.", flush=True )
     gene_counts=df_included_grouped.groupby( "gene" ).sum()
-    print( "End calculating gene counts." )
-    print( "Start calculating unique gene counts." )
+    print( "End calculating gene counts.", flush=True )
+    print( "Start calculating unique gene counts.", flush=True )
     unique_gene_counts = df_included_grouped.groupby( "gene" ).count()
-    print( "End calculating unique gene counts." )
+    print( "End calculating unique gene counts.", flush=True )
 
     # Same, but in tissue
-    print( "Start calculating gene counts in tissue." )
+    print( "Start calculating gene counts in tissue.", flush=True )
     gene_counts_tissue=df_included_tissue_grouped.groupby( "gene" ).sum()
-    print( "End calculating gene counts in tissue." )
-    print( "Start calculating unique gene counts in tissue." )
+    print( "End calculating gene counts in tissue.", flush=True )
+    print( "Start calculating unique gene counts in tissue.", flush=True )
     unique_gene_counts_tissue = df_included_tissue_grouped.groupby( "gene" ).count()  # 3s for 2M 18s for 5M
-    print( "End calculating unique gene counts in tissue." )
+    print( "End calculating unique gene counts in tissue.", flush=True )
 
     gene_counts=gene_counts.to_frame( name="gene_counts" ).reset_index()
     unique_gene_counts=unique_gene_counts.to_frame( name="unique_gene_counts" ).reset_index()
@@ -165,15 +165,15 @@ def calculate_metrics(
     median_unique_gene_counts=gene_counts_merged["unique_gene_counts" ].median()
     median_gene_counts_tissue=gene_counts_merged[ "gene_counts_tissue" ].median()
     median_unique_gene_counts_tissue=gene_counts_merged[ "unique_gene_counts_tissue" ].median()
-    print( "Median gene counts (total; unique; total in tissue; unique in tissue):", median_gene_counts, median_unique_gene_counts, median_gene_counts_tissue, median_unique_gene_counts_tissue )
+    print( "Median gene counts (total; unique; total in tissue; unique in tissue):", median_gene_counts, median_unique_gene_counts, median_gene_counts_tissue, median_unique_gene_counts_tissue, flush=True )
 
     median_reads_per_unique_umi=df_included_grouped.median()  # Am I sure this is correct. Check with Julien what is definition of unique UMI
     median_reads_per_unique_umi_tissue=df_included_tissue_grouped.median()
 
-    print("Median reads per unique umi:", median_reads_per_unique_umi, median_reads_per_unique_umi_tissue )
+    print("Median reads per unique umi:", median_reads_per_unique_umi, median_reads_per_unique_umi_tissue , flush=True)
 
 
-    print( "Start calculating metrics on all reads." )
+    print( "Start calculating metrics on all reads.", flush=True )
     start = time.time()
     # metrics to calculate for all reads. Check with Julien, this is for all reads, right?
     columns_to_sum = [
@@ -191,8 +191,8 @@ def calculate_metrics(
         ]
 
     reads_sum=df[  columns_to_sum  ].sum().compute()
-    print( "End Calculating metrics on all reads." )
-    print( "Took:", time.time() - start )
+    print( "End Calculating metrics on all reads.", flush=True )
+    print( "Took:", time.time() - start, flush=True )
 
     def safe_div(a, b): return a / b if b > 0 else 0
 
@@ -243,8 +243,8 @@ def calculate_metrics(
         os.path.join( output_dir, "metrics.csv" ),
         index=False,
         )
-    print( "Finished." )
-    print( "\n\n" )
+    print( "Finished.", flush=True )
+    print( "\n\n", flush=True )
 
 
 if __name__ == "__main__":
