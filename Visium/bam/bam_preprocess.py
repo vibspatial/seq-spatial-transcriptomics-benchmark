@@ -1,3 +1,4 @@
+import os
 import time
 import argparse
 from pathlib import Path
@@ -12,6 +13,10 @@ def main(
         output_path: str| Path,
         size: int = 0,
 ):
+    if os.path.exists( output_path ):
+        raise FileExistsError( f"File {output_path} exists." )
+    os.makedirs( os.path.dirname( output_path ), exist_ok=True )
+
     # Load barcodes in tissue
     with open(tissue_barcodes_path) as f:
         tissue_barcodes = set(line.strip() for line in f)
@@ -19,10 +24,6 @@ def main(
     # Get included genes from probe set
     probe_set_df = pd.read_csv(probe_set_path, comment='#')
     included_genes = set(probe_set_df[probe_set_df['included']]['gene_id'])
-
-    # 143 million reads
-
-    # iteration is fast (2m6s if you have 143 million reads)
 
     start = time.time()
     with pysam.AlignmentFile(bam_path, "rb") as bam:
