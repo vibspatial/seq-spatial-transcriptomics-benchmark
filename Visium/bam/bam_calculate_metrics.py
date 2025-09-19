@@ -89,7 +89,7 @@ def calculate_metrics(
         frac = sample_size / len( df )
         print( f"Start sampling {sample_size} reads.")
         df=df.sample( frac=frac )
-        _parquet_path = os.path.join( output_dir, f"sample_{uuid.uuid4()}_{sample_size}.parquet"  )
+        _parquet_path = os.path.join( output_dir, f"sample_{uuid.uuid4()}.parquet"  )
         df.to_parquet( _parquet_path )
         # read back lazy
         df=dd.read_parquet( _parquet_path )
@@ -159,7 +159,7 @@ def calculate_metrics(
         gene_counts_merged[ f"{_name}_corrected" ] = gene_counts_merged[ _name ] / tissue_area
 
 
-    gene_counts_merged.to_csv( os.path.join( output_dir, f"gene_counts_sample_size_{sample_size}.csv" ) )
+    gene_counts_merged.to_csv( os.path.join( output_dir, "gene_counts.csv" ) )
 
     median_gene_counts=gene_counts_merged[ "gene_counts" ].median()
     median_unique_gene_counts=gene_counts_merged["unique_gene_counts" ].median()
@@ -240,7 +240,7 @@ def calculate_metrics(
         shutil.rmtree(_parquet_path)
 
     pd.DataFrame( [ row ] ).to_csv(
-        os.path.join( output_dir, f"metrics_{sample_size}.csv" ),
+        os.path.join( output_dir, "metrics.csv" ),
         index=False,
         )
     print( "Finished." )
