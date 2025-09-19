@@ -47,7 +47,7 @@ def calculate_metrics_all(
     print( "Total size:", total_size, flush=True )
 
     sample_sizes = []
-    for i in range(1, len( df )//step_size+1 ):
+    for i in range(1, total_size //step_size+1 ):
         sample_sizes.append( i*step_size )
 
     if total_size not in sample_sizes:
