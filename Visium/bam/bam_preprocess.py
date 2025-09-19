@@ -35,8 +35,8 @@ def main(
             for i, read in enumerate(bam):
                 step = 1000000
                 if i%step == 0:
-                    print( f"{i} reads processed." )
-                    print(time.time() - start)
+                    print( f"{i} reads processed.", flush=True )
+                    print(time.time() - start, flush=True)
                 if size:
                     if i > size:
                         break
