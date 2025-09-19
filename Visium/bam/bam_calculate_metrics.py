@@ -5,19 +5,19 @@ import shutil
 
 
 import dask.dataframe as dd
+from dask.dataframe import DataFrame
 import pandas as pd
 from pathlib import Path
 import argparse
 
 
-def calculate_metrics(
+def calculate_metrics_all(
         input_path : str | Path,
         output_dir : str | Path,
         tissue_barcodes_path: str | Path,
         tissue_area: int = 1,
-        sample_size: int = 0,
-
-):
+        step_size: int = 10000000,
+)->DataFrame:
     os.makedirs(output_dir, exist_ok=True )
     df=dd.read_csv(
     input_path,
@@ -43,6 +43,43 @@ def calculate_metrics(
     #blocksize="1GB
     )
 
+    total_size = len( df )
+    print( "Total size:", total_size )
+
+    sample_sizes = []
+    for i in range(1, len( df )//step_size+1 ):
+        sample_sizes.append( i*step_size )
+
+    if total_size not in sample_sizes:
+        sample_sizes.append( total_size )
+    print( "All sample sizes:", sample_sizes )
+
+    for _sample_size in sample_sizes:
+        print( f"Processing sample size {_sample_size}." )
+        _output_dir_sample_size = os.path.join( output_dir, f"sample_size_{_sample_size}" )
+        os.makedirs( _output_dir_sample_size )
+        if _sample_size == total_size:
+            _sample_size=0 # do not sample if sample size is equal to total size
+        calculate_metrics( 
+            df=df,
+            output_dir=_output_dir_sample_size,
+            tissue_barcodes_path=tissue_barcodes_path,
+            tissue_area=tissue_area,
+            sample_size=_sample_size,
+         )
+
+    return df
+
+
+
+def calculate_metrics(
+        df : DataFrame,
+        output_dir : str | Path,
+        tissue_barcodes_path: str | Path,
+        tissue_area: int = 1,
+        sample_size: int = 0, # with sample_size 0, we do not sample
+
+):
     with open(tissue_barcodes_path) as f:
         tissue_barcodes = set(line.strip() for line in f)
 
@@ -206,6 +243,8 @@ def calculate_metrics(
         os.path.join( output_dir, f"metrics_{sample_size}.csv" ),
         index=False,
         )
+    print( "\n\n" )
+    print( "Finished." )
 
 if __name__ == "__main__":
 
@@ -215,13 +254,13 @@ if __name__ == "__main__":
     parser.add_argument("--tissue_barcodes_path", required=True, help="Path to tissue_barcodes.txt")
     parser.add_argument("--output_dir", required=True, help="Output directory where metrics and intermediate files will be stored.")
     parser.add_argument("--tissue_area", type=int, required=False, default=1, help="Tissue area in mm2.")
-    parser.add_argument("--sample_size", type=int, required=False, default=0, help="If >0 specified will calculate metrics for a random subset of 'sample size' reads.")
+    parser.add_argument("--step_size", type=int, required=False, default=10000000, help="Step size.")
     args = parser.parse_args()
 
-    calculate_metrics(
+    calculate_metrics_all(
         input_path=args.input_path,
         tissue_barcodes_path=args.tissue_barcodes_path,
         output_dir = args.output_dir,
         tissue_area=args.tissue_area,
-        sample_size=args.sample_size,
+        step_size=args.step_size,
         )
