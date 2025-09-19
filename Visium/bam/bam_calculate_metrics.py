@@ -15,7 +15,7 @@ def calculate_metrics_all(
         input_path : str | Path,
         output_dir : str | Path,
         tissue_barcodes_path: str | Path,
-        tissue_area: int = 1,
+        tissue_area: float = 1,
         step_size: int = 10000000,
 )->DataFrame:
     os.makedirs(output_dir, exist_ok=True )
@@ -76,7 +76,7 @@ def calculate_metrics(
         df : DataFrame,
         output_dir : str | Path,
         tissue_barcodes_path: str | Path,
-        tissue_area: int = 1,
+        tissue_area: float = 1,
         sample_size: int = 0, # with sample_size 0, we do not sample
 
 ):
@@ -254,7 +254,7 @@ if __name__ == "__main__":
     parser.add_argument("--input_path", required=True, help="Path to csv file created by bam_preprocess.py")
     parser.add_argument("--tissue_barcodes_path", required=True, help="Path to tissue_barcodes.txt")
     parser.add_argument("--output_dir", required=True, help="Output directory where metrics and intermediate files will be stored.")
-    parser.add_argument("--tissue_area", type=int, required=False, default=1, help="Tissue area in mm2.")
+    parser.add_argument("--tissue_area", type=float, required=False, default=1, help="Tissue area in mm2.")
     parser.add_argument("--step_size", type=int, required=False, default=10000000, help="Step size.")
     args = parser.parse_args()
 
