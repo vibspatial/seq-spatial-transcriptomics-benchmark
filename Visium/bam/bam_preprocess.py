@@ -104,6 +104,8 @@ def main(
                             f"{q30_read_bases},{q30_read_total},{q30_barcode_bases},{q30_barcode_total},{q30_umi_bases},{q30_umi_total},"
                             f"{reads_mapped},{reads_confident},{reads_confident_filtered},{reads_half_mapped},{reads_split_mapped}\n" )
                 
+    print( f"Finished, took {time.time()-start}", flush=True )
+                
 
 if __name__ == "__main__":
 
