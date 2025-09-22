@@ -6,6 +6,9 @@ from pathlib import Path
 import pandas as pd
 import pysam
 
+import random
+random.seed(42)
+
 def main(
         bam_path : str | Path,
         tissue_barcodes_path: str | Path,
@@ -30,9 +33,10 @@ def main(
         with open( output_path, "w" ) as f_out:
             f_out.write( "index,included,included_tissue,barcode,umi,gene,"
                         "q30_read_bases,q30_read_total,q30_barcode_bases,q30_barcode_total,q30_umi_bases,q30_umi_total,"
-                        "reads_mapped,reads_confident,reads_confident_filtered,reads_half_mapped,reads_split_mapped\n" )
+                        "reads_mapped,reads_confident,reads_confident_filtered,reads_half_mapped,reads_split_mapped,random\n" )
         # i is the total number of reads
             for i, read in enumerate(bam):
+                r = random.random()
                 step = 1000000
                 if i%step == 0:
                     print( f"{i} reads processed.", flush=True )
@@ -102,7 +106,7 @@ def main(
 
                 f_out.write( f"{i},{included},{included_tissue},{barcode},{umi},{gene},"
                             f"{q30_read_bases},{q30_read_total},{q30_barcode_bases},{q30_barcode_total},{q30_umi_bases},{q30_umi_total},"
-                            f"{reads_mapped},{reads_confident},{reads_confident_filtered},{reads_half_mapped},{reads_split_mapped}\n" )
+                            f"{reads_mapped},{reads_confident},{reads_confident_filtered},{reads_half_mapped},{reads_split_mapped},{r}\n" )
                 
     print( f"Finished, took {time.time()-start}", flush=True )
                 
