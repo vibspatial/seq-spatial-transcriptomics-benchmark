@@ -22,7 +22,6 @@ def calculate_metrics_all(
     df=dd.read_csv(
     input_path,
     dtype={
-        "random_number" : "float32",
         "included": "bool",
         "included_tissue": "bool",
         "barcode": "string",
@@ -39,9 +38,16 @@ def calculate_metrics_all(
         "reads_confident_filtered": "bool",
         "reads_half_mapped": "bool",
         "reads_split_mapped": "bool",
+        "random": "float32",
     },
     #blocksize="1GB
     )
+    # back it to parquet for faster processing
+    _parquet_path = os.path.join( output_dir, f"full_{uuid.uuid4()}.parquet"  )
+    print( "Writing to parquet file", flush=True )
+    df.to_parquet( _parquet_path )
+    df=dd.read_parquet( _parquet_path )
+    print( "Done writing to parquet file", flush=True )
 
     total_size = len( df )
     print( "Total size:", total_size, flush=True )
@@ -67,6 +73,10 @@ def calculate_metrics_all(
             tissue_area=tissue_area,
             sample_size=_sample_size,
          )
+        
+    # clean up parquet
+    if os.path.exists(_parquet_path):
+        shutil.rmtree(_parquet_path)
 
     return df
 
@@ -88,7 +98,7 @@ def calculate_metrics(
         start = time.time()
         frac = sample_size / len( df )
         print( f"Start sampling {sample_size} reads.", flush=True)
-        df=df.sample( frac=frac )
+        df=df[ df["random"]<=frac ]
         _parquet_path = os.path.join( output_dir, f"sample_{uuid.uuid4()}.parquet"  )
         df.to_parquet( _parquet_path )
         # read back lazy
@@ -236,8 +246,8 @@ def calculate_metrics(
     }
 
     # clean up parquet
-    if sample_size>0 and os.path.exists(_parquet_path):
-        shutil.rmtree(_parquet_path)
+    #if sample_size>0 and os.path.exists(_parquet_path):
+    #    shutil.rmtree(_parquet_path)
 
     pd.DataFrame( [ row ] ).to_csv(
         os.path.join( output_dir, "metrics.csv" ),
