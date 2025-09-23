@@ -246,8 +246,8 @@ def calculate_metrics(
     }
 
     # clean up parquet
-    #if sample_size>0 and os.path.exists(_parquet_path):
-    #    shutil.rmtree(_parquet_path)
+    if sample_size>0 and os.path.exists(_parquet_path):
+        shutil.rmtree(_parquet_path)
 
     pd.DataFrame( [ row ] ).to_csv(
         os.path.join( output_dir, "metrics.csv" ),

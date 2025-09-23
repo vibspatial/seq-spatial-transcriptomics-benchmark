@@ -13,3 +13,7 @@ dependencies:
       - ipykernel
 
 #CONDA_CHANNEL_PRIORITY=strict conda env create -f environment.yml
+# on VIB compute:
+# ml load Mamba
+# CONDA_CHANNEL_PRIORITY=strict mamba env create -f environment.yml
+
