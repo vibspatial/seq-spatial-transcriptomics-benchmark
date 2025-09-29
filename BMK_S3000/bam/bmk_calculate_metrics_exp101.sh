@@ -1,0 +1,23 @@
+#!/bin/bash
+#SBATCH --job-name=exp101_metrics
+#SBATCH --partition=gp_64C_128T_512GB
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --mem=256G
+#SBATCH --time=10:00:00
+
+source ~/.bashrc
+conda activate bamtools
+
+INPUT_PATH="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp101/bam_output/preprocessed_reads.csv"
+ALL_BARCODES_PATH="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp101/harpy/all_barcodes.txt"
+OUTPUT_DIR="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp101/bam_output"
+TISSUE_AREA=13.01
+STEP_SIZE=10000000
+
+python /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/scripts/BMK_S1000/bam/bmk_calculate_metrics.py \
+  --input_path $INPUT_PATH \
+  --output_dir $OUTPUT_DIR \
+  --all_barcodes_path $ALL_BARCODES_PATH \
+  --tissue_area $TISSUE_AREA \
+  --step_size $STEP_SIZE
