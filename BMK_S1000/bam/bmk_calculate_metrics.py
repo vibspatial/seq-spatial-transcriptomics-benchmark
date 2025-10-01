@@ -12,30 +12,34 @@ import argparse
 def calculate_metrics_all(
         input_path: str | Path,
         output_dir: str | Path,
-        all_barcodes_path: str | Path,
+        tissue_barcodes_path: str | Path,
         tissue_area: float = 1,
         step_size: int = 10000000,
 ) -> DataFrame:
     os.makedirs(output_dir, exist_ok=True)
 
-    df = dd.read_csv(
-        input_path,
-        dtype={
-            "included": "bool",
-            "included_tissue": "bool",
-            "barcode": "string",
-            "umi": "string",
-            "gene": "string",
-            "random": "float32",
-        },
-    )
+    existing_full = list(Path(output_dir).glob("full_*.parquet"))
+    if existing_full:
+        _parquet_path = str(existing_full[0])
+        print(f"Reusing existing full parquet: {_parquet_path}", flush=True)
+    else:
+        df_csv = dd.read_csv(
+            input_path,
+            dtype={
+                "included": "bool",
+                "included_tissue": "bool",
+                "barcode": "string",
+                "umi": "string",
+                "gene": "string",
+                "random": "float32",
+            },
+        )
+        _parquet_path = os.path.join(output_dir, f"full_{uuid.uuid4()}.parquet")
+        print("Writing full dataset to parquet file...", flush=True)
+        df_csv.to_parquet(_parquet_path)
+        print("Done writing parquet file", flush=True)
 
-    # Back it to parquet for faster processing
-    _parquet_path = os.path.join(output_dir, f"full_{uuid.uuid4()}.parquet")
-    print("Writing to parquet file...", flush=True)
-    df.to_parquet(_parquet_path)
     df = dd.read_parquet(_parquet_path)
-    print("Done writing parquet file", flush=True)
 
     total_size = len(df)
     print("Total size:", total_size, flush=True)
@@ -49,15 +53,26 @@ def calculate_metrics_all(
     print("All sample sizes:", sample_sizes, flush=True)
 
     for _sample_size in sample_sizes:
-        print(f"Sample size {_sample_size:,}", flush=True)
         _output_dir_sample_size = os.path.join(output_dir, f"sample_size_{_sample_size}")
-        os.makedirs(_output_dir_sample_size)
+        metrics_file = os.path.join(_output_dir_sample_size, "metrics.csv")
+            
+        if os.path.exists(metrics_file):
+            print(f"Skipping sample size {_sample_size:,} (metrics already exist).", flush=True)
+            continue
+
+        os.makedirs(_output_dir_sample_size, exist_ok=True)
+
         if _sample_size == total_size:
             _sample_size = 0  # do not sample if equal to total size
+
+        for item in Path(_output_dir_sample_size).glob("sample_*.parquet"):
+            print(f"Cleaning up leftover sample parquet: {item}", flush=True)
+            shutil.rmtree(item, ignore_errors=True)
+
         calculate_metrics(
             df=df,
             output_dir=_output_dir_sample_size,
-            all_barcodes_path=all_barcodes_path,
+            tissue_barcodes_path=tissue_barcodes_path,
             tissue_area=tissue_area,
             sample_size=_sample_size,
         )
@@ -68,18 +83,17 @@ def calculate_metrics_all(
 
     return df
 
-
 def calculate_metrics(
         df: DataFrame,
         output_dir: str | Path,
-        all_barcodes_path: str | Path,
+        tissue_barcodes_path: str | Path,
         tissue_area: float = 1,
         sample_size: int = 0,  # with sample_size 0, we do not sample
 ):
     t0 = time.time()
 
-    with open(all_barcodes_path) as f:
-        all_barcodes = set(line.strip() for line in f)
+    with open(tissue_barcodes_path) as f:
+        tissue_barcodes = set(line.strip() for line in f)
 
     # sample
     if sample_size:
@@ -153,7 +167,7 @@ def calculate_metrics(
     # put it in dictionary, then write to csv
     row = {
         "number_of_spots_with_at_least_1_UMI_in_tissue": df_included_tissue_grouped.index.get_level_values("barcode").nunique(),
-        "percentage_spots_recovered":df_included_tissue_grouped.index.get_level_values("barcode").nunique()/len(all_barcodes)*100,
+        "percentage_spots_recovered":df_included_tissue_grouped.index.get_level_values("barcode").nunique()/len(tissue_barcodes)*100,
         "total_number_of_reads": total_reads,
         "total_number_of_genes": len(gene_counts),
         "total_number_of_UMIs": total_umis,
@@ -183,6 +197,7 @@ def calculate_metrics(
     # clean up parquet
     if sample_size>0 and os.path.exists(_parquet_path):
         shutil.rmtree(_parquet_path)
+        
     pd.DataFrame([row]).to_csv(
         os.path.join(output_dir, "metrics.csv"),
         index=False,
@@ -195,7 +210,7 @@ def calculate_metrics(
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="UMI/gene metrics calculation")
     parser.add_argument("--input_path", required=True, help="Path to per-read CSV created by preprocess.py")
-    parser.add_argument("--all_barcodes_path", required=True, help="Path to all_barcodes.txt")
+    parser.add_argument("--tissue_barcodes_path", required=True, help="Path to tissue_barcodes.txt")
     parser.add_argument("--output_dir", required=True, help="Output directory where metrics and intermediate files will be stored.")
     parser.add_argument("--tissue_area", type=float, required=False, default=1, help="Tissue area in mm2.")
     parser.add_argument("--step_size", type=int, required=False, default=10000000, help="Step size.")
@@ -203,7 +218,7 @@ if __name__ == "__main__":
 
     calculate_metrics_all(
         input_path=args.input_path,
-        all_barcodes_path=args.all_barcodes_path,
+        tissue_barcodes_path=args.tissue_barcodes_path,
         output_dir=args.output_dir,
         tissue_area=args.tissue_area,
         step_size=args.step_size,
