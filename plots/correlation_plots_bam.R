@@ -172,7 +172,7 @@ for (sample_type in unique(sample_metadata$sample_type)) {
     filter(sample_type == !!sample_type)
   
   technologies <- unique(sample_metadata_subset$Technology)
-  subsample_dirs <- paste0("sample_size_", format(seq(10000000, 1000000000, 100000000), scientific=F, trim = TRUE))
+  subsample_dirs <- paste0("sample_size_", format(seq(10000000, 1000000000, 10000000), scientific=F, trim = TRUE))
 
   for (subsample in subsample_dirs) {
     df <- prepare_correlation_data(sample_type, subsample, technologies, sample_metadata_subset)

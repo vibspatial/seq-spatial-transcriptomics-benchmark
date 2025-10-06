@@ -1,0 +1,99 @@
+Reading umi_gene.tsv.gz...
+Reading features.tsv...
+Collapsed rows: 105,076,822
+Exploding rows by read_count...
+Rows after explosion: 298,586,711
+Adding 150,388,091 placeholder rows for missing reads...
+Final row count: 448,974,802 (should match FASTQ)
+
+Writing CSV to /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp101/bam_output/preprocessed_reads.csv
+5,000,000 rows written: 5.68 min
+10,000,000 rows written: 10.23 min
+15,000,000 rows written: 14.77 min
+20,000,000 rows written: 19.32 min
+25,000,000 rows written: 23.86 min
+30,000,000 rows written: 28.41 min
+35,000,000 rows written: 32.96 min
+40,000,000 rows written: 37.51 min
+45,000,000 rows written: 42.06 min
+50,000,000 rows written: 46.6 min
+55,000,000 rows written: 51.15 min
+60,000,000 rows written: 55.71 min
+65,000,000 rows written: 60.25 min
+70,000,000 rows written: 64.8 min
+75,000,000 rows written: 69.35 min
+80,000,000 rows written: 73.89 min
+85,000,000 rows written: 78.44 min
+90,000,000 rows written: 82.98 min
+95,000,000 rows written: 87.53 min
+100,000,000 rows written: 92.08 min
+105,000,000 rows written: 96.62 min
+110,000,000 rows written: 101.18 min
+115,000,000 rows written: 105.72 min
+120,000,000 rows written: 110.28 min
+125,000,000 rows written: 114.83 min
+130,000,000 rows written: 119.38 min
+135,000,000 rows written: 123.93 min
+140,000,000 rows written: 128.48 min
+145,000,000 rows written: 133.03 min
+150,000,000 rows written: 137.58 min
+155,000,000 rows written: 142.12 min
+160,000,000 rows written: 146.67 min
+165,000,000 rows written: 151.22 min
+170,000,000 rows written: 155.77 min
+175,000,000 rows written: 160.32 min
+180,000,000 rows written: 164.87 min
+185,000,000 rows written: 169.41 min
+190,000,000 rows written: 173.96 min
+195,000,000 rows written: 178.51 min
+200,000,000 rows written: 183.06 min
+205,000,000 rows written: 187.61 min
+210,000,000 rows written: 192.16 min
+215,000,000 rows written: 196.7 min
+220,000,000 rows written: 201.24 min
+225,000,000 rows written: 205.79 min
+230,000,000 rows written: 210.34 min
+235,000,000 rows written: 214.88 min
+240,000,000 rows written: 219.43 min
+245,000,000 rows written: 223.96 min
+250,000,000 rows written: 228.51 min
+255,000,000 rows written: 233.05 min
+260,000,000 rows written: 237.59 min
+265,000,000 rows written: 242.13 min
+270,000,000 rows written: 246.67 min
+275,000,000 rows written: 251.2 min
+280,000,000 rows written: 255.74 min
+285,000,000 rows written: 260.28 min
+290,000,000 rows written: 264.83 min
+295,000,000 rows written: 269.36 min
+300,000,000 rows written: 273.9 min
+305,000,000 rows written: 278.45 min
+310,000,000 rows written: 282.99 min
+315,000,000 rows written: 287.53 min
+320,000,000 rows written: 292.07 min
+325,000,000 rows written: 296.61 min
+330,000,000 rows written: 301.14 min
+335,000,000 rows written: 305.69 min
+340,000,000 rows written: 310.22 min
+345,000,000 rows written: 314.76 min
+350,000,000 rows written: 319.3 min
+355,000,000 rows written: 323.84 min
+360,000,000 rows written: 328.38 min
+365,000,000 rows written: 332.92 min
+370,000,000 rows written: 337.45 min
+375,000,000 rows written: 341.99 min
+380,000,000 rows written: 346.54 min
+385,000,000 rows written: 351.08 min
+390,000,000 rows written: 355.61 min
+395,000,000 rows written: 360.16 min
+400,000,000 rows written: 364.7 min
+405,000,000 rows written: 369.24 min
+410,000,000 rows written: 373.77 min
+415,000,000 rows written: 378.31 min
+420,000,000 rows written: 382.86 min
+425,000,000 rows written: 387.4 min
+430,000,000 rows written: 391.93 min
+435,000,000 rows written: 396.47 min
+440,000,000 rows written: 401.02 min
+445,000,000 rows written: 405.55 min
+Done!
