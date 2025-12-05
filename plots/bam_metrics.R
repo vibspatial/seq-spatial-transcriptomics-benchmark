@@ -31,10 +31,10 @@ sample_metadata <- tribble(
   
   "Exp74",      "Mouse_brain",    "BMKMANU_S1000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S1000/Exp74/bam_output",      4.7,
   
-  "Exp101",     "Mouse_lung",     "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp101/bam_output",    4.7,
-  #  "Exp100",     "Mouse_liver",    "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/bam_output",    6.8,
-  "Exp99",      "Mouse_brain",    "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp99/bam_output",     7.9,
-  "Exp102",     "Human_lung",     "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp102/bam_output",    9.6,
+  "Exp101",     "Mouse_lung",     "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp101/bam_output",     4.7,
+  "Exp100",     "Mouse_liver",    "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/bam_output",     6.8,
+  "Exp99",      "Mouse_brain",    "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp99/bam_output",      7.9,
+  "Exp102",     "Human_lung",     "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp102/bam_output",     9.6,
   
   "SC12",       "Mouse_lung",     "Curio_Seeker",   "E:/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC12/bam_output",    5.5,
   "SC13",       "Mouse_liver",    "Curio_Seeker",   "E:/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC13/bam_output",    5.4,
