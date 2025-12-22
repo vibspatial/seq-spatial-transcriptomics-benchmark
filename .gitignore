@@ -1,4 +1,6 @@
 notebooks/*
+
+# AnnData
 *.h5ad
 
 # Python cache
