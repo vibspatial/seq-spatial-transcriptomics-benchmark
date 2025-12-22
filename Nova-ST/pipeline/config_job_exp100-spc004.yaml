@@ -1,4 +1,4 @@
-env_yml: /staging/leuven/stg_00143/julienm/nova-st/config_env.yaml
+env_yml: /staging/leuven/stg_00143/julienm/nova-st/config_env_docker.yaml
 
 # ChipID for this experiment 061124-7D2
 

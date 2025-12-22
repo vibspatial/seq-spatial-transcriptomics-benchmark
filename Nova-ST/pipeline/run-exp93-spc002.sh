@@ -8,19 +8,22 @@
 #SBATCH --mem=200G
 #SBATCH --job-name=novascope93_02
 
-export LMOD_CACHED_LOADS=yes
-export LMOD_RC=/data/leuven/software/biomed/${VSC_INSTITUTE_CLUSTER}_${VSC_ARCH_LOCAL}_${VSC_OS_LOCAL}/lmodrc.lua
+novast_dir=/staging/leuven/stg_00143/julienm/nova-st
+container=${novast_dir}/apptainer/novascope_latest.sif
 
-echo LMOD_RC=$LMOD_RC
-echo LMOD_CACHED_LOADS=$LMOD_CACHED_LOADS
+seq1st_dir=/lustre1/project/stg_00003/cbd-bioinf/CBD__Bioinf_Unit__Nova-ST/NovaSeq6000_20241107
+job_dir=${novast_dir}/data/2024-07-UTBenchmark-SpC/Exp93-sampleSPC002
 
-module use /data/leuven/software/biomed/${VSC_INSTITUTE_CLUSTER}_${VSC_ARCH_LOCAL}_${VSC_OS_LOCAL}/20*/modules/all
-
-module load cluster/wice/batch_icelake
-module load GCC/12.3.0 GDAL/3.7.1-foss-2023a_SciPy_2311 ImageMagick/7.1.1-15-GCCcore-12.3.0 spatula/1.0.0-GCC-12.3.0 SAMtools/1.21-GCC-12.3.0 STAR/2.7.11a-GCC-12.3.0
-
-smk_dir=/staging/leuven/stg_00143/julienm/nova-st/git/NovaScope
-job_dir=/staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp93-sampleSPC002
-
-module load snakemake
-snakemake --latency-wait 20 -s ${smk_dir}/NovaScope.smk -d $job_dir --cores 32 --rerun-incomplete
+singularity exec \
+    --bind ${novast_dir}:${novast_dir} \
+    --bind ${seq1st_dir}:${seq1st_dir} \
+    --bind ${job_dir}:/data \
+    $container \
+    snakemake \
+        -s /app/novascope/NovaScope.smk \
+        -d /data \
+        --configfile /data/config_job.yaml \
+        --cores $SLURM_CPUS_PER_TASK \
+        --rerun-incomplete \
+        --latency-wait 20 \
+        -p

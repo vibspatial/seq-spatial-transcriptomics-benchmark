@@ -48,8 +48,6 @@ def bmkmanu(
         If `True`, an `in_tissue` column will be added to the `obs` DataFrame of the table layers.
     levels
         List of levels to include in the dataset. If `None`, all levels will be included.
-    image_path
-        Path to the registered H&E image from BMChiper.
     technology
         Specifies whether BMKGENE S1000 or S3000 was used. Should be set to either 'S1000' or 'S3000'.
     bc_path
@@ -58,7 +56,6 @@ def bmkmanu(
         present on the capture slide. If None, hypothetical spots will be kept in.
     output
         The path where the resulting `SpatialData` object will be backed. If None, it will not be backed to a zarr store.
-    
     """
     
     # Create SpatialData object from H&E image
