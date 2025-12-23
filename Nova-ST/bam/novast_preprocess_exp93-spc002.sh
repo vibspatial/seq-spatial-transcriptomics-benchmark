@@ -13,7 +13,7 @@ conda activate bamtools
 BAM="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Nova-ST/Exp93-sampleSPC002/NovaScope/novascope_output/align/NovaSeq6000_20241107/05C2/Exp93-sampleSPC002/bam/sttoolsAligned.sortedByCoord.out.bam"
 TISSUE_BARCODES_PATH="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Nova-ST/Exp93-sampleSPC002/harpy/barcodes_in_tissue.txt"
 OUTPUT_PATH="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Nova-ST/Exp93-sampleSPC002/bam_output/preprocessed_reads.csv"
-FASTQ_READ_COUNT=
+FASTQ_READ_COUNT=282980514
 
 python /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/scripts/2024-07-UTBenchmark-SpC/Nova-ST/bam/novast_preprocess.py \
   --bam_path "$BAM" \
