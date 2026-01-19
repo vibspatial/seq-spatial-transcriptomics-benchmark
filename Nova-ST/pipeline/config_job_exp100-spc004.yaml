@@ -16,6 +16,11 @@ input:
     fastq_R2: /staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-sampleSPC004/input/5147/5147_03_Exp100_SPC004_S7_L001_R2_001.fastq.gz
   - fastq_R1: /staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-sampleSPC004/input/5147/5147_03_Exp100_SPC004_S7_L002_R1_001.fastq.gz
     fastq_R2: /staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-sampleSPC004/input/5147/5147_03_Exp100_SPC004_S7_L002_R2_001.fastq.gz
+  - fastq_R1: /staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-sampleSPC004/input/5187/5187_03_Exp100_SPC004_S6_L001_R1_001.fastq.gz
+    fastq_R2: /staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-sampleSPC004/input/5187/5187_03_Exp100_SPC004_S6_L001_R2_001.fastq.gz
+  - fastq_R1: /staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-sampleSPC004/input/5187/5187_03_Exp100_SPC004_S6_L002_R1_001.fastq.gz
+    fastq_R2: /staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-sampleSPC004/input/5187/5187_03_Exp100_SPC004_S6_L002_R2_001.fastq.gz
+
 
 output: "/staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-sampleSPC004/novascope_output"
 

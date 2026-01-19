@@ -22,6 +22,7 @@ def novast(
     seq1st_id: str,
     chip_id: str,
     path_img: str | Path,
+    var_names_make_unique: bool = True,
     output: str | Path | None = None,
 ) -> SpatialData:
     """
@@ -39,6 +40,8 @@ def novast(
         Identifier for the Nova-ST chip. This should match the `chip` from the NovaScope config file.
     path_img
         Path to registered image.
+    var_names_make_unique
+        If `True`, call `.var_names_make_unique()` on the `AnnData` table.
     output
         The path where the resulting `SpatialData` object will be backed. If None, it will not be backed to a zarr store.
     """
@@ -48,10 +51,15 @@ def novast(
         input=path_img,
         img_layer=f'{dataset_id}_image',
         dims=['c', 'y', 'x'],
-        chunks=1024,
+        chunks=2048,
         to_coordinate_system=dataset_id,
         scale_factors=(2, 2, 2, 2),
     )
+
+    image_shape = hp.im._image._get_spatial_element(sdata, f'{dataset_id}_image').shape
+    
+    width = image_shape[2]
+    height = image_shape[1]
 
     # Read barcodes
     barcodes = pd.read_csv(
@@ -126,6 +134,9 @@ def novast(
         var=features
     )
 
+    if var_names_make_unique:
+        tables[bin_size_str].var_names_make_unique()
+
     # Add the other matrices as layers
     for k in ["GeneFull", "Spliced", "Unspliced", "Ambiguous"]:
         adata.layers[k] = layers[k]
@@ -149,28 +160,28 @@ def novast(
 
     # Add shapes and labels layer based on coordinates
     coordinates = adata.obsm["spatial"]
-    radius = 0.15
+    radius = _calculate_radius(coordinates, width, height)
     radii = np.full(len(coordinates), radius)
     spots = ShapesModel.parse(coordinates, geometry=0, radius=radii)
     spots.index = adata.obs[_INSTANCE_KEY]
-    polygons = spots.buffer(radius, cap_style="round")
+    polygons = spots.buffer(radius, cap_style="round", resolution=4)
 
     sdata = hp.sh.add_shapes_layer(
         sdata, 
         gpd.GeoDataFrame(geometry=polygons), 
         output_layer=f"{dataset_id}_shapes", 
-        transformations=get_transformation(sdata.images[f"{dataset_id}_he"], get_all=True),
+        transformations=get_transformation(sdata.images[f"{dataset_id}_image"], get_all=True),
         overwrite=True
     )
 
-    sdata = hp.im.rasterize(
-        sdata,
-        shapes_layer=f"{dataset_id}_shapes", 
-        output_layer=f"{dataset_id}_labels",
-        chunks=2048,
-        overwrite=True,
-        scale_factors=(2, 2, 2, 2),
-    )
+    # print("Starting rasterization...")
+    # sdata = hp.im.rasterize(
+    #     sdata,
+    #     shapes_layer=f"{dataset_id}_shapes", 
+    #     output_layer=f"{dataset_id}_labels",
+    #     chunks=512,
+    #     overwrite=True,
+    # )
 
     # Add adata as table layer
     sdata = hp.tb.add_table_layer(
@@ -186,3 +197,25 @@ def novast(
         sdata = read_zarr(sdata.path)
 
     return sdata
+
+def _calculate_radius(coordinates, width, height, subset_size=100):
+    x_center = width/2
+    y_center = height/2
+
+    x_min = x_center - (subset_size / 2)
+    x_max = x_center + (subset_size / 2)
+    y_min = y_center - (subset_size / 2)
+    y_max = y_center + (subset_size / 2)
+
+    subset_coords = coordinates[
+        (coordinates[:, 0] >= x_min) & (coordinates[:, 0] <= x_max) &
+        (coordinates[:, 1] >= y_min) & (coordinates[:, 1] <= y_max)
+    ]
+
+    distances = np.linalg.norm(subset_coords[:, np.newaxis] - subset_coords[np.newaxis, :], axis=-1)
+
+    np.fill_diagonal(distances, np.inf) 
+    min_distance = np.min(distances)
+
+    radius = (min_distance / 2) * 0.98
+    return radius

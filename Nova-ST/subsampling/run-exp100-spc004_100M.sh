@@ -4,7 +4,7 @@
 #SBATCH --partition=batch_icelake
 #SBATCH --nodes=1
 #SBATCH --cpus-per-task=32
-#SBATCH --time=7:00:00           # hh:mm:ss
+#SBATCH --time=12:00:00           # hh:mm:ss
 #SBATCH --mem=200G
 #SBATCH --job-name=novascope100_04_100M
 
@@ -21,8 +21,8 @@ module load cluster/wice/batch_icelake
 module load seqtk
 
 ## Subsample FASTQ files
-SAMPLE_NAME="Exp100_SPC004_S7"
-INPUT_DIRS=("/staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-sampleSPC004/input/5147")
+SAMPLE_NAME="Exp100_SPC004"
+INPUT_DIRS=("/staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-sampleSPC004/input/5147" "/staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-sampleSPC004/input/5187")
 OUT_DIR="/staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-sampleSPC004_100M/input/"
 
 TARGET_READS=100000000
