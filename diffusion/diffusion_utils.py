@@ -13,6 +13,7 @@ from matplotlib.patches import Rectangle
 from matplotlib.collections import LineCollection
 import numpy as np
 import geopandas as gpd
+import xarray as xr
 
 
 # from shapely.geometry import box, Polygon
@@ -62,8 +63,8 @@ def clip_polygon_to_bbox_lines(polygon, crop_rect):
     return result
 
 
-def get_figure_parameters(sdata, dataset_id, dpi=200, max_dim_for_plots=10000):
-    HE_image = f'{dataset_id}_full_image'
+def get_image_figure_parameters(sdata, HE_image, dpi=200, max_dim_for_plots=10000):
+    assert isinstance(sdata[HE_image], xr.DataTree), f"Expected xarray.DataTree for sdata[{HE_image!r}], got {type(sdata[HE_image])}"
 
     best_scale = best_datatree_scale(sdata[HE_image], max_dim_for_plots)
     print(f'best scale: {best_scale}')
@@ -73,44 +74,87 @@ def get_figure_parameters(sdata, dataset_id, dpi=200, max_dim_for_plots=10000):
                sdata.images[HE_image][best_scale]['image'].shape[1]/figsize_factor)
     print(f'figsize: {figsize}')
 
-    return HE_image, best_scale, dpi, figsize_factor, figsize
+    return best_scale, dpi, figsize_factor, figsize
 
 
-def plot_bins_on_HE_image(sdata, dataset_id, level, feature, bin_size_um):
+def get_labels_figure_parameters(sdata, labels_layer, dpi=200, max_dim_for_plots=10000):
+    assert isinstance(sdata.labels[labels_layer], xr.DataArray), f"Expected xarray.DataTree for sdata.labels[{labels_layer!r}], got {type(sdata.labels[labels_layer])}"
+
+    figsize_factor = dpi
+    figsize = (sdata.labels[labels_layer].shape[1]/figsize_factor,
+               sdata.labels[labels_layer].shape[0]/figsize_factor)
+    print(f'figsize: {figsize}')
+
+    return dpi, figsize_factor, figsize
+
+
+def plot_bins_colored_by_feature(sdata,
+                                 HE_image: str | None,
+                                 technology: str,
+                                 dataset_id: str,
+                                 level: str | None,
+                                 feature: str):
+    
     # color can be for example 'total_counts' or the name of a gene.
 
-    HE_image, best_scale, dpi, _, figsize = get_figure_parameters(sdata, dataset_id)
+    title = f"{feature} ({technology} {dataset_id} {level})"
 
-    title = f"{feature} ({bin_size_um} um bins)"
+    if level == "table":
+        # Special case where there is only one level (which is unnamed)
+        labels = f"{dataset_id}_labels"
+    else:
+        labels = f"{dataset_id}_{level}_labels"
 
-    sdata.pl.render_images(
-        element=HE_image, scale=best_scale
-    ).pl.render_labels(
-        element=f"{dataset_id}_{level}_labels", fill_alpha=0.5, contour_px=5, outline_alpha=0, 
-        color=feature, 
-        table_name=level,
-        scale=best_scale    # not necessary?
-    ).pl.show(
-        coordinate_systems=dataset_id,
-        title=title,
-        figsize=figsize,
-        colorbar=False,
-        dpi=dpi,
-        # pad_extent=rel_fontsize(fig, 0.02)
-    )
+    if HE_image:
+        best_scale, dpi, _, figsize = get_image_figure_parameters(sdata, HE_image)
+
+        sdata.pl.render_images(
+            element=HE_image, scale=best_scale
+        ).pl.render_labels(
+            element=labels, fill_alpha=0.5, contour_px=5, outline_alpha=0, 
+            color=feature, 
+            table_name=level,
+            scale=best_scale    # not necessary?
+        ).pl.show(
+            coordinate_systems=dataset_id,
+            title=title,
+            figsize=figsize,
+            colorbar=False,
+            dpi=dpi,
+            # pad_extent=rel_fontsize(fig, 0.02)
+        )
+    else:
+        dpi, _, figsize = get_labels_figure_parameters(sdata, labels)
+
+        sdata.pl.render_labels(
+            element=labels, fill_alpha=0.5, contour_px=5, outline_alpha=0, 
+            color=feature, 
+            table_name=level,
+            # scale=best_scale    # not necessary?
+        ).pl.show(
+            coordinate_systems=dataset_id,
+            title=title,
+            figsize=figsize,
+            colorbar=False,
+            dpi=dpi,
+            # pad_extent=rel_fontsize(fig, 0.02)
+        )
 
 
-def plot_tissue_outline_on_HE_image(sdata, dataset_id):
+def plot_tissue_outline_on_HE_image(sdata,
+                                    HE_image: str,
+                                    tissue_mask: str,
+                                    dataset_id: str):
     # Plot H&E image with tissue outline on top.
 
-    HE_image, best_scale, dpi, _, figsize = get_figure_parameters(sdata, dataset_id)
+    best_scale, dpi, _, figsize = get_image_figure_parameters(sdata, HE_image)
 
     title = "H&E with tissue outline"
 
     sdata.pl.render_images(
         element=HE_image, scale=best_scale
     ).pl.render_shapes(
-        element=f'{dataset_id}_tissue', color='#1f77b4', fill_alpha=0.3, outline_width=5, outline_alpha=1, outline_color='red'
+        element=tissue_mask, color='#1f77b4', fill_alpha=0.3, outline_width=5, outline_alpha=1, outline_color='red'
     ).pl.show(
         coordinate_systems=dataset_id,
         title=title,
@@ -121,7 +165,7 @@ def plot_tissue_outline_on_HE_image(sdata, dataset_id):
     )
 
 
-def plot_bins(crop_rect, bins_center_coordinates, bin_outlines_gdf, title: str):
+def plot_bin_outlines(crop_rect, bins_center_coordinates, bin_outlines_gdf, title: str):
     # crop_rect = [xmin, ymin, xmax, ymax] 
     # bins_center_coordinates = numpy array of nx2
     # bin_outlines_gdf: geopandas dataframe with outlines of the bins
