@@ -6,7 +6,8 @@ import geopandas as gpd
 import pandas as pd
 from spatialdata import SpatialData, read_zarr
 from spatialdata.models import TableModel
-from spatialdata.transformations import get_transformation, remove_transformation, set_transformation
+from shapely.affinity import translate as shapely_translate
+from spatialdata.transformations import get_transformation, remove_transformation, set_transformation, Translation, Sequence, Identity
 from spatialdata_io._constants._constants import VisiumKeys
 from spatialdata_io.readers.visium import visium as sdata_visium
 
@@ -19,6 +20,7 @@ def visium(
     dataset_id: str | None = None,
     counts_file: str = VisiumKeys.FILTERED_COUNTS_FILE,
     fullres_image_file: str | Path | None = None,
+    microns_per_pixel: float | None = None,
     output: str | Path | None = None,
 ) -> SpatialData:
     """
@@ -41,6 +43,9 @@ def visium(
         `'raw_feature_bc_matrix.h5'`, but `raw_probe_bc_matrix.h5` also works.
     fullres_image_file
         Path to the full-resolution image.
+    microns_per_pixel
+        Microns per pixel value for the full-resolution image. If specified, value will be used to accurately represent Visium spots as 55 μm diameter. 
+        If `None`, spot radius will be based on Scalefactors file, which tends to be larger to aid visualization.
     output
         The path where the resulting `SpatialData` object will be backed. If None, it will not be backed to a zarr store.
     """
@@ -88,18 +93,37 @@ def visium(
             adata.obs.drop(columns=_old_instance_key, inplace=True)
 
         # Convert Points to Polygons
-        if "radius" not in sdata.shapes[dataset_id].columns:
-            raise ValueError("Shapes layer is missing 'radius' column required for polygon buffering.")
-
-        radius = sdata.shapes[dataset_id]["radius"].mean()
+        if microns_per_pixel is not None:
+            radius = (55 / 2) / microns_per_pixel  # Visium spots have diameter of 55 microns
+        else:
+            if "radius" not in sdata.shapes[dataset_id].columns:
+                raise ValueError("Shapes layer is missing 'radius' column required for polygon buffering.")
+            radius = sdata.shapes[dataset_id]["radius"].mean()
+            
         polygons = sdata.shapes[dataset_id].buffer(radius, cap_style="round")
+        
+        min_x, min_y, max_x, max_y = polygons.total_bounds
+        offset_x, offset_y = -min_x, -min_y
+        
+        polygons = polygons.apply(
+            lambda geom: shapely_translate(geom, xoff=offset_x, yoff=offset_y)
+        ) # Offset coordinates so all of them are positive
+        
         transformations = get_transformation(sdata.shapes[dataset_id], get_all=True)
+        new_transformations = {}
+        
+        for coordinate_system, transformation in transformations.items():
+            translation = Translation([-offset_x, -offset_y], axes=("x", "y"))
+            if isinstance(transformation, Identity):
+                new_transformations[coordinate_system] = translation
+            else:
+                new_transformations[coordinate_system] = Sequence([translation, transformation])
         
         sdata = hp.sh.add_shapes_layer(
             sdata, 
             gpd.GeoDataFrame(geometry=polygons), 
             output_layer=dataset_id, 
-            transformations = transformations,
+            transformations = new_transformations,
             overwrite=True
         )
 
@@ -111,7 +135,7 @@ def visium(
             chunks=5000,
             overwrite=True,
         )
-
+                
         del sdata[table_layer]
 
         sdata[table_layer] = adata
