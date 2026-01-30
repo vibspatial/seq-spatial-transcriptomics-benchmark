@@ -11,9 +11,8 @@ from dask_image.imread import imread
 from spatialdata import SpatialData, read_zarr
 from spatialdata.models import ShapesModel
 from spatialdata.models import TableModel
-from spatialdata.transformations import get_transformation, remove_transformation, set_transformation
-# from spatialdata_io._constants._constants import VisiumKeys
-# from spatialdata_io.readers.visium import visium as sdata_visium
+from shapely.affinity import translate as shapely_translate
+from spatialdata.transformations import get_transformation, remove_transformation, set_transformation, Translation, Sequence, Identity
 
 import harpy as hp
 from harpy.utils._keys import _INSTANCE_KEY, _REGION_KEY
@@ -30,6 +29,7 @@ def bmkmanu(
     levels: list[int] | None = None,
     technology: str | None = None,
     bc_path: str | Path | None = None,
+    microns_per_pixel: float | None = None,
     output: str | Path | None = None,
 ) -> SpatialData:
     """
@@ -54,6 +54,9 @@ def bmkmanu(
         Path to .bc file for level 1 (L1) outputted by BSTMAtrix level_bc2bc.pl script. This maps the level names from the data stored in 05.AllheStat/BSTViewer_project/subdata 
         and 05.AllheStat/BSTViewer_project/level_matrix to the barcode names in the config_prefix folder. This allows us to remove hypothetical spots for level 1 that are not actually 
         present on the capture slide. If None, hypothetical spots will be kept in.
+    microns_per_pixel
+        Microns per pixel value for the BM Chiper registered image. If specified, value will be used to accurately represent level 1 spots as 2.5 μm diameter. Value is ignored for other levels.
+        If `None`, spot radius will be maximized for optimal visualization.
     output
         The path where the resulting `SpatialData` object will be backed. If None, it will not be backed to a zarr store.
     """
@@ -109,6 +112,7 @@ def bmkmanu(
             technology,
             add_in_tissue_column,
             bc_path,
+            microns_per_pixel
         )
         
     if output is not None:
@@ -156,7 +160,7 @@ def _calculate_radius(coordinates, width, height, subset_size=1000):
     radius = (min_distance / 2) * 0.98
     return radius
 
-def _add_BMK_level(sdata, dataset_id, level, level_name, level_path, width, height, technology, add_in_tissue_column, bc_path):
+def _add_BMK_level(sdata, dataset_id, level, level_name, level_path, width, height, technology, add_in_tissue_column, bc_path, microns_per_pixel):
     # Calculate scaling factor
     scaling_factor = _calculate_scaling_factor(width, height, technology)
 
@@ -203,23 +207,45 @@ def _add_BMK_level(sdata, dataset_id, level, level_name, level_path, width, heig
     
     # Add shapes and labels layer based on coordinates
     coordinates = adata.obsm["spatial"]
-    radius = _calculate_radius(coordinates, width, height)
+    
+    if microns_per_pixel is not None and level == 1:
+        radius = (2.5 / 2) / microns_per_pixel  # Level 1 spots have diameter of 2.5 microns
+    else:
+        radius = _calculate_radius(coordinates, width, height)
+    
     radii = np.full(len(coordinates), radius)
     spots = ShapesModel.parse(coordinates, geometry=0, radius=radii)
     spots.index = adata.obs.index
     polygons = spots.buffer(radius, cap_style="round")
     
+    min_x, min_y, max_x, max_y = polygons.total_bounds
+    offset_x, offset_y = -min_x, -min_y
+    
+    polygons = polygons.apply(
+        lambda geom: shapely_translate(geom, xoff=offset_x, yoff=offset_y)
+    ) # Offset coordinates so all of them are positive
+    
+    transformations = get_transformation(sdata.images[f"{dataset_id}_he"], get_all=True)
+    new_transformations = {}
+    
+    for coordinate_system, transformation in transformations.items():
+        translation = Translation([-offset_x, -offset_y], axes=("x", "y"))
+        if isinstance(transformation, Identity):
+            new_transformations[coordinate_system] = translation
+        else:
+            new_transformations[coordinate_system] = Sequence([translation, transformation])
+    
     sdata = hp.sh.add_shapes_layer(
         sdata, 
         gpd.GeoDataFrame(geometry=polygons), 
-        output_layer=f"{dataset_id}_{level_name}", 
-        transformations=get_transformation(sdata.images[f"{dataset_id}_he"], get_all=True),
+        output_layer=f"{dataset_id}_{level_name}_shapes", 
+        transformations=new_transformations,
         overwrite=True
     )
     
     sdata = hp.im.rasterize(
         sdata,
-        shapes_layer=f"{dataset_id}_{level_name}", 
+        shapes_layer=f"{dataset_id}_{level_name}_shapes", 
         output_layer=f"{dataset_id}_{level_name}_labels",
         chunks=2048,
         overwrite=True,
@@ -229,8 +255,8 @@ def _add_BMK_level(sdata, dataset_id, level, level_name, level_path, width, heig
     sdata = hp.tb.add_table_layer(
         sdata, 
         adata=adata.copy(), 
-        output_layer=level_name, 
-        region=[F"{dataset_id}_{level_name}_labels"], 
+        output_layer=f"{dataset_id}_{level_name}_table", 
+        region=[f"{dataset_id}_{level_name}_labels"], 
         overwrite=True
     )
 
