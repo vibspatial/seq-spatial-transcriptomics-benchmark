@@ -130,7 +130,15 @@ def _process_SAW_h5ad(sdata, dataset_id, adata, prefix, bin_size):
         region_key="temporary_region_key",
         instance_key="temporary_instance_key",
     )
-
+    
+    adata.obsm['spatial'] = adata.obsm['spatial'].astype(np.int32)  # SAW outputs uint32, but this trips up hp.tb.bin_counts()
+    
+    adata.var["gene_ids"] = adata.var_names
+    adata.var_names = adata.var["real_gene_name"]
+    adata.var.drop(columns=['real_gene_name'], inplace=True)
+    adata.var_names_make_unique()
+    adata.var_names.name = None
+    
     # Create square polygons based on coordinates
     coordinates = adata.obsm["spatial"]
     radius = bin_size / 2

@@ -8,13 +8,14 @@ import pandas as pd
 import numpy as np
 from spatialdata import SpatialData, read_zarr
 from spatialdata.models import ShapesModel
-from spatialdata.transformations import get_transformation, remove_transformation, set_transformation
+from spatialdata.transformations import get_transformation, remove_transformation, set_transformation, Scale
 
 import harpy as hp
 import gzip
 from scipy import sparse
 import anndata as ad
 from harpy.utils._keys import _INSTANCE_KEY, _REGION_KEY
+from shapely.affinity import scale
 
 def novast(
     path: str | Path,
@@ -22,7 +23,7 @@ def novast(
     seq1st_id: str,
     chip_id: str,
     path_img: str | Path,
-    var_names_make_unique: bool = True,
+    microns_per_pixel: float | None = None,
     output: str | Path | None = None,
 ) -> SpatialData:
     """
@@ -40,8 +41,9 @@ def novast(
         Identifier for the Nova-ST chip. This should match the `chip` from the NovaScope config file.
     path_img
         Path to registered image.
-    var_names_make_unique
-        If `True`, call `.var_names_make_unique()` on the `AnnData` table.
+    microns_per_pixel
+        Microns per pixel value for the image. If specified, value will be used to accurately represent spots as 0.3 μm diameter. Value is ignored for other levels.
+        If `None`, spot radius will be maximized for optimal visualization.
     output
         The path where the resulting `SpatialData` object will be backed. If None, it will not be backed to a zarr store.
     """
@@ -60,6 +62,10 @@ def novast(
     
     width = image_shape[2]
     height = image_shape[1]
+
+    if output is not None:
+        sdata.write(output)
+        sdata = read_zarr(sdata.path)
 
     # Read barcodes
     barcodes = pd.read_csv(
@@ -134,9 +140,6 @@ def novast(
         var=features
     )
 
-    if var_names_make_unique:
-        tables[bin_size_str].var_names_make_unique()
-
     # Add the other matrices as layers
     for k in ["GeneFull", "Spliced", "Unspliced", "Ambiguous"]:
         adata.layers[k] = layers[k]
@@ -145,6 +148,9 @@ def novast(
     # GeneFull: Counts reads overlapping entire gene locus, i.e. including exonic and intronic regions. This captures both unspliced (primary) and spliced transcripts and providing a more comprehensive view of gene activity.
     # Velocyto: Generates separate count matrices for spliced, unspliced, and ambiguous reads, following the rules from (La Manno et al., 2018). This enables RNA velocity analyses to infer dynamic cellular processes.
         
+    # Make var names unique
+    adata.var_names_make_unique()
+    
     # Remove indices
     adata.obs = adata.obs.drop(columns=["barcode_index", "full_barcode_index"])
     adata.var = adata.var.drop(columns=["feature_index"])
@@ -160,28 +166,37 @@ def novast(
 
     # Add shapes and labels layer based on coordinates
     coordinates = adata.obsm["spatial"]
-    radius = _calculate_radius(coordinates, width, height)
+    
+    if microns_per_pixel is not None:
+        radius = (0.3 / 2) / microns_per_pixel  # Spots have diameter of 0.3 microns
+    else:
+        radius = _calculate_radius(coordinates, width, height)
+    
     radii = np.full(len(coordinates), radius)
     spots = ShapesModel.parse(coordinates, geometry=0, radius=radii)
     spots.index = adata.obs[_INSTANCE_KEY]
     polygons = spots.buffer(radius, cap_style="round", resolution=4)
+    polygons_scaled = polygons.apply(
+        lambda geom: scale(geom, xfact=10, yfact=10, origin=(0, 0))
+    ) # Scale polygons by 10x for better rasterization resolution
+    
+    transformations = {dataset_id: Scale([0.1, 0.1], axes=("x", "y"))} # Scale down by 10x to account for earlier scaling of polygons
 
     sdata = hp.sh.add_shapes_layer(
         sdata, 
-        gpd.GeoDataFrame(geometry=polygons), 
+        gpd.GeoDataFrame(geometry=polygons_scaled), 
         output_layer=f"{dataset_id}_shapes", 
-        transformations=get_transformation(sdata.images[f"{dataset_id}_image"], get_all=True),
+        transformations=transformations,
         overwrite=True
     )
 
-    # print("Starting rasterization...")
-    # sdata = hp.im.rasterize(
-    #     sdata,
-    #     shapes_layer=f"{dataset_id}_shapes", 
-    #     output_layer=f"{dataset_id}_labels",
-    #     chunks=512,
-    #     overwrite=True,
-    # )
+    sdata = hp.im.rasterize(
+        sdata,
+        shapes_layer=f"{dataset_id}_shapes", 
+        output_layer=f"{dataset_id}_labels",
+        chunks=1024,
+        overwrite=True,
+    )
 
     # Add adata as table layer
     sdata = hp.tb.add_table_layer(
@@ -191,10 +206,6 @@ def novast(
         region=[f"{dataset_id}_labels"], 
         overwrite=True
     )
-
-    if output is not None:
-        sdata.write(output)
-        sdata = read_zarr(sdata.path)
 
     return sdata
 

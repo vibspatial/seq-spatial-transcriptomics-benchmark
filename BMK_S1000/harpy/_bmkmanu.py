@@ -18,7 +18,6 @@ import harpy as hp
 from harpy.utils._keys import _INSTANCE_KEY, _REGION_KEY
 
 # TODO: Add support for reading in fluorescence image, segmentation, ...
-# TODO: Spot sizes are not the actual size they should be in micrometer
 # TODO: Match barcode names for all levels
 
 def bmkmanu(
