@@ -1,31 +1,9 @@
 # Instructions to built a reference: https://www.10xgenomics.com/support/software/cell-ranger/latest/tutorials/cr-tutorial-mr
 
-# Download GTF
-wget https://ftp.ebi.ac.uk/ensemblgenomes/pub/release-62/plants/gtf/oryza_sativa/Oryza_sativa.IRGSP-1.0.62.gtf.gz
-
-# Unzip GTF
-gunzip Oryza_sativa.IRGSP-1.0.62.gtf.gz
-
-# Download FASTA
-wget https://ftp.ensemblgenomes.ebi.ac.uk/pub/plants/release-62/fasta/oryza_sativa/dna/Oryza_sativa.IRGSP-1.0.dna.toplevel.fa.gz
-
-# Unzip FASTA
-gunzip Oryza_sativa.IRGSP-1.0.dna.toplevel.fa.gz
-
-# Filter the GTF
-spaceranger mkgtf \
-    Oryza_sativa.IRGSP-1.0.62.gtf \
-    Oryza_sativa.IRGSP-1.0.62.filtered.gtf \
-    --attribute=gene_biotype:protein_coding
-
-# mkref
-spaceranger mkref \
-    --genome=Osativa_genome \
-    --fasta=Oryza_sativa.IRGSP-1.0.dna.toplevel.fa \
-    --genes=Oryza_sativa.IRGSP-1.0.62.filtered.gtf
+# We used the rice reference that was used for Space Ranger by the Single-Cell Core.
 
 ## index the reference genome
-cd Osativa_genome
+cd /staging/leuven/stg_00143/julienm/nova-st/ref/oryza_sativa_japonica/IRGSP.49
 gunzip -c ./genes/genes.gtf.gz > ./genes/genes.gtf
 rm ./genes/genes.gtf.gz
 
@@ -49,9 +27,12 @@ cp genes/genes.gtf indexes/STAR/2.7.10a/
 # and these do not work in the docker version anyway. I should be able to turn of these visualizations by setting action=False for drawsge, but
 # this still results in an path not found error for the genelist so I quickly created these files.
 
+mkdir genelists
+
 awk '$3 == "gene" {
   match($0, /gene_id "([^"]+)"/, arr);
   if (arr[1] != "") print arr[1];
+
 }' genes/genes.gtf > genelists/all.genes.tsv
 
 awk '$3 == "gene" && $1 == "Mt" {
