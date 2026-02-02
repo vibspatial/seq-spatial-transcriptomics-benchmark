@@ -20,7 +20,7 @@ module load seqtk
 
 # Specify arguments
 INPUT_DIRS=("/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Stereo-Seq/${ID}/fastqs")
-OUT_DIR="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Stereo-Seq/${ID}/subsampled_100M/FASTQ"
+OUT_DIR="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/${ID}/subsampled_100M/FASTQ"
 
 TARGET_READS=100000000
 SEED=42
@@ -30,8 +30,8 @@ mkdir -p "$OUT_DIR"
 echo "Subsampling FASTQ files for sample $ID..."
 
 # Gather all R1 and R2 files
-R1_FILES=$(for d in "${INPUT_DIRS[@]}"; do ls ${d}/${ID}*_R1_*.fastq.gz; done)
-R2_FILES=$(for d in "${INPUT_DIRS[@]}"; do ls ${d}/${ID}*_R2_*.fastq.gz; done)
+R1_FILES=$(for d in "${INPUT_DIRS[@]}"; do ls ${d}/*_1.fq.gz; done)
+R2_FILES=$(for d in "${INPUT_DIRS[@]}"; do ls ${d}/*_2.fq.gz; done)
 
 # Count reads in each R1 file (4 lines per read)
 TOTAL_READS=0
@@ -49,7 +49,7 @@ echo "Total reads across all R1 files: $TOTAL_READS"
 
 # Subsample each file proportionally
 for f in $R1_FILES; do
-    R2_FILE=${f/_R1_/_R2_}
+    R2_FILE=${f/_1.fq.gz/_2.fq.gz}
     COUNT=${FILE_READS["$f"]}
     KEEP=$((COUNT * TARGET_READS / TOTAL_READS))
 
@@ -66,7 +66,7 @@ for f in $R1_FILES; do
 done
 
 # Count reads after subsampling
-READS_KEPT=$(find "$OUT_DIR" -type f -name "*_R1_*.fastq.gz" -exec zcat {} + | wc -l)
+READS_KEPT=$(find "$OUT_DIR" -type f -name "*_1.fq.gz" -exec zcat {} + | wc -l)
 READS_KEPT=$((READS_KEPT / 4))
 echo "Total reads after subsampling: $READS_KEPT"
 
@@ -82,7 +82,7 @@ saw count \
     --chip-mask=/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Stereo-Seq/${ID}/mask/${SN}.barcodeToPos.h5 \
     --organism=mouse \
     --tissue=brain \
-    --fastqs=/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/${ID}/subsampled_100M/FASTQ \
+    --fastqs=/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/${ID}/subsampled_100M/FASTQ/fastqs \
     --reference=/data/groups/technologies/spatial.catalyst/Julien/SAW/reference/refdata-gex-mm10-2020-A \
     --image-tar=/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/raw/Stereo-Seq/${ID}/image/${TAR}
 
