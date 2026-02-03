@@ -3,6 +3,7 @@ import sys
 sys.path.append(os.path.abspath('..'))
 from utils.in_tissue import add_in_tissue, assign_region
 from utils.plotting import best_datatree_scale, rel_fontsize
+from diffusion import LevelInfo
 
 import shapely
 from shapely.geometry import box
@@ -92,77 +93,91 @@ def plot_bins_colored_by_feature(sdata,
                                  HE_image: str | None,
                                  technology: str,
                                  dataset_id: str,
-                                 level: str | None,
-                                 feature: str):
+                                 level_info: LevelInfo,
+                                 feature: str,
+                                 output_folder: str):
     
     # color can be for example 'total_counts' or the name of a gene.
 
-    title = f"{feature} ({technology} {dataset_id} {level})"
-
-    if level == "table":
-        # Special case where there is only one level (which is unnamed)
-        labels = f"{dataset_id}_labels"
-    else:
-        labels = f"{dataset_id}_{level}_labels"
+    title = f"{feature} ({technology} {dataset_id} {level_info.name})"
 
     if HE_image:
         best_scale, dpi, _, figsize = get_image_figure_parameters(sdata, HE_image)
 
+        fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
         sdata.pl.render_images(
             element=HE_image, scale=best_scale
         ).pl.render_labels(
-            element=labels, fill_alpha=0.5, contour_px=5, outline_alpha=0, 
+            element=level_info.labels_layer, fill_alpha=0.5, contour_px=5, outline_alpha=0, 
             color=feature, 
-            table_name=level,
-            scale=best_scale    # not necessary?
+            table_name=level_info.table_name,
         ).pl.show(
             coordinate_systems=dataset_id,
             title=title,
             figsize=figsize,
             colorbar=False,
             dpi=dpi,
-            # pad_extent=rel_fontsize(fig, 0.02)
+            ax=ax
         )
-    else:
-        dpi, _, figsize = get_labels_figure_parameters(sdata, labels)
+        save_path = os.path.join(output_folder, f'{technology}_{dataset_id}_{level_info.name}_{feature}.png')
+        fig.savefig(save_path, bbox_inches="tight", pad_inches=max(fig.get_size_inches())/100, facecolor="white", transparent=False)
+        plt.close(fig)
 
+    else:
+        dpi, _, figsize = get_labels_figure_parameters(sdata, level_info.labels_layer)
+
+        fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
         sdata.pl.render_labels(
-            element=labels, fill_alpha=0.5, contour_px=5, outline_alpha=0, 
+            element=level_info.labels_layer, fill_alpha=0.5, contour_px=5, outline_alpha=0, 
             color=feature, 
-            table_name=level,
-            # scale=best_scale    # not necessary?
+            table_name=level_info.table_name,
         ).pl.show(
             coordinate_systems=dataset_id,
             title=title,
             figsize=figsize,
             colorbar=False,
             dpi=dpi,
-            # pad_extent=rel_fontsize(fig, 0.02)
+            ax=ax
         )
+        save_path = os.path.join(output_folder, f'{technology}_{dataset_id}_{level_info.name}_{feature}.png')
+        fig.savefig(save_path, bbox_inches="tight", pad_inches=max(fig.get_size_inches())/100, facecolor="white", transparent=False)
+        plt.close(fig)
+
 
 
 def plot_tissue_outline_on_HE_image(sdata,
                                     HE_image: str,
                                     tissue_mask: str,
-                                    dataset_id: str):
+                                    technology: str,
+                                    dataset_id: str,
+                                    output_folder: str,
+                                    fill_alpha=0.3,
+                                    outline_width=5):
     # Plot H&E image with tissue outline on top.
 
     best_scale, dpi, _, figsize = get_image_figure_parameters(sdata, HE_image)
 
-    title = "H&E with tissue outline"
+    title = f"{technology} {dataset_id}: H&E with tissue outline"
 
+    fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
+    
     sdata.pl.render_images(
         element=HE_image, scale=best_scale
     ).pl.render_shapes(
-        element=tissue_mask, color='#1f77b4', fill_alpha=0.3, outline_width=5, outline_alpha=1, outline_color='red'
+        element=tissue_mask, color='#1f77b4', fill_alpha=fill_alpha, outline_width=outline_width, outline_alpha=1, outline_color='red'
     ).pl.show(
         coordinate_systems=dataset_id,
         title=title,
         figsize=figsize,
         colorbar=False,
         dpi=dpi,
-        # pad_extent=rel_fontsize(fig, 0.02)
+        ax=ax
     )
+
+    save_path = os.path.join(output_folder, f'{technology}_{dataset_id}_tissue.png')
+    fig.savefig(save_path, bbox_inches="tight", pad_inches=max(fig.get_size_inches())/100, facecolor="white", transparent=False)
+    plt.close(fig)
+    print(f"{save_path} saved")
 
 
 def plot_bin_outlines(crop_rect, bins_center_coordinates, bin_outlines_gdf, title: str):
