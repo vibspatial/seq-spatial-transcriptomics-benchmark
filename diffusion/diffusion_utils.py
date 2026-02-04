@@ -3,7 +3,7 @@ import sys
 sys.path.append(os.path.abspath('..'))
 from utils.in_tissue import add_in_tissue, assign_region
 from utils.plotting import best_datatree_scale, rel_fontsize
-from diffusion import LevelInfo
+from diffusion import LevelInfo, Experiment
 
 import shapely
 from shapely.geometry import box
@@ -262,3 +262,10 @@ def plot_bins_and_closest_points_on_contour(points_xy, closest_xy, closest_dista
     ax.set_title(f'{dataset_and_level}: bins and closest point on contour')
 
     plt.show()
+
+
+def get_experiment_by_id(experiments: list[Experiment], dataset_id: str) -> Experiment | None:
+    for experiment in experiments:
+        if experiment.dataset_id == dataset_id:
+            return experiment
+    return None
