@@ -17,5 +17,5 @@ class Experiment:
     sdata_path: str  # path to SpatialData zarr with analysis output
     he_image: str | None  # name of H&E image layer
     tissue_mask: str | None  # name of tissue mask shapes layer
-    levels: list[LevelInfo]  # bin sizes
-    crop_rect: list[int] | None  # crop rectangle [xmin, ymin, xmax, ymax] in pixel coordinates on "{dataset_id}_full_image"
+    levels: list[LevelInfo]  # bin sizes, they MUST be ordered from finest to coarsest
+    crop_rects: list[tuple[int, int, int, int]]  # list of crop rectangles (xmin, ymin, xmax, ymax) in pixel coordinates

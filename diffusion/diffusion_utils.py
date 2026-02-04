@@ -1,4 +1,4 @@
-import os
+﻿import os
 import sys
 sys.path.append(os.path.abspath('..'))
 from utils.in_tissue import add_in_tissue, assign_region
@@ -217,6 +217,7 @@ def plot_tissue_outline_on_HE_image(sdata,
                                     technology: str,
                                     dataset_id: str,
                                     output_folder: str | None,
+                                    filename: str | None = None,
                                     fill_alpha=0.3,
                                     outline_width=5,
                                     bounds: tuple[float, float, float, float] | None = None):
@@ -226,6 +227,9 @@ def plot_tissue_outline_on_HE_image(sdata,
     best_scale, dpi, _, figsize = get_image_figure_parameters(sdata, HE_image)
 
     title = f"{technology} {dataset_id}: H&E with tissue outline"
+    if bounds is not None:
+        xmin, ymin, xmax, ymax = bounds
+        title = f"{title}\n(crop: {xmin}, {ymin}, {xmax}, {ymax})"
 
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
     
@@ -247,7 +251,7 @@ def plot_tissue_outline_on_HE_image(sdata,
         ax.set_xlim(xmin, xmax)
         ax.set_ylim(ymax, ymin)
 
-    save_or_show_figure(fig, output_folder, f'{technology}_{dataset_id}_tissue.png')
+    save_or_show_figure(fig, output_folder, filename)
 
 
 def plot_bin_outlines(crop_rect, bins_center_coordinates, bin_outlines_gdf, title: str):
@@ -273,11 +277,16 @@ def plot_bin_outlines(crop_rect, bins_center_coordinates, bin_outlines_gdf, titl
     ax.add_patch(rect)
 
 
-def plot_boundary_geoseries(boundary: BaseGeometry, figsize: tuple[float, float] = (6, 6), invert_y: bool = True):
-    ax = gpd.GeoSeries([boundary]).plot(figsize=figsize)
-    if invert_y:
-        ax.set_ylim(ax.get_ylim()[::-1])
-    plt.show()
+def plot_boundary_geoseries(boundary: BaseGeometry,
+                            figsize: tuple[float, float] = (6, 6),
+                            output_folder: str | None = None,
+                            filename: str | None = None):
+    fig, ax = plt.subplots(figsize=figsize)
+
+    gpd.GeoSeries([boundary]).plot(ax=ax, figsize=figsize)
+    ax.invert_yaxis()
+
+    save_or_show_figure(fig, output_folder, filename)
 
 
 def closest_points_and_distances(points: np.ndarray, line: shapely.LineString) -> tuple[np.ndarray, np.ndarray]:
@@ -294,22 +303,35 @@ def closest_points_and_distances(points: np.ndarray, line: shapely.LineString) -
     return closest_xy, distances
 
 
-def plot_bin_gene_counts_and_contour(bin_centers, transcript_counts, contour, title:str) -> None:
+def plot_bin_gene_counts_and_contour(
+    bin_centers,
+    transcript_counts,
+    contour,
+    title: str,
+    figsize=(10, 10),
+    line_width=1,
+    marker_size=20,
+    output_folder: str | None = None,
+    filename: str | None = None
+) -> None:
     # Plot the bin centers, colored by the number of transcripts detected in that bin,
     # together with a given contour over it.
-    fig, ax = plt.subplots(figsize=(10, 10))
+    fig, ax = plt.subplots(figsize=figsize)
     ax.set_title(title)
-    sc = ax.scatter(bin_centers[:,0], bin_centers[:, 1], c=transcript_counts, s=20)
+    sc = ax.scatter(bin_centers[:,0], bin_centers[:, 1], c=transcript_counts, s=marker_size)
     cbar = fig.colorbar(sc, ax=ax, shrink=0.4)
     cbar.set_label("Counts")
     gpd.GeoSeries([contour]).plot(
         ax=ax,
         color="red",
-        linewidth=1
+        linewidth=line_width,
     )
+    ax.invert_yaxis()
+
+    save_or_show_figure(fig, output_folder, filename)
 
 
-def plot_bins_and_closest_points_on_contour(points_xy, closest_xy, closest_distances, contour, dataset_and_level):
+def plot_bins_and_closest_points_on_contour(points_xy, closest_xy, closest_distances, contour, title: str, output_folder: str | None = None, filename: str | None = None):
 
     # Line segments connecting each bin to its closest point on the contour
     segments = np.stack([points_xy, closest_xy], axis=1)  # shape (number of bins, 2, 2)
@@ -336,9 +358,10 @@ def plot_bins_and_closest_points_on_contour(points_xy, closest_xy, closest_dista
     ax.legend()
     ax.set_xlabel('X')
     ax.set_ylabel('Y')
-    ax.set_title(f'{dataset_and_level}: bins and closest point on contour')
+    ax.set_title(title)
+    ax.invert_yaxis()
 
-    plt.show()
+    save_or_show_figure(fig, output_folder, filename)
 
 
 def get_experiment_by_id(experiments: list[Experiment], dataset_id: str) -> Experiment | None:
@@ -346,3 +369,4 @@ def get_experiment_by_id(experiments: list[Experiment], dataset_id: str) -> Expe
         if experiment.dataset_id == dataset_id:
             return experiment
     return None
+
