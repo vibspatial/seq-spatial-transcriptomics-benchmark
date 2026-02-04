@@ -8,6 +8,7 @@ from diffusion import LevelInfo, Experiment
 import shapely
 from shapely.geometry import box
 from shapely.ops import unary_union
+from shapely.geometry.base import BaseGeometry
 import spatialdata_plot
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
@@ -62,6 +63,74 @@ def clip_polygon_to_bbox_lines(polygon, crop_rect):
     result = clipped_boundary.difference(bbox.boundary)
 
     return result
+
+
+def longest_cropped_shape_contour(
+    sdata,
+    shapes_layer: str,
+    crop_rect: tuple[float, float, float, float],
+) -> shapely.LineString | None:
+    """
+    Return the longest clipped contour (LineString) from a shapes layer.
+
+    If no shape overlaps the crop rectangle, return None.
+    """
+    def _iter_lines_local(geometry: BaseGeometry):
+        if geometry.is_empty:
+            return
+        geom_type = geometry.geom_type
+        if geom_type == "LineString":
+            yield geometry
+        elif geom_type == "MultiLineString":
+            for line in geometry.geoms:
+                yield line
+        elif geom_type == "GeometryCollection":
+            for part in geometry.geoms:
+                yield from _iter_lines_local(part)
+
+    gdf = sdata.shapes[shapes_layer]
+    if gdf.empty:
+        return None
+
+    bbox = box(*crop_rect)
+    best_line = None
+    best_len = -1.0
+
+    for _, geom in enumerate(gdf.geometry):
+        if geom is None or geom.is_empty:
+            continue
+        if not geom.intersects(bbox):
+            continue
+
+        clipped = geom.intersection(bbox)
+        if clipped.is_empty:
+            continue
+
+        # Remove bbox edges so only interior polygon boundaries remain.
+        if clipped.geom_type == "GeometryCollection":
+            polys = [g for g in clipped.geoms if g.geom_type in {"Polygon", "MultiPolygon"}]
+            if polys:
+                clipped_for_boundary = unary_union(polys)
+            else:
+                clipped_for_boundary = clipped
+        else:
+            clipped_for_boundary = clipped
+
+        boundary = clipped_for_boundary.boundary
+        if boundary is None or boundary.is_empty:
+            continue
+        boundary = boundary.difference(bbox.boundary)
+        if boundary is None or boundary.is_empty:
+            continue
+
+        line_count = 0
+        for line in _iter_lines_local(boundary):
+            line_count += 1
+            length = line.length
+            if length > best_len:
+                best_len = length
+                best_line = line
+    return best_line
 
 
 def get_image_figure_parameters(sdata, HE_image, dpi=200, max_dim_for_plots=10000):
@@ -211,6 +280,13 @@ def plot_bin_outlines(crop_rect, bins_center_coordinates, bin_outlines_gdf, titl
     ax.scatter(x=bins_center_coordinates[:, 0], y=bins_center_coordinates[:, 1], color="red", s=1)
     ax.plot
     ax.add_patch(rect)
+
+
+def plot_boundary_geoseries(boundary: BaseGeometry, figsize: tuple[float, float] = (6, 6), invert_y: bool = True):
+    ax = gpd.GeoSeries([boundary]).plot(figsize=figsize)
+    if invert_y:
+        ax.set_ylim(ax.get_ylim()[::-1])
+    plt.show()
 
 
 def closest_points_and_distances(points: np.ndarray, line: shapely.LineString) -> tuple[np.ndarray, np.ndarray]:
