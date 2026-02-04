@@ -8,14 +8,14 @@ import pandas as pd
 import numpy as np
 from spatialdata import SpatialData, read_zarr
 from spatialdata.models import ShapesModel
-from spatialdata.transformations import get_transformation, remove_transformation, set_transformation, Scale
+from spatialdata.transformations import get_transformation, remove_transformation, set_transformation, Scale, Translation, Sequence, Identity
 
 import harpy as hp
 import gzip
 from scipy import sparse
 import anndata as ad
 from harpy.utils._keys import _INSTANCE_KEY, _REGION_KEY
-from shapely.affinity import scale
+from shapely.affinity import scale, translate
 
 def novast(
     path: str | Path,
@@ -158,12 +158,16 @@ def novast(
     # Add coordinates to obsm
     coordinates = barcodes[["x","y"]].to_numpy() / 1000 # Divide by 1000 to get coordinates in micrometer
     adata.obsm["spatial"] = coordinates
+    
+    # Remove spots with (0,0) coordinates
+    adata = adata[(adata.obs["x"] != 0) | (adata.obs["y"] != 0)].copy()
     adata.obs = adata.obs.drop(columns=["x", "y"])
+    # NOTE: It's still somewhat unclear why but thousands of spots end up with (0,0) coordinates and fall on top of each other. These are clearly mistakes and need to be removed to avoid mismatches IDs between the labels and shapes layers.
 
     # Add region key and change indexes
     adata.obs[_REGION_KEY] = f"{dataset_id}_labels"
     adata.obs[_INSTANCE_KEY] = range(1, len(adata.obs) + 1)
-
+    
     # Add shapes and labels layer based on coordinates
     coordinates = adata.obsm["spatial"]
     
@@ -176,15 +180,26 @@ def novast(
     spots = ShapesModel.parse(coordinates, geometry=0, radius=radii)
     spots.index = adata.obs[_INSTANCE_KEY]
     polygons = spots.buffer(radius, cap_style="round", resolution=4)
-    polygons_scaled = polygons.apply(
+    
+    polygons = polygons.apply(
         lambda geom: scale(geom, xfact=10, yfact=10, origin=(0, 0))
     ) # Scale polygons by 10x for better rasterization resolution
     
-    transformations = {dataset_id: Scale([0.1, 0.1], axes=("x", "y"))} # Scale down by 10x to account for earlier scaling of polygons
+    min_x, min_y, max_x, max_y = polygons.total_bounds
+    offset_x, offset_y = -min_x, -min_y
+    
+    polygons = polygons.apply(
+        lambda geom: translate(geom, xoff=offset_x, yoff=offset_y)
+    ) # Offset coordinates so all of them are positive
+    
+    transformations = {dataset_id: Sequence([
+        Translation([-offset_x, -offset_y], axes=("x", "y")), # Translate back to original position
+        Scale([0.1, 0.1], axes=("x", "y")) # Scale down by 10x to account for earlier scaling of polygons
+        ])}
 
     sdata = hp.sh.add_shapes_layer(
         sdata, 
-        gpd.GeoDataFrame(geometry=polygons_scaled), 
+        gpd.GeoDataFrame(geometry=polygons), 
         output_layer=f"{dataset_id}_shapes", 
         transformations=transformations,
         overwrite=True
@@ -202,7 +217,7 @@ def novast(
     sdata = hp.tb.add_table_layer(
         sdata, 
         adata=adata.copy(), 
-        output_layer=f"{dataset_id}_table", 
+        output_layer="table", 
         region=[f"{dataset_id}_labels"], 
         overwrite=True
     )
