@@ -89,13 +89,23 @@ def get_labels_figure_parameters(sdata, labels_layer, dpi=200, max_dim_for_plots
     return dpi, figsize_factor, figsize
 
 
+def save_or_show_figure(fig: plt.Figure, output_folder: str | None, filename: str) -> None:
+    if output_folder is not None:
+        save_path = os.path.join(output_folder, filename)
+        fig.savefig(save_path, bbox_inches="tight", pad_inches=max(fig.get_size_inches())/100, facecolor="white", transparent=False)
+        print(f"{save_path} saved")
+    else:
+        plt.show()
+    plt.close(fig)
+
+
 def plot_bins_colored_by_feature(sdata,
                                  HE_image: str | None,
                                  technology: str,
                                  dataset_id: str,
                                  level_info: LevelInfo,
                                  feature: str,
-                                 output_folder: str):
+                                 output_folder: str | None):
     
     # color can be for example 'total_counts' or the name of a gene.
 
@@ -119,9 +129,7 @@ def plot_bins_colored_by_feature(sdata,
             dpi=dpi,
             ax=ax
         )
-        save_path = os.path.join(output_folder, f'{technology}_{dataset_id}_{level_info.name}_{feature}.png')
-        fig.savefig(save_path, bbox_inches="tight", pad_inches=max(fig.get_size_inches())/100, facecolor="white", transparent=False)
-        plt.close(fig)
+        save_or_show_figure(fig, output_folder, f'{technology}_{dataset_id}_{level_info.name}_{feature}.png')
 
     else:
         dpi, _, figsize = get_labels_figure_parameters(sdata, level_info.labels_layer)
@@ -139,9 +147,7 @@ def plot_bins_colored_by_feature(sdata,
             dpi=dpi,
             ax=ax
         )
-        save_path = os.path.join(output_folder, f'{technology}_{dataset_id}_{level_info.name}_{feature}.png')
-        fig.savefig(save_path, bbox_inches="tight", pad_inches=max(fig.get_size_inches())/100, facecolor="white", transparent=False)
-        plt.close(fig)
+        save_or_show_figure(fig, output_folder, f'{technology}_{dataset_id}_{level_info.name}_{feature}.png')
 
 
 
@@ -150,7 +156,7 @@ def plot_tissue_outline_on_HE_image(sdata,
                                     tissue_mask: str,
                                     technology: str,
                                     dataset_id: str,
-                                    output_folder: str,
+                                    output_folder: str | None,
                                     fill_alpha=0.3,
                                     outline_width=5):
     # Plot H&E image with tissue outline on top.
@@ -174,10 +180,7 @@ def plot_tissue_outline_on_HE_image(sdata,
         ax=ax
     )
 
-    save_path = os.path.join(output_folder, f'{technology}_{dataset_id}_tissue.png')
-    fig.savefig(save_path, bbox_inches="tight", pad_inches=max(fig.get_size_inches())/100, facecolor="white", transparent=False)
-    plt.close(fig)
-    print(f"{save_path} saved")
+    save_or_show_figure(fig, output_folder, f'{technology}_{dataset_id}_tissue.png')
 
 
 def plot_bin_outlines(crop_rect, bins_center_coordinates, bin_outlines_gdf, title: str):
