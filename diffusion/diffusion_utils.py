@@ -158,8 +158,10 @@ def plot_tissue_outline_on_HE_image(sdata,
                                     dataset_id: str,
                                     output_folder: str | None,
                                     fill_alpha=0.3,
-                                    outline_width=5):
+                                    outline_width=5,
+                                    bounds: tuple[float, float, float, float] | None = None):
     # Plot H&E image with tissue outline on top.
+    # Optionally restrict the plot to bounds = (xmin, ymin, xmax, ymax).
 
     best_scale, dpi, _, figsize = get_image_figure_parameters(sdata, HE_image)
 
@@ -179,6 +181,11 @@ def plot_tissue_outline_on_HE_image(sdata,
         dpi=dpi,
         ax=ax
     )
+    if bounds is not None:
+        # Restrict plot to the requested bounds and show the same bounds on axes.
+        xmin, ymin, xmax, ymax = bounds
+        ax.set_xlim(xmin, xmax)
+        ax.set_ylim(ymax, ymin)
 
     save_or_show_figure(fig, output_folder, f'{technology}_{dataset_id}_tissue.png')
 
