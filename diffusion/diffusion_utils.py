@@ -65,6 +65,44 @@ def clip_polygon_to_bbox_lines(polygon, crop_rect):
     return result
 
 
+def _cropped_shape_boundary(
+    geom: BaseGeometry,
+    crop_rect: tuple[float, float, float, float],
+) -> list[shapely.LineString]:
+    def _iter_lines_local(geometry: BaseGeometry):
+        if geometry.is_empty:
+            return
+        for part in shapely.get_parts(geometry):
+            if part.geom_type == "LineString":
+                yield part
+
+    bbox = box(*crop_rect)
+    if geom is None or geom.is_empty:
+        return []
+    if not geom.intersects(bbox):
+        return []
+
+    clipped = geom.intersection(bbox)
+    if clipped.is_empty:
+        return []
+
+    # Remove bbox edges so only interior polygon boundaries remain.
+    parts = list(shapely.get_parts(clipped))
+    poly_parts = [p for p in parts if p.geom_type in {"Polygon", "MultiPolygon"}]
+    if poly_parts:
+        boundary_geom = unary_union(poly_parts).boundary
+    else:
+        boundary_geom = clipped
+
+    if boundary_geom is None or boundary_geom.is_empty:
+        return []
+    boundary_geom = boundary_geom.difference(bbox.boundary)
+    if boundary_geom is None or boundary_geom.is_empty:
+        return []
+
+    return list(_iter_lines_local(boundary_geom))
+
+
 def longest_cropped_shape_contour(
     sdata,
     shapes_layer: str,
@@ -75,62 +113,15 @@ def longest_cropped_shape_contour(
 
     If no shape overlaps the crop rectangle, return None.
     """
-    def _iter_lines_local(geometry: BaseGeometry):
-        if geometry.is_empty:
-            return
-        geom_type = geometry.geom_type
-        if geom_type == "LineString":
-            yield geometry
-        elif geom_type == "MultiLineString":
-            for line in geometry.geoms:
-                yield line
-        elif geom_type == "GeometryCollection":
-            for part in geometry.geoms:
-                yield from _iter_lines_local(part)
-
     gdf = sdata.shapes[shapes_layer]
     if gdf.empty:
         return None
 
-    bbox = box(*crop_rect)
-    best_line = None
-    best_len = -1.0
+    lines = [line for geom in gdf.geometry for line in _cropped_shape_boundary(geom, crop_rect)]
 
-    for _, geom in enumerate(gdf.geometry):
-        if geom is None or geom.is_empty:
-            continue
-        if not geom.intersects(bbox):
-            continue
-
-        clipped = geom.intersection(bbox)
-        if clipped.is_empty:
-            continue
-
-        # Remove bbox edges so only interior polygon boundaries remain.
-        if clipped.geom_type == "GeometryCollection":
-            polys = [g for g in clipped.geoms if g.geom_type in {"Polygon", "MultiPolygon"}]
-            if polys:
-                clipped_for_boundary = unary_union(polys)
-            else:
-                clipped_for_boundary = clipped
-        else:
-            clipped_for_boundary = clipped
-
-        boundary = clipped_for_boundary.boundary
-        if boundary is None or boundary.is_empty:
-            continue
-        boundary = boundary.difference(bbox.boundary)
-        if boundary is None or boundary.is_empty:
-            continue
-
-        line_count = 0
-        for line in _iter_lines_local(boundary):
-            line_count += 1
-            length = line.length
-            if length > best_len:
-                best_len = length
-                best_line = line
-    return best_line
+    if not lines:
+        return None
+    return max(lines, key=lambda line: line.length)
 
 
 def get_image_figure_parameters(sdata, HE_image, dpi=200, max_dim_for_plots=10000):
