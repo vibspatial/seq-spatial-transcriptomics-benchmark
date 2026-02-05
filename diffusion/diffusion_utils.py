@@ -370,7 +370,7 @@ def closest_points_and_distances(
     points: np.ndarray,
     line: shapely.LineString,
     use_signed_distances: bool = False,
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+) -> "DistanceData":
     print("Calculating distances to and along boundary contour...")
     points_xy = np.asarray(points, dtype=float)
     points_geom = shapely.points(points_xy)
@@ -394,14 +394,20 @@ def closest_points_and_distances(
     assert closest_xy.shape[1] == 2
     assert len(distances.shape) == 1
     assert len(along_distances.shape) == 1
+    assert len(points) == len(distances)
+    assert len(points) == len(along_distances)
+    assert len(points) == closest_xy.shape[0]
 
     print("...done")
-    return closest_xy, distances, along_distances
+    return DistanceData(
+        closest_xy=closest_xy,
+        closest_distances=distances,
+        closest_along_boundary=along_distances,
+    )
 
 
 def plot_bin_gene_counts_and_contour(
-    bin_centers,
-    transcript_counts,
+    gene_bin_data: "GeneBinData",
     contour,
     title: str,
     figsize=(10, 10),
@@ -414,7 +420,7 @@ def plot_bin_gene_counts_and_contour(
     # together with a given contour over it.
     fig, ax = plt.subplots(figsize=figsize)
     ax.set_title(title)
-    sc = ax.scatter(bin_centers[:,0], bin_centers[:, 1], c=transcript_counts, s=marker_size)
+    sc = ax.scatter(gene_bin_data.bin_centers[:,0], gene_bin_data.bin_centers[:, 1], c=gene_bin_data.transcript_counts, s=marker_size)
     cbar = fig.colorbar(sc, ax=ax, shrink=0.4)
     cbar.set_label("Counts")
     gpd.GeoSeries([contour]).plot(
@@ -427,14 +433,22 @@ def plot_bin_gene_counts_and_contour(
     save_or_show_figure(fig, output_folder, filename)
 
 
-def plot_bins_and_closest_points_on_contour(points_xy, closest_xy, closest_distances, contour, title: str, output_folder: str | None = None, filename: str | None = None):
+def plot_bins_and_closest_points_on_contour(
+    data: DiffusionBinData,
+    contour,
+    title: str,
+    output_folder: str | None = None,
+    filename: str | None = None,
+):
 
     # Line segments connecting each bin to its closest point on the contour
-    segments = np.stack([points_xy, closest_xy], axis=1)  # shape (number of bins, 2, 2)
+    segments = np.stack(
+        [data.gene_bins.bin_centers, data.distance_data.closest_xy], axis=1
+    )  # shape (number of bins, 2, 2)
     lc = LineCollection(
         segments,
         # cmap='viridis',
-        array=closest_distances,  # color line by distance
+        array=data.distance_data.closest_distances,  # color line by distance
         linewidths=1
     )
 
@@ -445,7 +459,13 @@ def plot_bins_and_closest_points_on_contour(points_xy, closest_xy, closest_dista
     ax.plot(line_xy[:, 0], line_xy[:, 1], '-', c="red", lw=1, label='Contour')
 
     # Plot the bin centers
-    ax.scatter(points_xy[:, 0], points_xy[:, 1], c='blue', s=1, label='Bin centers')
+    ax.scatter(
+        data.gene_bins.bin_centers[:, 0],
+        data.gene_bins.bin_centers[:, 1],
+        c='blue',
+        s=1,
+        label='Bin centers',
+    )
 
     # Draw connecting line segments
     ax.add_collection(lc)
@@ -461,18 +481,21 @@ def plot_bins_and_closest_points_on_contour(points_xy, closest_xy, closest_dista
 
 
 def plot_filtered_bins_scatter(
-    closest_along_boundary: np.ndarray,
-    closest_distances: np.ndarray,
-    transcript_counts: np.ndarray,
+    data: DiffusionBinData,
     title: str,
     output_folder: str | None = None,
     filename: str | None = None,
     figsize: tuple[float, float] = (10, 2.5),
 ) -> None:
     # Scatter plot of filtered bins: along-boundary position vs distance to boundary.
-    sizes = np.asarray(transcript_counts, dtype=float)
+    sizes = np.asarray(data.gene_bins.transcript_counts, dtype=float)
     fig, ax = plt.subplots(figsize=figsize)
-    ax.scatter(closest_along_boundary, closest_distances, s=sizes, alpha=0.7)
+    ax.scatter(
+        data.distance_data.closest_along_boundary,
+        data.distance_data.closest_distances,
+        s=sizes,
+        alpha=0.7,
+    )
     ax.set_xlabel("Closest along boundary (normalized)")
     ax.set_ylabel("Closest distance")
     ax.set_title(title)
@@ -495,6 +518,59 @@ class DiffusionPlotSettings:
     distances_linearized: bool = True
     histogram: bool = True
     boxplot: bool = True
+
+
+@dataclass
+class DistanceData:
+    closest_xy: np.ndarray
+    closest_distances: np.ndarray
+    closest_along_boundary: np.ndarray
+
+
+@dataclass
+class GeneBinData:
+    bin_centers: np.ndarray
+    transcript_counts: np.ndarray
+
+
+@dataclass
+class DiffusionBinData:
+    gene_bins: GeneBinData
+    distance_data: DistanceData
+
+    def filter(self, mask: np.ndarray) -> "DiffusionBinData":
+        return DiffusionBinData(
+            gene_bins=GeneBinData(
+                bin_centers=self.gene_bins.bin_centers[mask],
+                transcript_counts=self.gene_bins.transcript_counts[mask],
+            ),
+            distance_data=DistanceData(
+                closest_xy=self.distance_data.closest_xy[mask],
+                closest_distances=self.distance_data.closest_distances[mask],
+                closest_along_boundary=self.distance_data.closest_along_boundary[mask],
+            ),
+        )
+
+
+def get_gene_bin_data(sdata, table_name: str, gene_name: str) -> GeneBinData:
+
+    # Get the feature column number for the gene we want to check diffusion for
+    gene_index: int = list(sdata.tables[table_name].var.index).index(gene_name)
+    assert sdata.tables[table_name].var.iloc[gene_index].name == gene_name
+
+    # Get the number of transcripts for the given gene, for each bin.
+    transcript_counts: np.ndarray = sdata.tables[table_name].X[:, gene_index].toarray().flatten()
+
+    # Get the (x,y) coordinates of the centers of each bin
+    bin_centers: np.ndarray = sdata.tables[table_name].obsm["spatial"]
+
+    # We must have a transcript count for exactly each bin
+    assert transcript_counts.shape[0] == bin_centers.shape[0]
+
+    return GeneBinData(
+        bin_centers=bin_centers,
+        transcript_counts=transcript_counts,
+    )
 
 
 def analyze_diffusion(
@@ -562,18 +638,7 @@ def analyze_diffusion(
             )
         # TODO? perhaps add title to plot above
 
-        # Get the feature column number for the gene we want to check diffusion for
-        gene_index: int = list(sdata_crop.tables[level].var.index).index(gene_name)
-        assert sdata_crop.tables[level].var.iloc[gene_index].name == gene_name
-
-        # Get the number of transcripts for the given gene, for each bin.
-        transcript_counts: np.ndarray = sdata_crop.tables[level].X[:, gene_index].toarray().flatten()
-
-        # Get the (x,y) coordinates of the centers of each bin
-        bin_centers: np.ndarray = sdata_crop.tables[level].obsm["spatial"]
-
-        # We must have a transcript count for exactly each bin
-        assert transcript_counts.shape[0] == bin_centers.shape[0]
+        gene_bin_data = get_gene_bin_data(sdata_crop, level, gene_name)
 
         [xmin, ymin, xmax, ymax] = crop_rect
         title = (
@@ -582,8 +647,7 @@ def analyze_diffusion(
         )
         if plot_settings.bin_gene_counts:
             plot_bin_gene_counts_and_contour(
-                bin_centers,
-                transcript_counts,
+                gene_bin_data,
                 boundary,
                 title,
                 output_folder=plot_folder,
@@ -591,31 +655,21 @@ def analyze_diffusion(
             )
 
         # Calculate closest points on contour and distances
-        closest_xy, closest_distances, closest_along_boundary = closest_points_and_distances(
-            bin_centers,
+        distance_data = closest_points_and_distances(
+            gene_bin_data.bin_centers,
             boundary,
             use_signed_distances=use_signed_distances,
         )
-
-        assert len(bin_centers) == len(closest_distances)
-        assert len(bin_centers) == len(closest_along_boundary)
-        assert len(bin_centers) == closest_xy.shape[0]
+        filtered = DiffusionBinData(
+            distance_data=distance_data,
+            gene_bins=gene_bin_data,
+        )
 
         # Keep only the bins that are within a certain maximum distance to the contour
-        within_max_distance = np.abs(closest_distances) <= max_distance
-        filtered_closest_xy = closest_xy[within_max_distance]
-        filtered_closest_distances = closest_distances[within_max_distance]
-        filtered_closest_along_boundary = closest_along_boundary[within_max_distance]
-        filtered_bin_centers = bin_centers[within_max_distance]
-        filtered_transcript_count = transcript_counts[within_max_distance]
+        filtered = filtered.filter(np.abs(filtered.distance_data.closest_distances) <= max_distance)
 
         # Keep only the bins with at least one transcript of the gene of interest
-        has_gene_transcripts = filtered_transcript_count > 0
-        filtered_closest_xy = filtered_closest_xy[has_gene_transcripts]
-        filtered_closest_distances = filtered_closest_distances[has_gene_transcripts]
-        filtered_closest_along_boundary = filtered_closest_along_boundary[has_gene_transcripts]
-        filtered_bin_centers = filtered_bin_centers[has_gene_transcripts]
-        filtered_transcript_count = filtered_transcript_count[has_gene_transcripts]
+        filtered = filtered.filter(filtered.gene_bins.transcript_counts > 0)
 
         # IMPORTANT FIXME: take number of transcripts in bin into account when analyzing diffusion distances!
 
@@ -626,9 +680,7 @@ def analyze_diffusion(
         # TODO: add gene name to title
         if plot_settings.bins_and_closest_points:
             plot_bins_and_closest_points_on_contour(
-                filtered_bin_centers,
-                filtered_closest_xy,
-                filtered_closest_distances,
+                filtered,
                 boundary,
                 title,
                 output_folder=plot_folder,
@@ -641,9 +693,7 @@ def analyze_diffusion(
         )
         if plot_settings.distances_linearized:
             plot_filtered_bins_scatter(
-                filtered_closest_along_boundary,
-                filtered_closest_distances,
-                filtered_transcript_count,
+                filtered,
                 title,
                 output_folder=plot_folder,
                 filename=f"{level}_{gene_name}_distances_linearized.png",
@@ -651,12 +701,12 @@ def analyze_diffusion(
 
         if plot_settings.histogram:
             fig, ax = plt.subplots(figsize=(6, 6))
-            ax.hist(filtered_closest_distances)  # TODO: add title
+            ax.hist(filtered.distance_data.closest_distances)  # TODO: add title
             save_or_show_figure(fig, plot_folder, f"{level}_{gene_name}_histogram.png")
 
         if plot_settings.boxplot:
             fig, ax = plt.subplots(figsize=(6, 6))
-            ax.boxplot(filtered_closest_distances)  # TODO: add title
+            ax.boxplot(filtered.distance_data.closest_distances)  # TODO: add title
             save_or_show_figure(fig, plot_folder, f"{level}_{gene_name}_boxplot.png")
 
 
