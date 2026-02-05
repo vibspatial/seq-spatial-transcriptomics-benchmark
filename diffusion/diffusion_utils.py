@@ -1,5 +1,6 @@
 ﻿import os
 import sys
+from dataclasses import dataclass
 sys.path.append(os.path.abspath('..'))
 from utils.in_tissue import add_in_tissue, assign_region
 from utils.plotting import best_datatree_scale, rel_fontsize
@@ -10,6 +11,7 @@ from shapely.geometry import box
 from shapely.ops import unary_union
 from shapely.geometry.base import BaseGeometry
 import spatialdata_plot
+import spatialdata as sd
 import matplotlib.pyplot as plt
 from matplotlib.patches import Rectangle
 from matplotlib.collections import LineCollection
@@ -483,4 +485,178 @@ def get_experiment_by_id(experiments: list[Experiment], dataset_id: str) -> Expe
         if experiment.dataset_id == dataset_id:
             return experiment
     return None
+
+@dataclass
+class DiffusionPlotSettings:
+    tissue_outline: bool = True
+    boundary: bool = True
+    bin_gene_counts: bool = True
+    bins_and_closest_points: bool = True
+    distances_linearized: bool = True
+    histogram: bool = True
+    boxplot: bool = True
+
+
+def analyze_diffusion(
+    experiment: Experiment,
+    level: str,
+    gene_name: str,
+    max_distance: float = 400,
+    use_signed_distances: bool = False,
+    base_folder: str | None = None,
+    plot_settings: DiffusionPlotSettings | None = None,
+) -> None:
+    if plot_settings is None:
+        plot_settings = DiffusionPlotSettings()
+
+    print(f"Analyzing diffusion for {experiment.technology} {experiment.dataset_id} at level {level}")
+
+    sdata = sd.read_zarr(experiment.sdata_path)
+
+    for crop_idx, crop_rect in enumerate(experiment.crop_rects):
+        print(f"Using crop rect: {crop_rect}")
+
+        # Create a cropped spatial data
+        crop_rect = np.array(crop_rect)
+        sdata_crop = sdata.query.bounding_box(
+            min_coordinate=crop_rect[:2],
+            max_coordinate=crop_rect[2:],
+            axes=("x", "y"),
+            target_coordinate_system=experiment.dataset_id,
+        )
+
+        if base_folder:
+            plot_folder = os.path.join(
+                base_folder,
+                experiment.technology,
+                experiment.dataset_id,
+                "analysis",
+                f"crop{crop_idx + 1}",
+            )
+            os.makedirs(plot_folder, exist_ok=True)
+        else:
+            plot_folder = None
+
+        # Plot close-up of cropped area
+        if plot_settings.tissue_outline and experiment.he_image:
+            plot_tissue_outline_on_HE_image(
+                sdata_crop,
+                experiment.he_image,
+                experiment.tissue_mask,
+                experiment.technology,
+                experiment.dataset_id,
+                plot_folder,
+                "tissue.png",
+                fill_alpha=0.1,
+                outline_width=1,
+                bounds=crop_rect,
+            )  # FIXME: filename should have crop info (currently only 1 is saved)
+
+        # Calculate tissue boundary against which we will calculate diffusion distances
+        boundary = longest_cropped_shape_contour(sdata_crop, experiment.tissue_mask, crop_rect)
+        if plot_settings.boundary:
+            plot_boundary_geoseries(
+                boundary,
+                output_folder=plot_folder,
+                filename="boundary.png",
+            )
+        # TODO? perhaps add title to plot above
+
+        # Get the feature column number for the gene we want to check diffusion for
+        gene_index: int = list(sdata_crop.tables[level].var.index).index(gene_name)
+        assert sdata_crop.tables[level].var.iloc[gene_index].name == gene_name
+
+        # Get the number of transcripts for the given gene, for each bin.
+        transcript_counts: np.ndarray = sdata_crop.tables[level].X[:, gene_index].toarray().flatten()
+
+        # Get the (x,y) coordinates of the centers of each bin
+        bin_centers: np.ndarray = sdata_crop.tables[level].obsm["spatial"]
+
+        # We must have a transcript count for exactly each bin
+        assert transcript_counts.shape[0] == bin_centers.shape[0]
+
+        [xmin, ymin, xmax, ymax] = crop_rect
+        title = (
+            f"{experiment.dataset_id}_{level}: {gene_name} transcript counts per bin\n"
+            f"(crop: {xmin}, {ymin}, {xmax}, {ymax})"
+        )
+        if plot_settings.bin_gene_counts:
+            plot_bin_gene_counts_and_contour(
+                bin_centers,
+                transcript_counts,
+                boundary,
+                title,
+                output_folder=plot_folder,
+                filename=f"{level}_{gene_name}_counts.png",
+            )
+
+        # Calculate closest points on contour and distances
+        closest_xy, closest_distances, closest_along_boundary = closest_points_and_distances(
+            bin_centers,
+            boundary,
+            use_signed_distances=use_signed_distances,
+        )
+
+        assert len(bin_centers) == len(closest_distances)
+        assert len(bin_centers) == len(closest_along_boundary)
+        assert len(bin_centers) == closest_xy.shape[0]
+
+        # Keep only the bins that are within a certain maximum distance to the contour
+        within_max_distance = np.abs(closest_distances) <= max_distance
+        filtered_closest_xy = closest_xy[within_max_distance]
+        filtered_closest_distances = closest_distances[within_max_distance]
+        filtered_closest_along_boundary = closest_along_boundary[within_max_distance]
+        filtered_bin_centers = bin_centers[within_max_distance]
+        filtered_transcript_count = transcript_counts[within_max_distance]
+
+        # Keep only the bins with at least one transcript of the gene of interest
+        has_gene_transcripts = filtered_transcript_count > 0
+        filtered_closest_xy = filtered_closest_xy[has_gene_transcripts]
+        filtered_closest_distances = filtered_closest_distances[has_gene_transcripts]
+        filtered_closest_along_boundary = filtered_closest_along_boundary[has_gene_transcripts]
+        filtered_bin_centers = filtered_bin_centers[has_gene_transcripts]
+        filtered_transcript_count = filtered_transcript_count[has_gene_transcripts]
+
+        # IMPORTANT FIXME: take number of transcripts in bin into account when analyzing diffusion distances!
+
+        title = (
+            f"{experiment.dataset_id}_{level}: bins and closest point on contour\n"
+            f"(crop: {xmin}, {ymin}, {xmax}, {ymax})"
+        )
+        # TODO: add gene name to title
+        if plot_settings.bins_and_closest_points:
+            plot_bins_and_closest_points_on_contour(
+                filtered_bin_centers,
+                filtered_closest_xy,
+                filtered_closest_distances,
+                boundary,
+                title,
+                output_folder=plot_folder,
+                filename=f"{level}_{gene_name}_bins_closest_contour.png",
+            )
+
+        title = (
+            f"{experiment.dataset_id}_{level}: bin distance to boundary vs distance along boundary\n"
+            f"(crop: {xmin}, {ymin}, {xmax}, {ymax})"
+        )
+        if plot_settings.distances_linearized:
+            plot_filtered_bins_scatter(
+                filtered_closest_along_boundary,
+                filtered_closest_distances,
+                filtered_transcript_count,
+                title,
+                output_folder=plot_folder,
+                filename=f"{level}_{gene_name}_distances_linearized.png",
+            )
+
+        if plot_settings.histogram:
+            fig, ax = plt.subplots(figsize=(6, 6))
+            ax.hist(filtered_closest_distances)  # TODO: add title
+            save_or_show_figure(fig, plot_folder, f"{level}_{gene_name}_histogram.png")
+
+        if plot_settings.boxplot:
+            fig, ax = plt.subplots(figsize=(6, 6))
+            ax.boxplot(filtered_closest_distances)  # TODO: add title
+            save_or_show_figure(fig, plot_folder, f"{level}_{gene_name}_boxplot.png")
+
 
