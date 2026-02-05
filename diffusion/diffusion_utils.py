@@ -290,14 +290,103 @@ def plot_boundary_geoseries(boundary: BaseGeometry,
     save_or_show_figure(fig, output_folder, filename)
 
 
-def closest_points_and_distances(points: np.ndarray, line: shapely.LineString) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    print("Calculating distances to and along boundary contour...")
-    points = shapely.points(points)
+def signed_distance_to_linestring(
+    points: np.ndarray,
+    line: shapely.LineString,
+    nearest_on_line: BaseGeometry | None = None,
+    closest_xy: np.ndarray | None = None,
+    along_distances: np.ndarray | None = None,
+) -> np.ndarray:
+    """
+    Signed distance to a LineString.
+    - Use closest point on interior segments.
+    - If the closest segment is the first and the projection is before the start,
+      extend the first segment to infinity.
+    - If the closest segment is the last and the projection is after the end,
+      extend the last segment to infinity.
+    """
+    points_xy = np.asarray(points, dtype=float)
+    if points_xy.ndim != 2 or points_xy.shape[1] != 2:
+        raise ValueError("points must be an (N, 2) array.")
 
-    _, nearest_on_line = shapely.ops.nearest_points(points, line)
+    if nearest_on_line is None:
+        points_geom = shapely.points(points_xy)
+        _, nearest_on_line = shapely.ops.nearest_points(points_geom, line)
+    if closest_xy is None:
+        closest_xy = shapely.get_coordinates(nearest_on_line)
+    if along_distances is None:
+        along_distances = shapely.line_locate_point(line, nearest_on_line, normalized=False)
+
+    coords = np.asarray(line.coords, dtype=float)
+    if coords.shape[0] < 2:
+        raise ValueError("line must have at least two coordinates.")
+
+    seg_starts = coords[:-1]
+    seg_ends = coords[1:]
+    seg_vec = seg_ends - seg_starts
+    seg_len = np.sqrt(np.einsum("ij,ij->i", seg_vec, seg_vec))
+    valid = seg_len > 0
+    if not np.any(valid):
+        raise ValueError("line has no non-degenerate segments.")
+
+    seg_starts = seg_starts[valid]
+    seg_vec = seg_vec[valid]
+    seg_len = seg_len[valid]
+    seg_len2 = seg_len * seg_len
+
+    cum_len = np.concatenate(([0.0], np.cumsum(seg_len)))
+    seg_idx = np.searchsorted(cum_len, along_distances, side="right") - 1
+    seg_idx = np.clip(seg_idx, 0, seg_vec.shape[0] - 1)
+
+    seg_start_sel = seg_starts[seg_idx]
+    seg_vec_sel = seg_vec[seg_idx]
+    seg_len_sel = seg_len[seg_idx]
+    seg_len2_sel = seg_len2[seg_idx]
+
+    rel = points_xy - seg_start_sel
+    t_sel = np.einsum("ij,ij->i", rel, seg_vec_sel) / seg_len2_sel
+
+    use_first_ext = (seg_idx == 0) & (t_sel < 0.0)
+    use_last_ext = (seg_idx == (seg_vec.shape[0] - 1)) & (t_sel > 1.0)
+    use_ext = use_first_ext | use_last_ext
+
+    seg_dir = seg_vec_sel / seg_len_sel[:, None]
+
+    vec_local = points_xy - closest_xy
+    vec_ext = points_xy - seg_start_sel
+    vec_for_cross = np.where(use_ext[:, None], vec_ext, vec_local)
+    cross = seg_dir[:, 0] * vec_for_cross[:, 1] - seg_dir[:, 1] * vec_for_cross[:, 0]
+
+    dist_local = np.sqrt(np.sum(vec_local * vec_local, axis=1))
+    dist_ext = np.abs(cross)
+    dist = np.where(use_ext, dist_ext, dist_local)
+
+    return dist * np.sign(cross)
+
+
+def closest_points_and_distances(
+    points: np.ndarray,
+    line: shapely.LineString,
+    use_signed_distances: bool = False,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    print("Calculating distances to and along boundary contour...")
+    points_xy = np.asarray(points, dtype=float)
+    points_geom = shapely.points(points_xy)
+
+    _, nearest_on_line = shapely.ops.nearest_points(points_geom, line)
 
     closest_xy: np.ndarray = shapely.get_coordinates(nearest_on_line)
-    distances: np.ndarray = shapely.distance(points, nearest_on_line)
+    if use_signed_distances:
+        along_distances_abs = shapely.line_locate_point(line, nearest_on_line, normalized=False)
+        distances = signed_distance_to_linestring(
+            points_xy,
+            line,
+            nearest_on_line=nearest_on_line,
+            closest_xy=closest_xy,
+            along_distances=along_distances_abs,
+        )
+    else:
+        distances = shapely.distance(points_geom, nearest_on_line)
     along_distances: np.ndarray = shapely.line_locate_point(line, nearest_on_line, normalized=True)
 
     assert closest_xy.shape[1] == 2
