@@ -138,5 +138,5 @@ def _calculate_radius(coordinates, subset_size=1000):
     np.fill_diagonal(distances, np.inf) 
     min_distance = np.min(distances)
 
-    radius = (min_distance / 2) * 0.98
+    radius = (min_distance / 2)
     return radius

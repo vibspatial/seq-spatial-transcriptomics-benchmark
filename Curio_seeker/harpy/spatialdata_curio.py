@@ -104,4 +104,4 @@ def curio(
 
     shapes = ShapesModel.parse(xy, geometry=0, radius=10, index=adata.obs[CurioKeys.INSTANCE_KEY])
 
-    return SpatialData(table=table, shapes={CurioKeys.REGION.value: shapes})
+    return SpatialData(tables={"table" : table}, shapes={CurioKeys.REGION.value: shapes})

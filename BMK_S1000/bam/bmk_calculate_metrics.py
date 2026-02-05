@@ -167,7 +167,7 @@ def calculate_metrics(
     # put it in dictionary, then write to csv
     row = {
         "number_of_spots_with_at_least_1_UMI_in_tissue": df_included_tissue_grouped.index.get_level_values("barcode").nunique(),
-        "percentage_spots_recovered":df_included_tissue_grouped.index.get_level_values("barcode").nunique()/len(tissue_barcodes)*100,
+        "percentage_spots_recovered": df_included_tissue_grouped.index.get_level_values("barcode").nunique()/len(tissue_barcodes)*100,
         "total_number_of_reads": total_reads,
         "total_number_of_genes": len(gene_counts),
         "total_number_of_UMIs": total_umis,

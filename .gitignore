@@ -1,1 +1,16 @@
 notebooks/*
+
+# AnnData
+*.h5ad
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# General cache
+.cache/
+.cache/**
+.cache/**/*
+*.cache
