@@ -291,6 +291,7 @@ def plot_boundary_geoseries(boundary: BaseGeometry,
 
 
 def closest_points_and_distances(points: np.ndarray, line: shapely.LineString) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    print("Calculating distances to and along boundary contour...")
     points = shapely.points(points)
 
     _, nearest_on_line = shapely.ops.nearest_points(points, line)
@@ -303,6 +304,7 @@ def closest_points_and_distances(points: np.ndarray, line: shapely.LineString) -
     assert len(distances.shape) == 1
     assert len(along_distances.shape) == 1
 
+    print("...done")
     return closest_xy, distances, along_distances
 
 
@@ -363,6 +365,26 @@ def plot_bins_and_closest_points_on_contour(points_xy, closest_xy, closest_dista
     ax.set_ylabel('Y')
     ax.set_title(title)
     ax.invert_yaxis()
+
+    save_or_show_figure(fig, output_folder, filename)
+
+
+def plot_filtered_bins_scatter(
+    closest_along_boundary: np.ndarray,
+    closest_distances: np.ndarray,
+    transcript_counts: np.ndarray,
+    title: str,
+    output_folder: str | None = None,
+    filename: str | None = None,
+    figsize: tuple[float, float] = (6, 6),
+) -> None:
+    # Scatter plot of filtered bins: along-boundary position vs distance to boundary.
+    sizes = np.asarray(transcript_counts, dtype=float)
+    fig, ax = plt.subplots(figsize=figsize)
+    ax.scatter(closest_along_boundary, closest_distances, s=sizes, alpha=0.7)
+    ax.set_xlabel("Closest along boundary (normalized)")
+    ax.set_ylabel("Closest distance")
+    ax.set_title(title)
 
     save_or_show_figure(fig, output_folder, filename)
 
