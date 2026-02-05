@@ -18,7 +18,7 @@ out_root <- file.path(root_dir, "plots/bam_plots")
 sample_metadata <- tribble(
   ~Sample,      ~sample_type,    ~Technology,       ~bam_dir,
   "SCA013",     "Mouse_lung",     "Visium",         "E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA013/bam_output",
-  "SCA014",     "Mouse_liver",    "Visium",         "E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA014/bam_output",
+  #"SCA014",     "Mouse_liver",    "Visium",         "E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA014/bam_output",
   "SCA016",     "Mouse_brain",    "Visium",         "E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA016/bam_output",
   "SCA015",     "Human_lung",     "Visium",         "E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA015/bam_output",
   
@@ -34,10 +34,10 @@ sample_metadata <- tribble(
   
   "Exp74",      "Mouse_brain",    "BMKMANU_S1000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S1000/Exp74/bam_output",
   
-  #  "Exp101",     "Mouse_lung",     "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp101/bam_output",
-  #  "Exp100",     "Mouse_liver",    "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/bam_output",
-  #  "Exp99",      "Mouse_brain",    "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp99/bam_output",
-  #  "Exp102",     "Human_lung",     "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp102/bam_output",
+  "Exp101",     "Mouse_lung",     "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp101/bam_output",
+  #"Exp100",     "Mouse_liver",    "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/bam_output",
+  "Exp99",      "Mouse_brain",    "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp99/bam_output",
+  "Exp102",     "Human_lung",     "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp102/bam_output",
   
   "SC12",       "Mouse_lung",     "Curio_Seeker",   "E:/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC12/bam_output",
   "SC13",       "Mouse_liver",    "Curio_Seeker",   "E:/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC13/bam_output",
@@ -172,7 +172,7 @@ for (sample_type in unique(sample_metadata$sample_type)) {
     filter(sample_type == !!sample_type)
   
   technologies <- unique(sample_metadata_subset$Technology)
-  subsample_dirs <- paste0("sample_size_", format(seq(10000000, 1000000000, 100000000), scientific=F, trim = TRUE))
+  subsample_dirs <- paste0("sample_size_", format(seq(10000000, 1000000000, 10000000), scientific=F, trim = TRUE))
 
   for (subsample in subsample_dirs) {
     df <- prepare_correlation_data(sample_type, subsample, technologies, sample_metadata_subset)

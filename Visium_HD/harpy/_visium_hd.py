@@ -12,6 +12,7 @@ from harpy.utils._keys import _INSTANCE_KEY, _REGION_KEY
 
 # TODO: Add suport for raw_probe_bc_matrix.h5 in spatialdata-io. Only possible for bin size 2. 
 # Ideally, we could just add this to the sdata and can have both datasets.
+# TODO: Add support for reading in segmentation results
 
 def visium_hd(
     path: str | Path,
@@ -58,12 +59,20 @@ def visium_hd(
         path=path,
         dataset_id=dataset_id,
         filtered_counts_file=filtered_counts_file,
+        load_segmentations_only=False, 
+        load_nucleus_segmentations=False,
         bin_size=bin_size,
         annotate_table_by_labels=True,
         fullres_image_file=fullres_image_file,
         load_all_images=load_all_images,
         bins_as_squares=bins_as_squares,
     )
+    
+    # FIXME: Temporary fix to avoid reading in segmentation results. See: https://github.com/scverse/spatialdata-io/issues/359
+    if VisiumHDKeys.CELL_SEG_KEY_HD in [*sdata.tables]:
+        del sdata.tables[VisiumHDKeys.CELL_SEG_KEY_HD]
+    if f'{dataset_id}_{VisiumHDKeys.CELL_SEG_KEY_HD}' in [*sdata.shapes]:
+        del sdata.shapes[f'{dataset_id}_{VisiumHDKeys.CELL_SEG_KEY_HD}']
 
     for table_layer in [*sdata.tables]:
         adata = sdata[table_layer]

@@ -1,0 +1,389 @@
+execute:  snakemake -c 16 -s /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/config/count.smk --configfile /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/pipeline-logs/config.yaml -d .snakemake_julien.mortier --retries 0 --nolock --rerun-incomplete --rerun-triggers mtime   --jobs 500 --latency-wait 120 >/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/pipeline-logs/log 2>&1
+The program execution has completed successfully.
+Converting .raw.gef ...
+2026-01-31 07:25:11 [runtime] (start:gef2gem)
+2026-01-31 07:25:11 [runtime] (run:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.raw.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.raw.gem -b 1 -s Y40048N5
+2026-01-31 07:25:11 [INFO   ] not specify mask file...
+2026-01-31 07:25:18 [INFO   ] minx:0 miny:0 maxx:23519 maxy:23519
+2026-01-31 07:25:56 [runtime] (done:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.raw.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.raw.gem -b 1 -s Y40048N5
+2026-01-31 07:26:02 [runtime] (start:gef2h5ad)
+2026-01-31 07:26:02 [runtime] (run:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.raw.gef --bin_size 1 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.raw.h5ad
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:68: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_to_dna(twobit: int, size: int) -> str:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:85: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def dna_to_twobit(dna: str) -> int:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:102: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_1hamming(twobit: int, size: int) -> List[int]:
+[2026-01-31 07:26:15][Stereo][3350214][MainThread][140653945919296][reader][1303][INFO]: read_gef begin ...
+2026-01-31 07:26:15 [INFO   ] input file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.raw.gef specify block size:1
+[2026-01-31 07:26:15][Stereo][3350214][MainThread][140653945919296][reader][1389][INFO]: BegfR
+[2026-01-31 07:26:15][Stereo][3350214][MainThread][140653945919296][reader][1392][INFO]: StereoExpData
+[2026-01-31 07:26:15][Stereo][3350214][MainThread][140653945919296][reader][1394][INFO]: 0 0
+[2026-01-31 07:26:15][Stereo][3350214][MainThread][140653945919296][reader][1404][INFO]: {'minX': 0, 'minY': 0, 'maxX': 23519, 'maxY': 23519, 'maxExp': 21, 'resolution': 500} 
+[2026-01-31 07:26:15][Stereo][3350214][MainThread][140653945919296][reader][1435][INFO]: gene list none
+[2026-01-31 07:26:45][Stereo][3350214][MainThread][140653945919296][reader][1437][INFO]: 12755
+[2026-01-31 07:26:45][Stereo][3350214][MainThread][140653945919296][reader][1439][INFO]: 91263352
+[2026-01-31 07:26:45][Stereo][3350214][MainThread][140653945919296][reader][1441][INFO]: ENSG00000000003 TSPAN6
+[2026-01-31 07:26:45][Stereo][3350214][MainThread][140653945919296][reader][1443][INFO]: 35609
+[2026-01-31 07:27:28][Stereo][3350214][MainThread][140653945919296][reader][1449][INFO]: 2
+[2026-01-31 07:27:36][Stereo][3350214][MainThread][140653945919296][reader][1451][INFO]: csr
+[2026-01-31 07:27:36][Stereo][3350214][MainThread][140653945919296][reader][1459][INFO]: 2
+[2026-01-31 07:27:36][Stereo][3350214][MainThread][140653945919296][reader][1462][INFO]: 3
+[2026-01-31 07:27:36][Stereo][3350214][MainThread][140653945919296][reader][1464][INFO]: 4
+[2026-01-31 07:28:16][Stereo][3350214][MainThread][140653945919296][reader][1468][INFO]: the matrix has 91263352 cells, and 35609 genes.
+[2026-01-31 07:28:16][Stereo][3350214][MainThread][140653945919296][reader][1469][INFO]: read_gef end.
+[2026-01-31 07:28:16][Stereo][3350214][MainThread][140653945919296][st_pipeline][41][INFO]: start to run cal_qc...
+[2026-01-31 07:28:26][Stereo][3350214][MainThread][140653945919296][st_pipeline][44][INFO]: cal_qc end, consume time 10.5959s.
+[2026-01-31 07:29:09][Stereo][3350214][MainThread][140653945919296][reader][940][INFO]: Adding sample in adata.obs['orig.ident'].
+[2026-01-31 07:29:15][Stereo][3350214][MainThread][140653945919296][reader][943][INFO]: Adding data.position as adata.obsm['spatial'] .
+[2026-01-31 07:29:15][Stereo][3350214][MainThread][140653945919296][reader][948][INFO]: Adding data.position as adata.obs['x'] and adata.obs['y'] .
+[2026-01-31 07:29:45][Stereo][3350214][MainThread][140653945919296][reader][1109][INFO]: Adding data.tl.raw.exp_matrix as adata.raw .
+[2026-01-31 07:31:24][Stereo][3350214][MainThread][140653945919296][reader][1189][INFO]: Finished conversion to anndata.
+... storing 'real_gene_name' as categorical
+... storing 'real_gene_name' as categorical
+[2026-01-31 07:34:01][Stereo][3350214][MainThread][140653945919296][reader][1193][INFO]: Finished output to /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.raw.h5ad
+2026-01-31 07:34:07 [runtime] (done:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.raw.gef --bin_size 1 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.raw.h5ad
+Converting .tissue.gef for bin size 1...
+2026-01-31 07:34:13 [runtime] (start:gef2gem)
+2026-01-31 07:34:13 [runtime] (run:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin1.gem -b 1 -s Y40048N5
+2026-01-31 07:34:13 [INFO   ] not specify mask file...
+2026-01-31 07:34:19 [INFO   ] minx:0 miny:0 maxx:23519 maxy:23519
+2026-01-31 07:34:48 [runtime] (done:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin1.gem -b 1 -s Y40048N5
+2026-01-31 07:34:53 [runtime] (start:gef2h5ad)
+2026-01-31 07:34:53 [runtime] (run:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef --bin_size 1 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin1.h5ad
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:68: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_to_dna(twobit: int, size: int) -> str:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:85: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def dna_to_twobit(dna: str) -> int:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:102: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_1hamming(twobit: int, size: int) -> List[int]:
+[2026-01-31 07:35:02][Stereo][3351879][MainThread][140543878039360][reader][1303][INFO]: read_gef begin ...
+2026-01-31 07:35:02 [INFO   ] input file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef specify block size:1
+[2026-01-31 07:35:02][Stereo][3351879][MainThread][140543878039360][reader][1389][INFO]: BegfR
+[2026-01-31 07:35:02][Stereo][3351879][MainThread][140543878039360][reader][1392][INFO]: StereoExpData
+[2026-01-31 07:35:02][Stereo][3351879][MainThread][140543878039360][reader][1394][INFO]: 0 0
+[2026-01-31 07:35:02][Stereo][3351879][MainThread][140543878039360][reader][1404][INFO]: {'minX': 0, 'minY': 0, 'maxX': 23519, 'maxY': 23519, 'maxExp': 21, 'resolution': 500} 
+[2026-01-31 07:35:02][Stereo][3351879][MainThread][140543878039360][reader][1435][INFO]: gene list none
+[2026-01-31 07:35:26][Stereo][3351879][MainThread][140543878039360][reader][1437][INFO]: 30876519899603
+[2026-01-31 07:35:26][Stereo][3351879][MainThread][140543878039360][reader][1439][INFO]: 63866780
+[2026-01-31 07:35:26][Stereo][3351879][MainThread][140543878039360][reader][1441][INFO]: ENSG00000000003 TSPAN6
+[2026-01-31 07:35:26][Stereo][3351879][MainThread][140543878039360][reader][1443][INFO]: 35310
+[2026-01-31 07:35:59][Stereo][3351879][MainThread][140543878039360][reader][1449][INFO]: 2
+[2026-01-31 07:36:06][Stereo][3351879][MainThread][140543878039360][reader][1451][INFO]: csr
+[2026-01-31 07:36:06][Stereo][3351879][MainThread][140543878039360][reader][1459][INFO]: 2
+[2026-01-31 07:36:06][Stereo][3351879][MainThread][140543878039360][reader][1462][INFO]: 3
+[2026-01-31 07:36:06][Stereo][3351879][MainThread][140543878039360][reader][1464][INFO]: 4
+[2026-01-31 07:36:34][Stereo][3351879][MainThread][140543878039360][reader][1468][INFO]: the matrix has 63866780 cells, and 35310 genes.
+[2026-01-31 07:36:34][Stereo][3351879][MainThread][140543878039360][reader][1469][INFO]: read_gef end.
+[2026-01-31 07:36:34][Stereo][3351879][MainThread][140543878039360][st_pipeline][41][INFO]: start to run cal_qc...
+[2026-01-31 07:36:42][Stereo][3351879][MainThread][140543878039360][st_pipeline][44][INFO]: cal_qc end, consume time 8.0614s.
+[2026-01-31 07:37:15][Stereo][3351879][MainThread][140543878039360][reader][940][INFO]: Adding sample in adata.obs['orig.ident'].
+[2026-01-31 07:37:19][Stereo][3351879][MainThread][140543878039360][reader][943][INFO]: Adding data.position as adata.obsm['spatial'] .
+[2026-01-31 07:37:19][Stereo][3351879][MainThread][140543878039360][reader][948][INFO]: Adding data.position as adata.obs['x'] and adata.obs['y'] .
+[2026-01-31 07:37:39][Stereo][3351879][MainThread][140543878039360][reader][1109][INFO]: Adding data.tl.raw.exp_matrix as adata.raw .
+[2026-01-31 07:38:52][Stereo][3351879][MainThread][140543878039360][reader][1189][INFO]: Finished conversion to anndata.
+... storing 'real_gene_name' as categorical
+... storing 'real_gene_name' as categorical
+[2026-01-31 07:40:46][Stereo][3351879][MainThread][140543878039360][reader][1193][INFO]: Finished output to /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin1.h5ad
+2026-01-31 07:40:50 [runtime] (done:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef --bin_size 1 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin1.h5ad
+Converting .tissue.gef for bin size 5...
+2026-01-31 07:40:55 [runtime] (start:gef2gem)
+2026-01-31 07:40:56 [runtime] (run:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin5.gem -b 5 -s Y40048N5
+2026-01-31 07:40:56 [INFO   ] not specify mask file...
+2026-01-31 07:41:01 [INFO   ] minx:0 miny:0 maxx:23515 maxy:23515
+2026-01-31 07:41:29 [runtime] (done:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin5.gem -b 5 -s Y40048N5
+2026-01-31 07:41:34 [runtime] (start:gef2h5ad)
+2026-01-31 07:41:34 [runtime] (run:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef --bin_size 5 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin5.h5ad
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:68: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_to_dna(twobit: int, size: int) -> str:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:85: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def dna_to_twobit(dna: str) -> int:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:102: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_1hamming(twobit: int, size: int) -> List[int]:
+[2026-01-31 07:41:42][Stereo][3353194][MainThread][139717633181504][reader][1303][INFO]: read_gef begin ...
+2026-01-31 07:41:42 [INFO   ] input file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef specify block size:5
+[2026-01-31 07:41:42][Stereo][3353194][MainThread][139717633181504][reader][1389][INFO]: BegfR
+[2026-01-31 07:41:42][Stereo][3353194][MainThread][139717633181504][reader][1392][INFO]: StereoExpData
+[2026-01-31 07:41:42][Stereo][3353194][MainThread][139717633181504][reader][1394][INFO]: 0 0
+[2026-01-31 07:41:42][Stereo][3353194][MainThread][139717633181504][reader][1404][INFO]: {'minX': 0, 'minY': 0, 'maxX': 23515, 'maxY': 23515, 'maxExp': 35, 'resolution': 500} 
+[2026-01-31 07:41:42][Stereo][3353194][MainThread][139717633181504][reader][1435][INFO]: gene list none
+[2026-01-31 07:42:01][Stereo][3353194][MainThread][139717633181504][reader][1437][INFO]: 30859340030415
+[2026-01-31 07:42:01][Stereo][3353194][MainThread][139717633181504][reader][1439][INFO]: 7166126
+[2026-01-31 07:42:01][Stereo][3353194][MainThread][139717633181504][reader][1441][INFO]: ENSG00000000003 TSPAN6
+[2026-01-31 07:42:01][Stereo][3353194][MainThread][139717633181504][reader][1443][INFO]: 35310
+[2026-01-31 07:42:07][Stereo][3353194][MainThread][139717633181504][reader][1449][INFO]: 2
+[2026-01-31 07:42:15][Stereo][3353194][MainThread][139717633181504][reader][1451][INFO]: csr
+[2026-01-31 07:42:15][Stereo][3353194][MainThread][139717633181504][reader][1459][INFO]: 2
+[2026-01-31 07:42:15][Stereo][3353194][MainThread][139717633181504][reader][1462][INFO]: 3
+[2026-01-31 07:42:15][Stereo][3353194][MainThread][139717633181504][reader][1464][INFO]: 4
+[2026-01-31 07:42:18][Stereo][3353194][MainThread][139717633181504][reader][1468][INFO]: the matrix has 7166126 cells, and 35310 genes.
+[2026-01-31 07:42:18][Stereo][3353194][MainThread][139717633181504][reader][1469][INFO]: read_gef end.
+[2026-01-31 07:42:18][Stereo][3353194][MainThread][139717633181504][st_pipeline][41][INFO]: start to run cal_qc...
+[2026-01-31 07:42:21][Stereo][3353194][MainThread][139717633181504][st_pipeline][44][INFO]: cal_qc end, consume time 2.7904s.
+[2026-01-31 07:42:24][Stereo][3353194][MainThread][139717633181504][reader][940][INFO]: Adding sample in adata.obs['orig.ident'].
+[2026-01-31 07:42:25][Stereo][3353194][MainThread][139717633181504][reader][943][INFO]: Adding data.position as adata.obsm['spatial'] .
+[2026-01-31 07:42:25][Stereo][3353194][MainThread][139717633181504][reader][948][INFO]: Adding data.position as adata.obs['x'] and adata.obs['y'] .
+[2026-01-31 07:42:27][Stereo][3353194][MainThread][139717633181504][reader][1109][INFO]: Adding data.tl.raw.exp_matrix as adata.raw .
+[2026-01-31 07:42:35][Stereo][3353194][MainThread][139717633181504][reader][1189][INFO]: Finished conversion to anndata.
+... storing 'real_gene_name' as categorical
+... storing 'real_gene_name' as categorical
+[2026-01-31 07:43:15][Stereo][3353194][MainThread][139717633181504][reader][1193][INFO]: Finished output to /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin5.h5ad
+2026-01-31 07:43:16 [runtime] (done:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef --bin_size 5 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin5.h5ad
+Converting .tissue.gef for bin size 10...
+2026-01-31 07:43:21 [runtime] (start:gef2gem)
+2026-01-31 07:43:21 [runtime] (run:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin10.gem -b 10 -s Y40048N5
+2026-01-31 07:43:21 [INFO   ] not specify mask file...
+2026-01-31 07:43:26 [INFO   ] minx:0 miny:0 maxx:23510 maxy:23510
+2026-01-31 07:43:54 [runtime] (done:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin10.gem -b 10 -s Y40048N5
+2026-01-31 07:43:59 [runtime] (start:gef2h5ad)
+2026-01-31 07:43:59 [runtime] (run:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef --bin_size 10 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin10.h5ad
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:68: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_to_dna(twobit: int, size: int) -> str:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:85: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def dna_to_twobit(dna: str) -> int:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:102: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_1hamming(twobit: int, size: int) -> List[int]:
+[2026-01-31 07:44:08][Stereo][3353691][MainThread][139928380073792][reader][1303][INFO]: read_gef begin ...
+2026-01-31 07:44:08 [INFO   ] input file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef specify block size:10
+[2026-01-31 07:44:08][Stereo][3353691][MainThread][139928380073792][reader][1389][INFO]: BegfR
+[2026-01-31 07:44:08][Stereo][3353691][MainThread][139928380073792][reader][1392][INFO]: StereoExpData
+[2026-01-31 07:44:08][Stereo][3353691][MainThread][139928380073792][reader][1394][INFO]: 0 0
+[2026-01-31 07:44:08][Stereo][3353691][MainThread][139928380073792][reader][1404][INFO]: {'minX': 0, 'minY': 0, 'maxX': 23510, 'maxY': 23510, 'maxExp': 87, 'resolution': 500} 
+[2026-01-31 07:44:08][Stereo][3353691][MainThread][139928380073792][reader][1435][INFO]: gene list none
+[2026-01-31 07:44:26][Stereo][3353691][MainThread][139928380073792][reader][1437][INFO]: 30837865193930
+[2026-01-31 07:44:26][Stereo][3353691][MainThread][139928380073792][reader][1439][INFO]: 1796197
+[2026-01-31 07:44:26][Stereo][3353691][MainThread][139928380073792][reader][1441][INFO]: ENSG00000000003 TSPAN6
+[2026-01-31 07:44:26][Stereo][3353691][MainThread][139928380073792][reader][1443][INFO]: 35310
+[2026-01-31 07:44:29][Stereo][3353691][MainThread][139928380073792][reader][1449][INFO]: 2
+[2026-01-31 07:44:34][Stereo][3353691][MainThread][139928380073792][reader][1451][INFO]: csr
+[2026-01-31 07:44:34][Stereo][3353691][MainThread][139928380073792][reader][1459][INFO]: 2
+[2026-01-31 07:44:34][Stereo][3353691][MainThread][139928380073792][reader][1462][INFO]: 3
+[2026-01-31 07:44:34][Stereo][3353691][MainThread][139928380073792][reader][1464][INFO]: 4
+[2026-01-31 07:44:35][Stereo][3353691][MainThread][139928380073792][reader][1468][INFO]: the matrix has 1796197 cells, and 35310 genes.
+[2026-01-31 07:44:35][Stereo][3353691][MainThread][139928380073792][reader][1469][INFO]: read_gef end.
+[2026-01-31 07:44:35][Stereo][3353691][MainThread][139928380073792][st_pipeline][41][INFO]: start to run cal_qc...
+[2026-01-31 07:44:37][Stereo][3353691][MainThread][139928380073792][st_pipeline][44][INFO]: cal_qc end, consume time 2.1558s.
+[2026-01-31 07:44:38][Stereo][3353691][MainThread][139928380073792][reader][940][INFO]: Adding sample in adata.obs['orig.ident'].
+[2026-01-31 07:44:38][Stereo][3353691][MainThread][139928380073792][reader][943][INFO]: Adding data.position as adata.obsm['spatial'] .
+[2026-01-31 07:44:38][Stereo][3353691][MainThread][139928380073792][reader][948][INFO]: Adding data.position as adata.obs['x'] and adata.obs['y'] .
+[2026-01-31 07:44:38][Stereo][3353691][MainThread][139928380073792][reader][1109][INFO]: Adding data.tl.raw.exp_matrix as adata.raw .
+[2026-01-31 07:44:40][Stereo][3353691][MainThread][139928380073792][reader][1189][INFO]: Finished conversion to anndata.
+... storing 'real_gene_name' as categorical
+... storing 'real_gene_name' as categorical
+[2026-01-31 07:45:14][Stereo][3353691][MainThread][139928380073792][reader][1193][INFO]: Finished output to /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin10.h5ad
+2026-01-31 07:45:15 [runtime] (done:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef --bin_size 10 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin10.h5ad
+Converting .tissue.gef for bin size 20...
+2026-01-31 07:45:20 [runtime] (start:gef2gem)
+2026-01-31 07:45:20 [runtime] (run:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin20.gem -b 20 -s Y40048N5
+2026-01-31 07:45:20 [INFO   ] not specify mask file...
+2026-01-31 07:45:25 [INFO   ] minx:0 miny:0 maxx:23500 maxy:23500
+2026-01-31 07:45:51 [runtime] (done:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin20.gem -b 20 -s Y40048N5
+2026-01-31 07:45:56 [runtime] (start:gef2h5ad)
+2026-01-31 07:45:56 [runtime] (run:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef --bin_size 20 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin20.h5ad
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:68: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_to_dna(twobit: int, size: int) -> str:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:85: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def dna_to_twobit(dna: str) -> int:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:102: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_1hamming(twobit: int, size: int) -> List[int]:
+[2026-01-31 07:46:05][Stereo][3354127][MainThread][139758341945152][reader][1303][INFO]: read_gef begin ...
+2026-01-31 07:46:05 [INFO   ] input file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef specify block size:20
+[2026-01-31 07:46:05][Stereo][3354127][MainThread][139758341945152][reader][1389][INFO]: BegfR
+[2026-01-31 07:46:05][Stereo][3354127][MainThread][139758341945152][reader][1392][INFO]: StereoExpData
+[2026-01-31 07:46:05][Stereo][3354127][MainThread][139758341945152][reader][1394][INFO]: 0 0
+[2026-01-31 07:46:05][Stereo][3354127][MainThread][139758341945152][reader][1404][INFO]: {'minX': 0, 'minY': 0, 'maxX': 23500, 'maxY': 23500, 'maxExp': 258, 'resolution': 500} 
+[2026-01-31 07:46:05][Stereo][3354127][MainThread][139758341945152][reader][1435][INFO]: gene list none
+[2026-01-31 07:46:23][Stereo][3354127][MainThread][139758341945152][reader][1437][INFO]: 30837865193920
+[2026-01-31 07:46:23][Stereo][3354127][MainThread][139758341945152][reader][1439][INFO]: 450808
+[2026-01-31 07:46:23][Stereo][3354127][MainThread][139758341945152][reader][1441][INFO]: ENSG00000000003 TSPAN6
+[2026-01-31 07:46:23][Stereo][3354127][MainThread][139758341945152][reader][1443][INFO]: 35310
+[2026-01-31 07:46:25][Stereo][3354127][MainThread][139758341945152][reader][1449][INFO]: 2
+[2026-01-31 07:46:28][Stereo][3354127][MainThread][139758341945152][reader][1451][INFO]: csr
+[2026-01-31 07:46:28][Stereo][3354127][MainThread][139758341945152][reader][1459][INFO]: 2
+[2026-01-31 07:46:28][Stereo][3354127][MainThread][139758341945152][reader][1462][INFO]: 3
+[2026-01-31 07:46:28][Stereo][3354127][MainThread][139758341945152][reader][1464][INFO]: 4
+[2026-01-31 07:46:28][Stereo][3354127][MainThread][139758341945152][reader][1468][INFO]: the matrix has 450808 cells, and 35310 genes.
+[2026-01-31 07:46:28][Stereo][3354127][MainThread][139758341945152][reader][1469][INFO]: read_gef end.
+[2026-01-31 07:46:28][Stereo][3354127][MainThread][139758341945152][st_pipeline][41][INFO]: start to run cal_qc...
+[2026-01-31 07:46:30][Stereo][3354127][MainThread][139758341945152][st_pipeline][44][INFO]: cal_qc end, consume time 1.9447s.
+[2026-01-31 07:46:30][Stereo][3354127][MainThread][139758341945152][reader][940][INFO]: Adding sample in adata.obs['orig.ident'].
+[2026-01-31 07:46:30][Stereo][3354127][MainThread][139758341945152][reader][943][INFO]: Adding data.position as adata.obsm['spatial'] .
+[2026-01-31 07:46:30][Stereo][3354127][MainThread][139758341945152][reader][948][INFO]: Adding data.position as adata.obs['x'] and adata.obs['y'] .
+[2026-01-31 07:46:30][Stereo][3354127][MainThread][139758341945152][reader][1109][INFO]: Adding data.tl.raw.exp_matrix as adata.raw .
+[2026-01-31 07:46:31][Stereo][3354127][MainThread][139758341945152][reader][1189][INFO]: Finished conversion to anndata.
+... storing 'real_gene_name' as categorical
+... storing 'real_gene_name' as categorical
+[2026-01-31 07:47:01][Stereo][3354127][MainThread][139758341945152][reader][1193][INFO]: Finished output to /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin20.h5ad
+2026-01-31 07:47:02 [runtime] (done:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef --bin_size 20 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin20.h5ad
+Converting .tissue.gef for bin size 50...
+2026-01-31 07:47:07 [runtime] (start:gef2gem)
+2026-01-31 07:47:07 [runtime] (run:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin50.gem -b 50 -s Y40048N5
+2026-01-31 07:47:08 [INFO   ] not specify mask file...
+2026-01-31 07:47:12 [INFO   ] minx:0 miny:0 maxx:23500 maxy:23500
+2026-01-31 07:47:35 [runtime] (done:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin50.gem -b 50 -s Y40048N5
+2026-01-31 07:47:41 [runtime] (start:gef2h5ad)
+2026-01-31 07:47:41 [runtime] (run:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef --bin_size 50 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin50.h5ad
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:68: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_to_dna(twobit: int, size: int) -> str:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:85: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def dna_to_twobit(dna: str) -> int:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:102: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_1hamming(twobit: int, size: int) -> List[int]:
+[2026-01-31 07:47:50][Stereo][3354620][MainThread][140219610294080][reader][1303][INFO]: read_gef begin ...
+2026-01-31 07:47:50 [INFO   ] input file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef specify block size:50
+[2026-01-31 07:47:50][Stereo][3354620][MainThread][140219610294080][reader][1389][INFO]: BegfR
+[2026-01-31 07:47:50][Stereo][3354620][MainThread][140219610294080][reader][1392][INFO]: StereoExpData
+[2026-01-31 07:47:50][Stereo][3354620][MainThread][140219610294080][reader][1394][INFO]: 0 0
+[2026-01-31 07:47:50][Stereo][3354620][MainThread][140219610294080][reader][1404][INFO]: {'minX': 0, 'minY': 0, 'maxX': 23500, 'maxY': 23500, 'maxExp': 818, 'resolution': 500} 
+[2026-01-31 07:47:50][Stereo][3354620][MainThread][140219610294080][reader][1435][INFO]: gene list none
+[2026-01-31 07:48:04][Stereo][3354620][MainThread][140219610294080][reader][1437][INFO]: 30709016175050
+[2026-01-31 07:48:04][Stereo][3354620][MainThread][140219610294080][reader][1439][INFO]: 72892
+[2026-01-31 07:48:04][Stereo][3354620][MainThread][140219610294080][reader][1441][INFO]: ENSG00000000003 TSPAN6
+[2026-01-31 07:48:04][Stereo][3354620][MainThread][140219610294080][reader][1443][INFO]: 35310
+[2026-01-31 07:48:06][Stereo][3354620][MainThread][140219610294080][reader][1449][INFO]: 2
+[2026-01-31 07:48:07][Stereo][3354620][MainThread][140219610294080][reader][1451][INFO]: csr
+[2026-01-31 07:48:07][Stereo][3354620][MainThread][140219610294080][reader][1459][INFO]: 2
+[2026-01-31 07:48:07][Stereo][3354620][MainThread][140219610294080][reader][1462][INFO]: 3
+[2026-01-31 07:48:07][Stereo][3354620][MainThread][140219610294080][reader][1464][INFO]: 4
+[2026-01-31 07:48:07][Stereo][3354620][MainThread][140219610294080][reader][1468][INFO]: the matrix has 72892 cells, and 35310 genes.
+[2026-01-31 07:48:07][Stereo][3354620][MainThread][140219610294080][reader][1469][INFO]: read_gef end.
+[2026-01-31 07:48:08][Stereo][3354620][MainThread][140219610294080][st_pipeline][41][INFO]: start to run cal_qc...
+[2026-01-31 07:48:09][Stereo][3354620][MainThread][140219610294080][st_pipeline][44][INFO]: cal_qc end, consume time 1.7053s.
+[2026-01-31 07:48:09][Stereo][3354620][MainThread][140219610294080][reader][940][INFO]: Adding sample in adata.obs['orig.ident'].
+[2026-01-31 07:48:09][Stereo][3354620][MainThread][140219610294080][reader][943][INFO]: Adding data.position as adata.obsm['spatial'] .
+[2026-01-31 07:48:09][Stereo][3354620][MainThread][140219610294080][reader][948][INFO]: Adding data.position as adata.obs['x'] and adata.obs['y'] .
+[2026-01-31 07:48:09][Stereo][3354620][MainThread][140219610294080][reader][1109][INFO]: Adding data.tl.raw.exp_matrix as adata.raw .
+[2026-01-31 07:48:09][Stereo][3354620][MainThread][140219610294080][reader][1189][INFO]: Finished conversion to anndata.
+... storing 'real_gene_name' as categorical
+... storing 'real_gene_name' as categorical
+[2026-01-31 07:48:34][Stereo][3354620][MainThread][140219610294080][reader][1193][INFO]: Finished output to /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin50.h5ad
+2026-01-31 07:48:35 [runtime] (done:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef --bin_size 50 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin50.h5ad
+Converting .tissue.gef for bin size 100...
+2026-01-31 07:48:40 [runtime] (start:gef2gem)
+2026-01-31 07:48:40 [runtime] (run:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin100.gem -b 100 -s Y40048N5
+2026-01-31 07:48:40 [INFO   ] not specify mask file...
+2026-01-31 07:48:44 [INFO   ] minx:0 miny:0 maxx:23500 maxy:23500
+2026-01-31 07:49:01 [runtime] (done:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin100.gem -b 100 -s Y40048N5
+2026-01-31 07:49:06 [runtime] (start:gef2h5ad)
+2026-01-31 07:49:06 [runtime] (run:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef --bin_size 100 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin100.h5ad
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:68: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_to_dna(twobit: int, size: int) -> str:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:85: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def dna_to_twobit(dna: str) -> int:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:102: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_1hamming(twobit: int, size: int) -> List[int]:
+[2026-01-31 07:49:15][Stereo][3354977][MainThread][140328787601216][reader][1303][INFO]: read_gef begin ...
+2026-01-31 07:49:15 [INFO   ] input file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef specify block size:100
+[2026-01-31 07:49:15][Stereo][3354977][MainThread][140328787601216][reader][1389][INFO]: BegfR
+[2026-01-31 07:49:15][Stereo][3354977][MainThread][140328787601216][reader][1392][INFO]: StereoExpData
+[2026-01-31 07:49:15][Stereo][3354977][MainThread][140328787601216][reader][1394][INFO]: 0 0
+[2026-01-31 07:49:15][Stereo][3354977][MainThread][140328787601216][reader][1404][INFO]: {'minX': 0, 'minY': 0, 'maxX': 23500, 'maxY': 23500, 'maxExp': 2233, 'resolution': 500} 
+[2026-01-31 07:49:15][Stereo][3354977][MainThread][140328787601216][reader][1435][INFO]: gene list none
+[2026-01-31 07:49:26][Stereo][3354977][MainThread][140328787601216][reader][1437][INFO]: 30494267810200
+[2026-01-31 07:49:26][Stereo][3354977][MainThread][140328787601216][reader][1439][INFO]: 18539
+[2026-01-31 07:49:26][Stereo][3354977][MainThread][140328787601216][reader][1441][INFO]: ENSG00000000003 TSPAN6
+[2026-01-31 07:49:26][Stereo][3354977][MainThread][140328787601216][reader][1443][INFO]: 35310
+[2026-01-31 07:49:27][Stereo][3354977][MainThread][140328787601216][reader][1449][INFO]: 2
+[2026-01-31 07:49:29][Stereo][3354977][MainThread][140328787601216][reader][1451][INFO]: csr
+[2026-01-31 07:49:29][Stereo][3354977][MainThread][140328787601216][reader][1459][INFO]: 2
+[2026-01-31 07:49:29][Stereo][3354977][MainThread][140328787601216][reader][1462][INFO]: 3
+[2026-01-31 07:49:29][Stereo][3354977][MainThread][140328787601216][reader][1464][INFO]: 4
+[2026-01-31 07:49:29][Stereo][3354977][MainThread][140328787601216][reader][1468][INFO]: the matrix has 18539 cells, and 35310 genes.
+[2026-01-31 07:49:29][Stereo][3354977][MainThread][140328787601216][reader][1469][INFO]: read_gef end.
+[2026-01-31 07:49:29][Stereo][3354977][MainThread][140328787601216][st_pipeline][41][INFO]: start to run cal_qc...
+[2026-01-31 07:49:30][Stereo][3354977][MainThread][140328787601216][st_pipeline][44][INFO]: cal_qc end, consume time 1.2420s.
+[2026-01-31 07:49:30][Stereo][3354977][MainThread][140328787601216][reader][940][INFO]: Adding sample in adata.obs['orig.ident'].
+[2026-01-31 07:49:30][Stereo][3354977][MainThread][140328787601216][reader][943][INFO]: Adding data.position as adata.obsm['spatial'] .
+[2026-01-31 07:49:30][Stereo][3354977][MainThread][140328787601216][reader][948][INFO]: Adding data.position as adata.obs['x'] and adata.obs['y'] .
+[2026-01-31 07:49:30][Stereo][3354977][MainThread][140328787601216][reader][1109][INFO]: Adding data.tl.raw.exp_matrix as adata.raw .
+[2026-01-31 07:49:30][Stereo][3354977][MainThread][140328787601216][reader][1189][INFO]: Finished conversion to anndata.
+... storing 'real_gene_name' as categorical
+... storing 'real_gene_name' as categorical
+[2026-01-31 07:49:50][Stereo][3354977][MainThread][140328787601216][reader][1193][INFO]: Finished output to /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin100.h5ad
+2026-01-31 07:49:51 [runtime] (done:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef --bin_size 100 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin100.h5ad
+Converting .tissue.gef for bin size 150...
+2026-01-31 07:49:56 [runtime] (start:gef2gem)
+2026-01-31 07:49:56 [runtime] (run:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin150.gem -b 150 -s Y40048N5
+2026-01-31 07:49:56 [INFO   ] not specify mask file...
+2026-01-31 07:49:59 [INFO   ] minx:0 miny:0 maxx:23400 maxy:23400
+2026-01-31 07:50:13 [runtime] (done:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin150.gem -b 150 -s Y40048N5
+2026-01-31 07:50:19 [runtime] (start:gef2h5ad)
+2026-01-31 07:50:19 [runtime] (run:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef --bin_size 150 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin150.h5ad
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:68: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_to_dna(twobit: int, size: int) -> str:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:85: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def dna_to_twobit(dna: str) -> int:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:102: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_1hamming(twobit: int, size: int) -> List[int]:
+[2026-01-31 07:50:27][Stereo][3355297][MainThread][140143679600448][reader][1303][INFO]: read_gef begin ...
+2026-01-31 07:50:27 [INFO   ] input file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef specify block size:150
+[2026-01-31 07:50:27][Stereo][3355297][MainThread][140143679600448][reader][1389][INFO]: BegfR
+[2026-01-31 07:50:27][Stereo][3355297][MainThread][140143679600448][reader][1392][INFO]: StereoExpData
+[2026-01-31 07:50:27][Stereo][3355297][MainThread][140143679600448][reader][1394][INFO]: 0 0
+[2026-01-31 07:50:27][Stereo][3355297][MainThread][140143679600448][reader][1404][INFO]: {'minX': 0, 'minY': 0, 'maxX': 23400, 'maxY': 23400, 'maxExp': 4129, 'resolution': 500} 
+[2026-01-31 07:50:27][Stereo][3355297][MainThread][140143679600448][reader][1435][INFO]: gene list none
+[2026-01-31 07:50:36][Stereo][3355297][MainThread][140143679600448][reader][1437][INFO]: 30279519445350
+[2026-01-31 07:50:36][Stereo][3355297][MainThread][140143679600448][reader][1439][INFO]: 8364
+[2026-01-31 07:50:36][Stereo][3355297][MainThread][140143679600448][reader][1441][INFO]: ENSG00000000003 TSPAN6
+[2026-01-31 07:50:36][Stereo][3355297][MainThread][140143679600448][reader][1443][INFO]: 35310
+[2026-01-31 07:50:37][Stereo][3355297][MainThread][140143679600448][reader][1449][INFO]: 2
+[2026-01-31 07:50:38][Stereo][3355297][MainThread][140143679600448][reader][1451][INFO]: csr
+[2026-01-31 07:50:38][Stereo][3355297][MainThread][140143679600448][reader][1459][INFO]: 2
+[2026-01-31 07:50:38][Stereo][3355297][MainThread][140143679600448][reader][1462][INFO]: 3
+[2026-01-31 07:50:38][Stereo][3355297][MainThread][140143679600448][reader][1464][INFO]: 4
+[2026-01-31 07:50:38][Stereo][3355297][MainThread][140143679600448][reader][1468][INFO]: the matrix has 8364 cells, and 35310 genes.
+[2026-01-31 07:50:38][Stereo][3355297][MainThread][140143679600448][reader][1469][INFO]: read_gef end.
+[2026-01-31 07:50:38][Stereo][3355297][MainThread][140143679600448][st_pipeline][41][INFO]: start to run cal_qc...
+[2026-01-31 07:50:39][Stereo][3355297][MainThread][140143679600448][st_pipeline][44][INFO]: cal_qc end, consume time 0.9670s.
+[2026-01-31 07:50:39][Stereo][3355297][MainThread][140143679600448][reader][940][INFO]: Adding sample in adata.obs['orig.ident'].
+[2026-01-31 07:50:39][Stereo][3355297][MainThread][140143679600448][reader][943][INFO]: Adding data.position as adata.obsm['spatial'] .
+[2026-01-31 07:50:39][Stereo][3355297][MainThread][140143679600448][reader][948][INFO]: Adding data.position as adata.obs['x'] and adata.obs['y'] .
+[2026-01-31 07:50:39][Stereo][3355297][MainThread][140143679600448][reader][1109][INFO]: Adding data.tl.raw.exp_matrix as adata.raw .
+[2026-01-31 07:50:39][Stereo][3355297][MainThread][140143679600448][reader][1189][INFO]: Finished conversion to anndata.
+... storing 'real_gene_name' as categorical
+... storing 'real_gene_name' as categorical
+[2026-01-31 07:50:55][Stereo][3355297][MainThread][140143679600448][reader][1193][INFO]: Finished output to /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin150.h5ad
+2026-01-31 07:50:55 [runtime] (done:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef --bin_size 150 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin150.h5ad
+Converting .tissue.gef for bin size 200...
+2026-01-31 07:51:01 [runtime] (start:gef2gem)
+2026-01-31 07:51:01 [runtime] (run:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin200.gem -b 200 -s Y40048N5
+2026-01-31 07:51:01 [INFO   ] not specify mask file...
+2026-01-31 07:51:03 [INFO   ] minx:0 miny:0 maxx:23400 maxy:23400
+2026-01-31 07:51:15 [runtime] (done:gef2gem) /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/geftools/bin/geftools view -i /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef -o /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin200.gem -b 200 -s Y40048N5
+2026-01-31 07:51:20 [runtime] (start:gef2h5ad)
+2026-01-31 07:51:20 [runtime] (run:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef --bin_size 200 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin200.h5ad
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:68: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_to_dna(twobit: int, size: int) -> str:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:85: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def dna_to_twobit(dna: str) -> int:
+/data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/anaconda/lib/python3.8/site-packages/loompy/bus_file.py:102: NumbaDeprecationWarning: [1mThe 'nopython' keyword argument was not supplied to the 'numba.jit' decorator. The implicit default value for this argument is currently False, but it will be changed to True in Numba 0.59.0. See https://numba.readthedocs.io/en/stable/reference/deprecation.html#deprecation-of-object-mode-fall-back-behaviour-when-using-jit for details.[0m
+  def twobit_1hamming(twobit: int, size: int) -> List[int]:
+[2026-01-31 07:51:29][Stereo][3355591][MainThread][139838026409792][reader][1303][INFO]: read_gef begin ...
+2026-01-31 07:51:29 [INFO   ] input file:/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef specify block size:200
+[2026-01-31 07:51:29][Stereo][3355591][MainThread][139838026409792][reader][1389][INFO]: BegfR
+[2026-01-31 07:51:29][Stereo][3355591][MainThread][139838026409792][reader][1392][INFO]: StereoExpData
+[2026-01-31 07:51:29][Stereo][3355591][MainThread][139838026409792][reader][1394][INFO]: 0 0
+[2026-01-31 07:51:29][Stereo][3355591][MainThread][139838026409792][reader][1404][INFO]: {'minX': 0, 'minY': 0, 'maxX': 23400, 'maxY': 23400, 'maxExp': 7567, 'resolution': 500} 
+[2026-01-31 07:51:29][Stereo][3355591][MainThread][139838026409792][reader][1435][INFO]: gene list none
+[2026-01-31 07:51:35][Stereo][3355591][MainThread][139838026409792][reader][1437][INFO]: 30064771080600
+[2026-01-31 07:51:35][Stereo][3355591][MainThread][139838026409792][reader][1439][INFO]: 4782
+[2026-01-31 07:51:35][Stereo][3355591][MainThread][139838026409792][reader][1441][INFO]: ENSG00000000003 TSPAN6
+[2026-01-31 07:51:35][Stereo][3355591][MainThread][139838026409792][reader][1443][INFO]: 35310
+[2026-01-31 07:51:36][Stereo][3355591][MainThread][139838026409792][reader][1449][INFO]: 2
+[2026-01-31 07:51:37][Stereo][3355591][MainThread][139838026409792][reader][1451][INFO]: csr
+[2026-01-31 07:51:37][Stereo][3355591][MainThread][139838026409792][reader][1459][INFO]: 2
+[2026-01-31 07:51:37][Stereo][3355591][MainThread][139838026409792][reader][1462][INFO]: 3
+[2026-01-31 07:51:37][Stereo][3355591][MainThread][139838026409792][reader][1464][INFO]: 4
+[2026-01-31 07:51:37][Stereo][3355591][MainThread][139838026409792][reader][1468][INFO]: the matrix has 4782 cells, and 35310 genes.
+[2026-01-31 07:51:37][Stereo][3355591][MainThread][139838026409792][reader][1469][INFO]: read_gef end.
+[2026-01-31 07:51:37][Stereo][3355591][MainThread][139838026409792][st_pipeline][41][INFO]: start to run cal_qc...
+[2026-01-31 07:51:37][Stereo][3355591][MainThread][139838026409792][st_pipeline][44][INFO]: cal_qc end, consume time 0.7399s.
+[2026-01-31 07:51:38][Stereo][3355591][MainThread][139838026409792][reader][940][INFO]: Adding sample in adata.obs['orig.ident'].
+[2026-01-31 07:51:38][Stereo][3355591][MainThread][139838026409792][reader][943][INFO]: Adding data.position as adata.obsm['spatial'] .
+[2026-01-31 07:51:38][Stereo][3355591][MainThread][139838026409792][reader][948][INFO]: Adding data.position as adata.obs['x'] and adata.obs['y'] .
+[2026-01-31 07:51:38][Stereo][3355591][MainThread][139838026409792][reader][1109][INFO]: Adding data.tl.raw.exp_matrix as adata.raw .
+[2026-01-31 07:51:38][Stereo][3355591][MainThread][139838026409792][reader][1189][INFO]: Finished conversion to anndata.
+... storing 'real_gene_name' as categorical
+... storing 'real_gene_name' as categorical
+[2026-01-31 07:51:51][Stereo][3355591][MainThread][139838026409792][reader][1193][INFO]: Finished output to /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin200.h5ad
+2026-01-31 07:51:52 [runtime] (done:gef2h5ad) python /data/groups/technologies/spatial.catalyst/Julien/SAW/package/saw-8.2.2/lib/saw_stereo2h5ad/stereo2h5ad.pyc --input_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.tissue.gef --bin_size 200 --output_file /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/SAW/spc022/outs/feature_expression/Y40048N5.bin200.h5ad

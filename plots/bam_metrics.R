@@ -12,38 +12,38 @@ library(scales)
 
 # Define look-up table ------------------------------------------
 sample_metadata <- tribble(
-  ~Sample,      ~sample_type,    ~Technology,       ~bam_dir,
-  "SCA013",     "Mouse_lung",     "Visium",         "E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA013/bam_output",
-  "SCA014",     "Mouse_liver",    "Visium",         "E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA014/bam_output",
-  "SCA016",     "Mouse_brain",    "Visium",         "E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA016/bam_output",
-  "SCA015",     "Human_lung",     "Visium",         "E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA015/bam_output",
+  ~Sample,      ~sample_type,    ~Technology,       ~bam_dir,                                                                    ~effective_capture_area_in_tissue,
+  "SCA013",     "Mouse_lung",     "Visium",         "E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA013/bam_output",        4.2,
+  "SCA014",     "Mouse_liver",    "Visium",         "E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA014/bam_output",        7.6,
+  "SCA016",     "Mouse_brain",    "Visium",         "E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA016/bam_output",        6.6,
+  "SCA015",     "Human_lung",     "Visium",         "E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA015/bam_output",        9.3,
   
-  "SCA001",     "Mouse_lung",     "Visium_HD_FFPE", "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA001/bam_output",
-  "SCA002",     "Mouse_liver",    "Visium_HD_FFPE", "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA002/bam_output",
-  "SCA003",     "Mouse_brain",    "Visium_HD_FFPE", "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA003/bam_output",
-  "SCA005",     "Mouse_colon",    "Visium_HD_FFPE", "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA005/bam_output",
-  "SCA010",     "Human_lung",     "Visium_HD_FFPE", "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA010/bam_output",
+  "SCA001",     "Mouse_lung",     "Visium_HD_FFPE", "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA001/bam_output",     15.3,
+  "SCA002",     "Mouse_liver",    "Visium_HD_FFPE", "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA002/bam_output",     29.4,
+  "SCA003",     "Mouse_brain",    "Visium_HD_FFPE", "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA003/bam_output",     24.9,
+  "SCA005",     "Mouse_colon",    "Visium_HD_FFPE", "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA005/bam_output",     7,
+  "SCA010",     "Human_lung",     "Visium_HD_FFPE", "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA010/bam_output",     33.3,
   
-  "SCA017",     "Mouse_lung",     "Visium_HD_FF",   "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA017/bam_output",
-  "SCA018",     "Mouse_liver",    "Visium_HD_FF",   "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA018/bam_output",
-  "SCA019",     "Mouse_brain",    "Visium_HD_FF",   "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA019/bam_output",
-  "SCA020",     "Human_lung",     "Visium_HD_FF",   "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA020/bam_output",
+  "SCA017",     "Mouse_lung",     "Visium_HD_FF",   "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA017/bam_output",     10.4,   
+  "SCA018",     "Mouse_liver",    "Visium_HD_FF",   "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA018/bam_output",     21.2,
+  "SCA019",     "Mouse_brain",    "Visium_HD_FF",   "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA019/bam_output",     19.1,
+  "SCA020",     "Human_lung",     "Visium_HD_FF",   "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA020/bam_output",     40.1,
   
-  "Exp74",      "Mouse_brain",    "BMKMANU_S1000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S1000/Exp74/bam_output",
+  "Exp74",      "Mouse_brain",    "BMKMANU_S1000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S1000/Exp74/bam_output",      4.7,
   
-  #  "Exp101",     "Mouse_lung",     "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp101/bam_output",
-  #  "Exp100",     "Mouse_liver",    "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/bam_output",
-  #  "Exp99",      "Mouse_brain",    "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp99/bam_output",
-  #  "Exp102",     "Human_lung",     "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp102/bam_output",
+  "Exp101",     "Mouse_lung",     "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp101/bam_output",     4.7,
+  "Exp100",     "Mouse_liver",    "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/bam_output",     6.8,
+  "Exp99",      "Mouse_brain",    "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp99/bam_output",      7.9,
+  "Exp102",     "Human_lung",     "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp102/bam_output",     9.6,
   
-  "SC12",       "Mouse_lung",     "Curio_Seeker",   "E:/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC12/bam_output",
-  "SC13",       "Mouse_liver",    "Curio_Seeker",   "E:/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC13/bam_output",
-  "SC11",       "Mouse_brain",    "Curio_Seeker",   "E:/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/bam_output",
-  "SC14",       "Human_lung",     "Curio_Seeker",   "E:/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC14/bam_output",
+  "SC12",       "Mouse_lung",     "Curio_Seeker",   "E:/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC12/bam_output",    5.5,
+  "SC13",       "Mouse_liver",    "Curio_Seeker",   "E:/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC13/bam_output",    5.4,
+  "SC11",       "Mouse_brain",    "Curio_Seeker",   "E:/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/bam_output",    5.5,
+  "SC14",       "Human_lung",     "Curio_Seeker",   "E:/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC14/bam_output",    5.6,
 )
 
 # Columns ------------------------------------------------------
-general_columns <- c(
+read_columns <- c(
   "number_of_spots_with_at_least_1_UMI_in_tissue",
   "percentage_spots_recovered",
   "total_number_of_genes",
@@ -65,7 +65,18 @@ general_columns <- c(
   "percentage_of_reads_with_usable_UMI",
   "ratio_reads_per_unique_UMI",
   "median_reads_per_unique_UMI",
-  "median_reads_per_unique_UMI_tissue"
+  "median_reads_per_unique_UMI_tissue",
+  "unique_UMIs_per_mm2_in_tissue_corrected"
+)
+
+umi_columns <- c(
+  "total_number_of_genes",
+  "total_number_of_unique_UMIs",
+  "number_of_unique_UMIs_in_tissue",
+  "unique_UMIs_per_mm2_in_tissue",
+  "sequencing_saturation_UMIs",
+  "median_unique_UMIs_per_gene_in_tissue_per_mm2",
+  "unique_UMIs_per_mm2_in_tissue_corrected"
 )
 
 # Colors -------------------------------------------------------
@@ -98,7 +109,7 @@ tech_outdirs <- list(
 )
 
 # Define function to read all metrics.csv for a given sample -------------------------
-read_sample_metrics <- function(bam_dir, sample_name, sample_type, technology) {
+read_sample_metrics <- function(bam_dir, sample_name, sample_type, technology, effective_capture_area_in_tissue) {
   files <- list.files(file.path(bam_dir, "output_metrics"),
                       pattern = "metrics.csv", recursive = TRUE, full.names = TRUE)
   
@@ -108,6 +119,9 @@ read_sample_metrics <- function(bam_dir, sample_name, sample_type, technology) {
         target_reads = str_extract(.x, "sample_size_\\d+") %>%
           str_remove("sample_size_") %>%
           as.numeric()
+      ) %>%
+      mutate(
+        unique_UMIs_per_mm2_in_tissue_corrected = !!sym("number_of_unique_UMIs_in_tissue") / effective_capture_area_in_tissue
       )
   })
   
@@ -121,7 +135,7 @@ read_sample_metrics <- function(bam_dir, sample_name, sample_type, technology) {
 # Load all samples --------------------------------------------------------
 all_data <- map_dfr(1:nrow(sample_metadata), function(i) {
   row <- sample_metadata[i, ]
-  read_sample_metrics(row$bam_dir, row$Sample, row$sample_type, row$Technology)
+  read_sample_metrics(row$bam_dir, row$Sample, row$sample_type, row$Technology, row$effective_capture_area_in_tissue)
 })
 
 zero_rows <- all_data %>%
@@ -134,9 +148,10 @@ zero_rows <- all_data %>%
 all_data <- bind_rows(all_data, zero_rows)
 
 # Function to make line plots ---------------------------------------------
-make_line_plot <- function(df, ycol, outpath, color_by, palette) {
+make_line_plot <- function(df, xcol, ycol, outpath, color_by, palette) {
   df_plot <- df %>%
-    select(Sample, sample_type, Technology, total_number_of_reads, !!sym(ycol)) %>%
+    select(Sample, sample_type, Technology, !!sym(xcol), !!sym(ycol)) %>%
+    rename(x_val = !!sym(xcol)) %>%
     rename(y_val = !!sym(ycol))
   
   percentage <- grepl(
@@ -148,7 +163,7 @@ make_line_plot <- function(df, ycol, outpath, color_by, palette) {
     scales::comma
   }
   
-  p <- ggplot(df_plot, aes(x = total_number_of_reads, y = y_val,
+  p <- ggplot(df_plot, aes(x = x_val, y = y_val,
                            color = !!sym(color_by), group = Sample)) +
     geom_line(size=1.1) +
     theme_minimal() +
@@ -167,7 +182,7 @@ make_line_plot <- function(df, ycol, outpath, color_by, palette) {
       axis.title.y=element_blank(),
       plot.margin = margin(10, 20, 10, 10)
     ) +
-    labs(title = ycol, x = "Total number of reads", y = ycol, color = color_by) +
+    labs(title = ycol, x = xcol, y = ycol, color = color_by) +
     scale_color_manual(values = palette) +
     scale_x_continuous(
       labels = scales::label_number(scale = 1e-6, suffix = "M"),
@@ -182,8 +197,8 @@ make_line_plot <- function(df, ycol, outpath, color_by, palette) {
     ) +
     guides(color = guide_legend(reverse = TRUE))
   
-  dir.create(outpath, recursive = TRUE, showWarnings = FALSE)
-  ggsave(file.path(outpath, paste0(gsub(" ", "_", ycol), ".png")),
+  dir.create(file.path(outpath, xcol), recursive = TRUE, showWarnings = FALSE)
+  ggsave(file.path(outpath, xcol, paste0(gsub(" ", "_", ycol), ".png")),
          plot = p, width = 6, height = 4)
 }
 
@@ -192,8 +207,11 @@ samples <- distinct(all_data, Sample, bam_dir)
 for (i in seq_len(nrow(samples))) {
   sub <- filter(all_data, Sample == samples$Sample[i])
   outdir <- file.path(samples$bam_dir[i], "plots")
-  for (col in general_columns) {
-    make_line_plot(sub, col, outdir, "Technology", tech_colors)
+  for (col in read_columns) {
+    make_line_plot(sub, "total_number_of_reads", col, outdir, "Technology", tech_colors)
+  }
+  for (col in umi_columns) {
+    make_line_plot(sub, "total_number_of_UMIs", col, outdir, "Technology", tech_colors)
   }
 }
 
@@ -205,8 +223,11 @@ for (tech in tech_list) {
   outdir <- outdir <- tech_outdirs[[tech]]
   if (!dir.exists(outdir)) dir.create(outdir, recursive = TRUE)
   
-  for (col in general_columns) {
-    make_line_plot(subset_df, col, outdir, "sample_type", sample_type_colors)
+  for (col in read_columns) {
+    make_line_plot(subset_df, "total_number_of_reads", col, outdir, "sample_type", sample_type_colors)
+  }
+  for (col in umi_columns) {
+    make_line_plot(subset_df, "total_number_of_UMIs", col, outdir, "sample_type", sample_type_colors)
   }
 }
 
@@ -218,8 +239,11 @@ for (sample_type in sample_type_list) {
   outdir <- file.path("E:/2024-07-UTBenchmark-SpC/data/processed/plots/bam_plots", sample_type)
   if (!dir.exists(outdir)) dir.create(outdir, recursive = TRUE)
   
-  for (col in general_columns) {
-    make_line_plot(subset_df, col, outdir, "Technology", tech_colors)
+  for (col in read_columns) {
+    make_line_plot(subset_df, "total_number_of_reads", col, outdir, "Technology", tech_colors)
+  }
+  for (col in umi_columns) {
+    make_line_plot(subset_df, "total_number_of_UMIs", col, outdir, "Technology", tech_colors)
   }
 }
 
@@ -276,8 +300,8 @@ make_bar_plot <- function(df, ycol, outpath) {
     expand = expansion(mult = c(0, 0.05))
   )
   
-  dir.create(outpath, recursive = TRUE, showWarnings = FALSE)
-  ggsave(file.path(outpath, paste0(ycol, ".png")),
+  dir.create(file.path(outpath, "bar_plots"), recursive = TRUE, showWarnings = FALSE)
+  ggsave(file.path(outpath, "bar_plots", paste0(ycol, ".png")),
          plot = p, width = 8, height = 2.5)
 }
 

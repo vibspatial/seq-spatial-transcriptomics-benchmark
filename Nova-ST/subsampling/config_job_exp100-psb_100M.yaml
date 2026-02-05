@@ -1,0 +1,49 @@
+env_yml: /staging/leuven/stg_00143/julienm/nova-st/config_env_docker.yaml
+
+# ChipID for this experiment 061124-7A2
+
+input:
+  chip: 07A2
+  flowcell: NovaSeq6000_20241107
+  run_id: Exp100-samplePSB_100M
+  species: rice
+  seq1st:
+    id: NovaSeq6000_20241107
+    fastq: /lustre1/project/stg_00003/cbd-bioinf/CBD__Bioinf_Unit__Nova-ST/NovaSeq6000_20241107/Demultiplexed_Total/Undetermined_S0_R1_001.fastq.gz
+    layout: /lustre1/project/stg_00003/cbd-bioinf/CBD__Bioinf_Unit__Nova-ST/NovaSeq6000_20241107/NovaScope_Chip_Layouts/07A2.layout.tsv
+  seq2nd:
+  - fastq_R1: /staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-samplePSB_100M/input/5147/5147_04_Exp100_PSB_S8_L001_R1_001.fastq.gz
+    fastq_R2: /staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-samplePSB_100M/input/5147/5147_04_Exp100_PSB_S8_L001_R2_001.fastq.gz
+  - fastq_R1: /staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-samplePSB_100M/input/5147/5147_04_Exp100_PSB_S8_L002_R1_001.fastq.gz
+    fastq_R2: /staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-samplePSB_100M/input/5147/5147_04_Exp100_PSB_S8_L002_R2_001.fastq.gz
+  - fastq_R1: /staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-samplePSB_100M/input/5187/5187_04_Exp100_PSB_S7_L001_R1_001.fastq.gz
+    fastq_R2: /staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-samplePSB_100M/input/5187/5187_04_Exp100_PSB_S7_L001_R2_001.fastq.gz
+  - fastq_R1: /staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-samplePSB_100M/input/5187/5187_04_Exp100_PSB_S7_L002_R1_001.fastq.gz
+    fastq_R2: /staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-samplePSB_100M/input/5187/5187_04_Exp100_PSB_S7_L002_R2_001.fastq.gz
+
+output: "/staging/leuven/stg_00143/julienm/nova-st/data/2024-07-UTBenchmark-SpC/Exp100-samplePSB_100M/novascope_output"
+
+# Kris Davie only requests sge-per-run and transcript-per-unit
+# sbcd-per-chip is optional, outputs a spatial barcode distribution image of the chip
+request:
+- sge-per-run
+- transcript-per-unit
+#- histology-per-run
+#- segment-10x-per-unit
+#- sbcd-per-chip  
+
+upstream:
+  # For the NovaSeq6000_20241107 flowcell, the upstream / fastq2sbcd / format has the default value DraI32
+  smatch:
+    skip_sbcd: 0
+  visualization:
+    drawsge:
+      action: true
+      genes:
+      - blue: MT
+        green: Unspliced
+        red: nonMT
+    resource:
+      assign_type: stdin
+      stdin:
+        threads: 60
