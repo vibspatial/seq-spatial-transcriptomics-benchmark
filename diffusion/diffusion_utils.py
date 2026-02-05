@@ -465,7 +465,7 @@ def plot_filtered_bins_scatter(
     title: str,
     output_folder: str | None = None,
     filename: str | None = None,
-    figsize: tuple[float, float] = (6, 6),
+    figsize: tuple[float, float] = (10, 2.5),
 ) -> None:
     # Scatter plot of filtered bins: along-boundary position vs distance to boundary.
     sizes = np.asarray(transcript_counts, dtype=float)
