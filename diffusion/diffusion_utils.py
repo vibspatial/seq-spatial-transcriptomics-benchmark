@@ -165,7 +165,8 @@ def plot_bins_colored_by_feature(sdata,
                                  dataset_id: str,
                                  level_info: LevelInfo,
                                  feature: str,
-                                 output_folder: str | None):
+                                 output_folder: str | None,
+                                 filename: str | None = None):
     
     # color can be for example 'total_counts' or the name of a gene.
 
@@ -189,7 +190,7 @@ def plot_bins_colored_by_feature(sdata,
             dpi=dpi,
             ax=ax
         )
-        save_or_show_figure(fig, output_folder, f'{technology}_{dataset_id}_{level_info.name}_{feature}.png')
+        save_or_show_figure(fig, output_folder, filename)
 
     else:
         dpi, _, figsize = get_labels_figure_parameters(sdata, level_info.labels_layer)
@@ -207,7 +208,7 @@ def plot_bins_colored_by_feature(sdata,
             dpi=dpi,
             ax=ax
         )
-        save_or_show_figure(fig, output_folder, f'{technology}_{dataset_id}_{level_info.name}_{feature}.png')
+        save_or_show_figure(fig, output_folder, filename)
 
 
 
