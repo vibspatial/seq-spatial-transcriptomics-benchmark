@@ -290,18 +290,20 @@ def plot_boundary_geoseries(boundary: BaseGeometry,
     save_or_show_figure(fig, output_folder, filename)
 
 
-def closest_points_and_distances(points: np.ndarray, line: shapely.LineString) -> tuple[np.ndarray, np.ndarray]:
+def closest_points_and_distances(points: np.ndarray, line: shapely.LineString) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     points = shapely.points(points)
 
     _, nearest_on_line = shapely.ops.nearest_points(points, line)
 
     closest_xy: np.ndarray = shapely.get_coordinates(nearest_on_line)
     distances: np.ndarray = shapely.distance(points, nearest_on_line)
+    along_distances: np.ndarray = shapely.line_locate_point(line, nearest_on_line, normalized=True)
 
     assert closest_xy.shape[1] == 2
     assert len(distances.shape) == 1
+    assert len(along_distances.shape) == 1
 
-    return closest_xy, distances
+    return closest_xy, distances, along_distances
 
 
 def plot_bin_gene_counts_and_contour(
@@ -340,7 +342,7 @@ def plot_bins_and_closest_points_on_contour(points_xy, closest_xy, closest_dista
         segments,
         # cmap='viridis',
         array=closest_distances,  # color line by distance
-        linewidths=1.5 + 2*closest_distances/closest_distances.max()  # scale line width by distance
+        linewidths=1
     )
 
     fig, ax = plt.subplots(figsize=(6, 6))
