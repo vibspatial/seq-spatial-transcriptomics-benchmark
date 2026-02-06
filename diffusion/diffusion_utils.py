@@ -10,7 +10,7 @@ from diffusion_plots import (
     plot_boundary_geoseries,
     plot_distance_boxplot,
     plot_distance_histogram,
-    plot_filtered_bins_scatter,
+    plot_distances_linearized,
     plot_tissue_outline_on_HE_image,
 )
 
@@ -395,11 +395,11 @@ def analyze_diffusion(
             )
 
         title = (  # TODO: add level to title?
-            f"{experiment.dataset_id}_{level}: bin distance to boundary vs distance along boundary\n"
+            f"{experiment.dataset_id}_{level}: bin distance to boundary vs position along boundary\n"
             f"(crop: {xmin}, {ymin}, {xmax}, {ymax})"
         )
         if plot_settings.distances_linearized:
-            plot_filtered_bins_scatter(
+            plot_distances_linearized(
                 filtered,
                 title,
                 output_folder=plot_folder,
