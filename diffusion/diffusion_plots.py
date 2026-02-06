@@ -13,6 +13,8 @@ from matplotlib.collections import LineCollection
 from matplotlib.patches import Rectangle
 from shapely.geometry.base import BaseGeometry
 
+import sys
+sys.path.append(os.path.abspath('..'))
 from utils.plotting import best_datatree_scale
 
 if TYPE_CHECKING:
