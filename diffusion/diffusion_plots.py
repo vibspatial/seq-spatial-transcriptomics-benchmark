@@ -256,22 +256,11 @@ def plot_bins_and_closest_points_on_contour(
     data: "DiffusionBinData",
     contour,
     title: str,
+    line_width=1,
     output_folder: str | None = None,
     filename: str | None = None,
 ):
-    # Line segments connecting each bin to its closest point on the contour
-    segments = np.stack([data.gene_bins.bin_centers, data.distance_data.closest_xy], axis=1)
-    lc = LineCollection(
-        segments,
-        array=data.distance_data.closest_distances,  # color line by distance
-        linewidths=1,
-    )
-
     fig, ax = plt.subplots(figsize=(6, 6))
-
-    # Plot the contour
-    line_xy = np.array(contour.coords)
-    ax.plot(line_xy[:, 0], line_xy[:, 1], "-", c="red", lw=1, label="Contour")
 
     # Plot the bin centers
     ax.scatter(
@@ -282,8 +271,18 @@ def plot_bins_and_closest_points_on_contour(
         label="Bin centers",
     )
 
-    # Draw connecting line segments
+    # Line segments connecting each bin to its closest point on the contour
+    segments = np.stack([data.gene_bins.bin_centers, data.distance_data.closest_xy], axis=1)
+    lc = LineCollection(
+        segments,
+        array=data.distance_data.closest_distances,  # color line by distance
+        linewidths=line_width,
+    )
     ax.add_collection(lc)
+
+    # Plot the contour
+    line_xy = np.array(contour.coords)
+    ax.plot(line_xy[:, 0], line_xy[:, 1], "-", c="red", lw=line_width, label="Contour")
 
     ax.set_aspect("equal")
     ax.legend()
