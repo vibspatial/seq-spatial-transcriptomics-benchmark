@@ -294,14 +294,14 @@ def plot_bins_and_closest_points_on_contour(
     save_or_show_figure(fig, output_folder, filename)
 
 
-def plot_filtered_bins_scatter(
+def plot_distances_linearized(
     data: "DiffusionBinData",
     title: str,
     output_folder: str | None = None,
     filename: str | None = None,
     figsize: tuple[float, float] = (10, 2.5),
 ) -> None:
-    # Scatter plot of filtered bins: along-boundary position vs distance to boundary.
+    # Scatter plot of bins: along-boundary position vs distance to boundary.
     sizes = np.asarray(data.gene_bins.transcript_counts, dtype=float)
     fig, ax = plt.subplots(figsize=figsize)
     ax.scatter(
@@ -310,8 +310,8 @@ def plot_filtered_bins_scatter(
         s=sizes,
         alpha=0.7,
     )
-    ax.set_xlabel("Closest along boundary (normalized)")
-    ax.set_ylabel("Closest distance")
+    ax.set_xlabel("Normalized position along boundary")
+    ax.set_ylabel("Distance to boundary")
     ax.set_title(title)
 
     save_or_show_figure(fig, output_folder, filename)
