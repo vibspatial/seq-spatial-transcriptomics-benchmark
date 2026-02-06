@@ -332,17 +332,17 @@ def analyze_diffusion(
                 fill_alpha=0.1,
                 outline_width=1,
                 bounds=crop_rect,
-            )  # FIXME: filename should have crop info (currently only 1 is saved)
+            )
 
         # Calculate tissue boundary against which we will calculate diffusion distances
         boundary = longest_cropped_shape_contour(sdata_crop, experiment.tissue_mask, crop_rect)
         if plot_settings.boundary:
+            # TODO? perhaps add title to plot
             plot_boundary_geoseries(
                 boundary,
                 output_folder=plot_folder,
                 filename="boundary.png",
             )
-        # TODO? perhaps add title to plot above
 
         gene_bin_data = get_gene_bin_data(sdata_crop, level, gene_name)
 
@@ -357,7 +357,7 @@ def analyze_diffusion(
                 boundary,
                 title,
                 output_folder=plot_folder,
-                filename=f"{level}_{gene_name}_counts.png",
+                filename=f"counts_{gene_name}.png",
             )
 
         # Calculate closest points on contour and distances
@@ -383,17 +383,18 @@ def analyze_diffusion(
             f"{experiment.dataset_id}_{level}: bins and closest point on contour\n"
             f"(crop: {xmin}, {ymin}, {xmax}, {ymax})"
         )
-        # TODO: add gene name to title
+        # TODO: add gene name to title?
         if plot_settings.bins_and_closest_points:
             plot_bins_and_closest_points_on_contour(
                 filtered,
                 boundary,
                 title,
+                line_width=0.5,
                 output_folder=plot_folder,
-                filename=f"{level}_{gene_name}_bins_closest_contour.png",
+                filename="bins_closest_contour.png",
             )
 
-        title = (
+        title = (  # TODO: add level to title?
             f"{experiment.dataset_id}_{level}: bin distance to boundary vs distance along boundary\n"
             f"(crop: {xmin}, {ymin}, {xmax}, {ymax})"
         )
@@ -402,21 +403,23 @@ def analyze_diffusion(
                 filtered,
                 title,
                 output_folder=plot_folder,
-                filename=f"{level}_{gene_name}_distances_linearized.png",
+                filename="distances_linearized.png",
             )
 
         if plot_settings.histogram:
+            # TODO: add title (including level? gene name?)
             plot_distance_histogram(
                 filtered,
                 plot_folder,
-                f"{level}_{gene_name}_histogram.png",
+                "histogram.png",
             )
 
         if plot_settings.boxplot:
+            # TODO: add title (including level? gene name?)
             plot_distance_boxplot(
                 filtered,
                 plot_folder,
-                f"{level}_{gene_name}_boxplot.png",
+                "boxplot.png",
             )
 
 
