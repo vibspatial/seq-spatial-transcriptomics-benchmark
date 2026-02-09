@@ -1,10 +1,10 @@
 #!/bin/bash
-#SBATCH --job-name=spc002_preprocess
+#SBATCH --job-name=spc022_preprocess
 #SBATCH --partition=gp_64C_128T_512GB
 #SBATCH --nodes=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --mem=350G
-#SBATCH --time=12:00:00
+#SBATCH --mem=450G
+#SBATCH --time=36:00:00
 
 ml SAMtools
 source ~/.bashrc
@@ -13,7 +13,7 @@ conda activate bamtools
 BAM="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Nova-ST/Exp93-sampleSPC022/NovaScope/novascope_output/align/NovaSeq6000_20241107/08A2/Exp93-sampleSPC022/bam/sttoolsAligned.sortedByCoord.out.bam"
 TISSUE_BARCODES_PATH="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Nova-ST/Exp93-sampleSPC022/harpy/barcodes_in_tissue.txt"
 OUTPUT_PATH="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Nova-ST/Exp93-sampleSPC022/bam_output/preprocessed_reads.csv"
-FASTQ_READ_COUNT=
+FASTQ_READ_COUNT=431485173
 
 python /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/scripts/2024-07-UTBenchmark-SpC/Nova-ST/bam/novast_preprocess.py \
   --bam_path "$BAM" \
