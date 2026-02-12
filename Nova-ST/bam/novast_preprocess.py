@@ -29,6 +29,7 @@ def main(
 
     # Create output CSV
     start = time.time()
+    seen_reads = set()
     reads_included = 0
     
     def _valid_tag(x):
@@ -40,6 +41,9 @@ def main(
         # Get included reads from BAM
         with pysam.AlignmentFile(bam_path, "rb") as bam:
             for read in bam:
+                if read.query_name in seen_reads:
+                    continue
+                
                 r = random.random()
                 barcode = 0
                 umi = 0
@@ -47,8 +51,8 @@ def main(
                 included = 0
                 included_tissue = 0
 
-                if read.has_tag("CB") and read.has_tag("UB") and read.has_tag("GN"):
-                    if read.has_tag("sM") and read.get_tag("sM") >= 0 and read.has_tag("NH") and read.get_tag("NH") == 1:
+                if read.has_tag("sM") and read.get_tag("sM") >= 0:
+                    if read.has_tag("CB") and read.has_tag("UB") and read.has_tag("GN"):
                         barcode = read.get_tag("CB")
                         umi = read.get_tag("UB")
                         gene = read.get_tag("GN")
@@ -58,6 +62,8 @@ def main(
                     reads_included += 1
                     if barcode in tissue_barcodes_prefix_map:
                         included_tissue = 1
+                        
+                    seen_reads.add(read.query_name)
 
                     f_out.write(f"{reads_included},{included},{included_tissue},{barcode},{umi},{gene},{r}\n")
                     if reads_included % 5_000_000 == 0 and reads_included > 0:
