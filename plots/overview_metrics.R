@@ -1,5 +1,5 @@
-# Working directory -------------------------------------------------------
-setwd("E:/2024-07-UTBenchmark-SpC")
+# Set
+setwd("/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/plots/overview_metrics")
 
 # Import libraries --------------------------------------------------------
 library(readr)
@@ -9,21 +9,23 @@ library(tidyr)
 library(scales)
 
 # Read data ---------------------------------------------------------------
-df <- read.csv("E:/2024-07-UTBenchmark-SpC/data/processed/plots/overview_metrics/Overview.csv", header = TRUE, sep=',') %>%
-  filter(Sample != "Mouse_colon") %>%
-  filter(Technology != "BMKMANU_S1000")
+df <- read.csv("/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/plots/overview_metrics/Overview.csv", header = TRUE, sep=',') %>%
+  filter(Sample != "Mouse_colon") #%>%
+#  filter(Technology != "BMKMANU_S1000")
 
 # Exclude 'Sample' and 'Technology' columns
 cols_to_plot <- setdiff(names(df), c("Sample", "Technology"))
 
 # Define colors
 tech_colors <- c(
-  "Visium" = "#f7c7ac",
-  "Visium_HD_FFPE" = "#b5e6a2",
-  "Visium_HD_FF" = "#fff07a",
-  "BMKMANU_S1000" = "#a6c9ec",
-  "BMKMANU_S3000" = "#e49edd",
-  "Curio_Seeker" = "#d9d9d9"
+  "Visium" = "#F4B18C",
+  "Visium_HD_FFPE" = "#A6E18F",
+  "Visium_HD_FF" = "#FFEC61",
+  "BMKMANU_S1000" = "#D694F7",
+  "BMKMANU_S3000" = "#F2A7E6",
+  "Curio_Seeker" = "#9B9B9B",
+  "Nova_ST" = "#F55151",
+  "Stereo_Seq" = "#87DDFF"
 )
 
 # Function to create bar plots
@@ -57,7 +59,7 @@ make_bar_plot <- function(df, ycol) {
   # Plot
   p <- ggplot(df_plot, aes(x = Sample, y = y_val, fill = Technology)) +
     geom_bar(stat = "identity", position = position_dodge(width = dodge_width), color = "black") +
-    geom_text(aes(label = label_text), position = position_dodge(width = dodge_width), hjust = -0.1, vjust = 0.5, size = 3.3) +
+    geom_text(aes(label = label_text), position = position_dodge(width = dodge_width), hjust = -0.1, vjust = 0.5, size = 2.8) +
     coord_flip() +
     theme_minimal() +
     theme(
