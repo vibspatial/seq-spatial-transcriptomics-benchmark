@@ -283,7 +283,7 @@ def analyze_diffusion(
     experiment: Experiment,
     level: str,
     gene_name: str,
-    max_distance: float = 400,
+    max_distance_px: float = 400,
     use_signed_distances: bool = False,
     base_folder: str | None = None,
     plot_settings: DiffusionPlotSettings | None = None,
@@ -356,6 +356,7 @@ def analyze_diffusion(
                 gene_bin_data,
                 boundary,
                 title,
+                dpi=600,
                 output_folder=plot_folder,
                 filename=f"counts_{gene_name}.png",
             )
@@ -372,7 +373,7 @@ def analyze_diffusion(
         )
 
         # Keep only the bins that are within a certain maximum distance to the contour
-        filtered = filtered.filter(np.abs(filtered.distance_data.closest_distances) <= max_distance)
+        filtered = filtered.filter(np.abs(filtered.distance_data.closest_distances) <= max_distance_px)
 
         # Keep only the bins with at least one transcript of the gene of interest
         filtered = filtered.filter(filtered.gene_bins.transcript_counts > 0)
@@ -380,7 +381,7 @@ def analyze_diffusion(
         # IMPORTANT FIXME: take number of transcripts in bin into account when analyzing diffusion distances!
 
         title = (
-            f"{experiment.dataset_id}_{level}: bins and closest point on contour\n"
+            f"{level}: bins and closest point on boundary\n"
             f"(crop: {xmin}, {ymin}, {xmax}, {ymax})"
         )
         # TODO: add gene name to title?
@@ -390,36 +391,53 @@ def analyze_diffusion(
                 boundary,
                 title,
                 line_width=0.5,
+                dpi=600,
                 output_folder=plot_folder,
-                filename="bins_closest_contour.png",
+                filename="bins_closest_point_on_boundary.png",
             )
 
-        title = (  # TODO: add level to title?
-            f"{experiment.dataset_id}_{level}: bin distance to boundary vs position along boundary\n"
+        title = (
+            f"{level}: bin distance to boundary vs position along boundary\n"
             f"(crop: {xmin}, {ymin}, {xmax}, {ymax})"
         )
         if plot_settings.distances_linearized:
             plot_distances_linearized(
                 filtered,
                 title,
+                pixel_size_um=experiment.pixel_size_um,
+                dpi=600,
                 output_folder=plot_folder,
                 filename="distances_linearized.png",
             )
 
         if plot_settings.histogram:
-            # TODO: add title (including level? gene name?)
             plot_distance_histogram(
                 filtered,
                 plot_folder,
-                "histogram.png",
+                "histogram_px.png",
+                unit="px",
             )
+            if experiment.pixel_size_um is not None and experiment.pixel_size_um > 0:
+                plot_distance_histogram(
+                    filtered,
+                    plot_folder,
+                    "histogram_um.png",
+                    unit="um",
+                    pixel_size_um=experiment.pixel_size_um,
+                )
 
         if plot_settings.boxplot:
-            # TODO: add title (including level? gene name?)
             plot_distance_boxplot(
                 filtered,
                 plot_folder,
-                "boxplot.png",
+                "boxplot_px.png",
+                unit="px",
             )
-
-
+            if experiment.pixel_size_um is not None and experiment.pixel_size_um > 0:
+                plot_distance_boxplot(
+                    filtered,
+                    plot_folder,
+                    "boxplot_um.png",
+                    unit="um",
+                    pixel_size_um=experiment.pixel_size_um,
+                )
