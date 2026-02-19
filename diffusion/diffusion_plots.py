@@ -9,8 +9,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import spatialdata_plot  # noqa: F401
 import xarray as xr
+from matplotlib import font_manager as fm
 from matplotlib.collections import LineCollection
 from matplotlib.patches import Rectangle
+from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 from shapely.geometry.base import BaseGeometry
 
 import sys
@@ -19,6 +21,8 @@ from utils.plotting import best_datatree_scale
 
 if TYPE_CHECKING:
     from diffusion_utils import DiffusionBinData, GeneBinData
+
+MICROMETER_UNIT = "\u00B5m"
 
 
 @dataclass
@@ -79,6 +83,51 @@ def save_or_show_figure(fig: plt.Figure, output_folder: str | None, filename: st
     else:
         plt.show()
     plt.close(fig)
+
+
+def pick_scalebar_length_um(
+    visible_width_px: float,
+    pixel_size_um: float,
+    target_fraction: float = 0.2,
+    nice_lengths_um: np.ndarray | None = None,
+) -> float:
+    assert visible_width_px > 0, "visible_width_px must be positive."
+    assert pixel_size_um > 0, "pixel_size_um must be positive."
+    assert 0 < target_fraction < 1, "target_fraction must be between 0 and 1."
+
+    if nice_lengths_um is None:
+        nice_lengths_um = np.asarray([20, 50, 100, 200, 500, 1000, 2000], dtype=float)
+    assert np.all(nice_lengths_um > 0), "All scale bar candidates must be positive."
+
+    visible_width_um = visible_width_px * pixel_size_um
+    target_um = visible_width_um * target_fraction
+    candidates = nice_lengths_um[nice_lengths_um <= target_um]
+    if candidates.size == 0:
+        return float(nice_lengths_um[0])
+    return float(candidates[-1])
+
+
+def add_scalebar(
+    ax: plt.Axes,
+    length_px: float,
+    label: str,
+    loc: str = "lower right",
+    color: str = "white",
+    font_size: int = 8,
+) -> None:
+    assert length_px > 0, "length_px must be positive."
+    scalebar = AnchoredSizeBar(
+        transform=ax.transData,
+        size=length_px,
+        label=label,
+        loc=loc,
+        pad=0.4,
+        color=color,
+        frameon=True,
+        size_vertical=max(1.0, length_px * 0.01),
+        fontproperties=fm.FontProperties(size=font_size),
+    )
+    ax.add_artist(scalebar)
 
 
 def plot_bins_colored_by_feature(
@@ -149,6 +198,8 @@ def plot_tissue_outline_on_HE_image(
     fill_alpha=0.3,
     outline_width=5,
     bounds: tuple[float, float, float, float] | None = None,
+    add_scale_bar: bool = False,
+    pixel_size_um: float | None = None,
 ):
     # Plot H&E image with tissue outline on top.
     # Optionally restrict the plot to bounds = (xmin, ymin, xmax, ymax).
@@ -177,11 +228,22 @@ def plot_tissue_outline_on_HE_image(
         dpi=dpi,
         ax=ax,
     )
+    ax.set_xlabel("x [px]")
+    ax.set_ylabel("y [px]")
     if bounds is not None:
         # Restrict plot to the requested bounds and show the same bounds on axes.
         xmin, ymin, xmax, ymax = bounds
         ax.set_xlim(xmin, xmax)
         ax.set_ylim(ymax, ymin)
+    if add_scale_bar:
+        assert pixel_size_um is not None and pixel_size_um > 0, (
+            "pixel_size_um must be set to a positive number when add_scale_bar=True."
+        )
+        x0, x1 = ax.get_xlim()
+        visible_width_px = abs(x1 - x0)
+        bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
+        bar_px = bar_um / pixel_size_um
+        add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
 
     save_or_show_figure(fig, output_folder, filename)
 
@@ -215,6 +277,8 @@ def plot_boundary_geoseries(
     fig, ax = plt.subplots(figsize=figsize)
 
     gpd.GeoSeries([boundary]).plot(ax=ax, figsize=figsize)
+    ax.set_xlabel("x [px]")
+    ax.set_ylabel("y [px]")
     ax.invert_yaxis()
 
     save_or_show_figure(fig, output_folder, filename)
@@ -227,12 +291,13 @@ def plot_bin_gene_counts_and_contour(
     figsize=(10, 10),
     line_width=1,
     marker_size=20,
+    dpi: int | None = None,
     output_folder: str | None = None,
     filename: str | None = None,
 ) -> None:
     # Plot the bin centers, colored by the number of transcripts detected in that bin,
     # together with a given contour over it.
-    fig, ax = plt.subplots(figsize=figsize)
+    fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
     ax.set_title(title)
     sc = ax.scatter(
         gene_bin_data.bin_centers[:, 0],
@@ -247,6 +312,8 @@ def plot_bin_gene_counts_and_contour(
         color="red",
         linewidth=line_width,
     )
+    ax.set_xlabel("x [px]")
+    ax.set_ylabel("y [px]")
     ax.invert_yaxis()
 
     save_or_show_figure(fig, output_folder, filename)
@@ -259,8 +326,10 @@ def plot_bins_and_closest_points_on_contour(
     line_width=1,
     output_folder: str | None = None,
     filename: str | None = None,
+    figsize: tuple[float, float] = (6, 6),
+    dpi: int | None = None,
 ):
-    fig, ax = plt.subplots(figsize=(6, 6))
+    fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
 
     # Plot the bin centers
     ax.scatter(
@@ -285,9 +354,11 @@ def plot_bins_and_closest_points_on_contour(
     ax.plot(line_xy[:, 0], line_xy[:, 1], "-", c="red", lw=line_width, label="Contour")
 
     ax.set_aspect("equal")
-    ax.legend()
-    ax.set_xlabel("X")
-    ax.set_ylabel("Y")
+    # Place legend outside to the right to avoid overlapping the plot.
+    ax.legend(loc="center left", bbox_to_anchor=(1.02, 0.5), borderaxespad=0)
+    fig.subplots_adjust(right=0.78)
+    ax.set_xlabel("x [px]")
+    ax.set_ylabel("y [px]")
     ax.set_title(title)
     ax.invert_yaxis()
 
@@ -297,21 +368,35 @@ def plot_bins_and_closest_points_on_contour(
 def plot_distances_linearized(
     data: "DiffusionBinData",
     title: str,
+    pixel_size_um: float | None = None,
     output_folder: str | None = None,
     filename: str | None = None,
     figsize: tuple[float, float] = (10, 2.5),
+    dpi: int | None = None,
 ) -> None:
     # Scatter plot of bins: along-boundary position vs distance to boundary.
     sizes = np.asarray(data.gene_bins.transcript_counts, dtype=float)
-    fig, ax = plt.subplots(figsize=figsize)
+    fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
     ax.scatter(
         data.distance_data.closest_along_boundary,
         data.distance_data.closest_distances,
         s=sizes,
         alpha=0.7,
     )
+    ax.axhline(0, color="red", linewidth=1, linestyle=":", zorder=3)
     ax.set_xlabel("Normalized position along boundary")
-    ax.set_ylabel("Distance to boundary")
+    ax.set_ylabel("Distance to boundary [px]")
+
+    if pixel_size_um is not None and pixel_size_um > 0:
+        secax = ax.secondary_yaxis(
+            "right",
+            functions=(
+                lambda y_px: y_px * pixel_size_um,
+                lambda y_um: y_um / pixel_size_um,
+            ),
+        )
+        secax.set_ylabel("Distance to boundary [um]")
+
     ax.set_title(title)
 
     save_or_show_figure(fig, output_folder, filename)
@@ -321,9 +406,34 @@ def plot_distance_histogram(
     data: "DiffusionBinData",
     output_folder: str | None,
     filename: str,
+    unit: str = "px",
+    pixel_size_um: float | None = None,
+    title: str | None = None,
 ) -> None:
+    distances = np.asarray(data.distance_data.closest_distances, dtype=float)
+    assert unit in {"px", "um"}, "unit must be 'px' or 'um'."
+    assert unit == "px" or (pixel_size_um is not None and pixel_size_um > 0), (
+        "pixel_size_um must be set to a positive number when unit='um'."
+    )
+    if unit == "um":
+        distances = distances * pixel_size_um
+        unit_label = MICROMETER_UNIT
+        bin_width = 5.0
+    else:
+        unit_label = "px"
+        # Use a ~5 µm bin width in pixel space when conversion is available.
+        bin_width = 5.0 / pixel_size_um if pixel_size_um is not None and pixel_size_um > 0 else 5.0
+
     fig, ax = plt.subplots(figsize=(6, 6))
-    ax.hist(data.distance_data.closest_distances)  # TODO: add title
+    dmin = float(np.min(distances))
+    dmax = float(np.max(distances))
+    bins = np.arange(dmin, dmax + bin_width, bin_width)
+    if bins.size < 2:
+        bins = 10
+    ax.hist(distances, bins=bins)
+    ax.set_xlabel(f"Distance to boundary [{unit_label}]")
+    ax.set_ylabel("Count")
+    ax.set_title(title or f"Distance to boundary histogram [{unit_label}]")
     save_or_show_figure(fig, output_folder, filename)
 
 
@@ -331,7 +441,23 @@ def plot_distance_boxplot(
     data: "DiffusionBinData",
     output_folder: str | None,
     filename: str,
+    unit: str = "px",
+    pixel_size_um: float | None = None,
+    title: str | None = None,
 ) -> None:
+    distances = np.asarray(data.distance_data.closest_distances, dtype=float)
+    assert unit in {"px", "um"}, "unit must be 'px' or 'um'."
+    assert unit == "px" or (pixel_size_um is not None and pixel_size_um > 0), (
+        "pixel_size_um must be set to a positive number when unit='um'."
+    )
+    if unit == "um":
+        distances = distances * pixel_size_um
+        unit_label = MICROMETER_UNIT
+    else:
+        unit_label = "px"
+
     fig, ax = plt.subplots(figsize=(6, 6))
-    ax.boxplot(data.distance_data.closest_distances)  # TODO: add title
+    ax.boxplot(distances)
+    ax.set_ylabel(f"Distance to boundary [{unit_label}]")
+    ax.set_title(title or f"Distance to boundary boxplot [{unit_label}]")
     save_or_show_figure(fig, output_folder, filename)
