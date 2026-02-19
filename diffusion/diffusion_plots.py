@@ -375,13 +375,18 @@ def plot_distances_linearized(
     dpi: int | None = None,
 ) -> None:
     # Scatter plot of bins: along-boundary position vs distance to boundary.
-    sizes = np.asarray(data.gene_bins.transcript_counts, dtype=float)
+    x = data.distance_data.closest_along_boundary
+    y = data.distance_data.closest_distances
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
     ax.scatter(
-        data.distance_data.closest_along_boundary,
-        data.distance_data.closest_distances,
-        s=sizes,
-        alpha=0.7,
+        x,
+        y,
+        s=3.0,
+        alpha=0.6,
+        c="#1f77b4",
+        marker=".",
+        edgecolors="none",
+        linewidths=0,
     )
     ax.axhline(0, color="red", linewidth=1, linestyle=":", zorder=3)
     ax.set_xlabel("Normalized position along boundary")
@@ -395,7 +400,7 @@ def plot_distances_linearized(
                 lambda y_um: y_um / pixel_size_um,
             ),
         )
-        secax.set_ylabel("Distance to boundary [um]")
+        secax.set_ylabel(f"Distance to boundary [{MICROMETER_UNIT}]")
 
     ax.set_title(title)
 
