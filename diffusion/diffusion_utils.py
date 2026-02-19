@@ -1,6 +1,7 @@
 ﻿import os
 import sys
 from dataclasses import dataclass
+from time import perf_counter
 sys.path.append(os.path.abspath('..'))
 from diffusion import Experiment
 from diffusion_plots import (
@@ -186,14 +187,29 @@ def closest_points_and_distances(
     use_signed_distances: bool = False,
 ) -> "DistanceData":
     print("Calculating distances to and along boundary contour...")
+    t_total_start = perf_counter()
+
+    t0 = perf_counter()
     points_xy = np.asarray(points, dtype=float)
+    t_points_xy = perf_counter() - t0
+
+    t0 = perf_counter()
     points_geom = shapely.points(points_xy)
+    t_points_geom = perf_counter() - t0
 
+    t0 = perf_counter()
     _, nearest_on_line = shapely.ops.nearest_points(points_geom, line)
+    t_nearest = perf_counter() - t0
 
+    t0 = perf_counter()
     closest_xy: np.ndarray = shapely.get_coordinates(nearest_on_line)
+    t_get_coords = perf_counter() - t0
     if use_signed_distances:
+        t0 = perf_counter()
         along_distances_abs = shapely.line_locate_point(line, nearest_on_line, normalized=False)
+        t_along_abs = perf_counter() - t0
+
+        t0 = perf_counter()
         distances = signed_distance_to_linestring(
             points_xy,
             line,
@@ -201,9 +217,23 @@ def closest_points_and_distances(
             closest_xy=closest_xy,
             along_distances=along_distances_abs,
         )
+        t_distances = perf_counter() - t0
     else:
+        t_along_abs = 0.0
+        t0 = perf_counter()
         distances = shapely.distance(points_geom, nearest_on_line)
-    along_distances: np.ndarray = shapely.line_locate_point(line, nearest_on_line, normalized=True)
+        t_distances = perf_counter() - t0
+
+    if use_signed_distances:
+        t0 = perf_counter()
+        line_length = float(line.length)
+        assert line_length > 0, "line length must be positive."
+        along_distances: np.ndarray = along_distances_abs / line_length
+        t_along_norm = perf_counter() - t0
+    else:
+        t0 = perf_counter()
+        along_distances = shapely.line_locate_point(line, nearest_on_line, normalized=True)
+        t_along_norm = perf_counter() - t0
 
     assert closest_xy.shape[1] == 2
     assert len(distances.shape) == 1
@@ -212,6 +242,18 @@ def closest_points_and_distances(
     assert len(points) == len(along_distances)
     assert len(points) == closest_xy.shape[0]
 
+    t_total = perf_counter() - t_total_start
+    print(
+        "Timing (s): "
+        f"asarray={t_points_xy:.4f}, "
+        f"points={t_points_geom:.4f}, "
+        f"nearest={t_nearest:.4f}, "
+        f"coords={t_get_coords:.4f}, "
+        f"along_abs={t_along_abs:.4f}, "
+        f"dist={t_distances:.4f}, "
+        f"along_norm={t_along_norm:.4f}, "
+        f"total={t_total:.4f}"
+    )
     print("...done")
     return DistanceData(
         closest_xy=closest_xy,
