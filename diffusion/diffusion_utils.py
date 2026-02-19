@@ -332,6 +332,8 @@ def analyze_diffusion(
                 fill_alpha=0.1,
                 outline_width=1,
                 bounds=crop_rect,
+                add_scale_bar=experiment.pixel_size_um is not None,
+                pixel_size_um=experiment.pixel_size_um,
             )
 
         # Calculate tissue boundary against which we will calculate diffusion distances
@@ -359,6 +361,8 @@ def analyze_diffusion(
                 dpi=600,
                 output_folder=plot_folder,
                 filename=f"counts_{gene_name}.png",
+                add_scale_bar=experiment.pixel_size_um is not None,
+                pixel_size_um=experiment.pixel_size_um,
             )
 
         # Calculate closest points on contour and distances

@@ -11,7 +11,9 @@ import spatialdata_plot  # noqa: F401
 import xarray as xr
 from matplotlib import font_manager as fm
 from matplotlib.collections import LineCollection
+from matplotlib.colors import LogNorm
 from matplotlib.patches import Rectangle
+from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
 from shapely.geometry.base import BaseGeometry
 
@@ -112,7 +114,7 @@ def add_scalebar(
     length_px: float,
     label: str,
     loc: str = "lower right",
-    color: str = "white",
+    color: str = "black",
     font_size: int = 8,
 ) -> None:
     assert length_px > 0, "length_px must be positive."
@@ -121,12 +123,17 @@ def add_scalebar(
         size=length_px,
         label=label,
         loc=loc,
-        pad=0.4,
+        pad=0.5,
+        borderpad=1.0,
+        sep=4,
         color=color,
         frameon=True,
         size_vertical=max(1.0, length_px * 0.01),
         fontproperties=fm.FontProperties(size=font_size),
     )
+    scalebar.patch.set_facecolor("white")
+    scalebar.patch.set_edgecolor("black")
+    scalebar.patch.set_alpha(0.8)
     ax.add_artist(scalebar)
 
 
@@ -139,10 +146,13 @@ def plot_bins_colored_by_feature(
     feature: str,
     output_folder: str | None,
     filename: str | None = None,
+    add_scale_bar: bool | None = None,
+    pixel_size_um: float | None = None,
 ):
     # color can be for example 'total_counts' or the name of a gene.
 
     title = f"{feature} ({technology} {dataset_id} {level_info.name})"
+    should_add_scale_bar = (pixel_size_um is not None) if add_scale_bar is None else add_scale_bar
 
     if HE_image:
         best_scale, dpi, _, figsize = get_image_figure_parameters(sdata, HE_image)
@@ -163,6 +173,15 @@ def plot_bins_colored_by_feature(
             dpi=dpi,
             ax=ax,
         )
+        if should_add_scale_bar:
+            assert pixel_size_um is not None and pixel_size_um > 0, (
+                "pixel_size_um must be set to a positive number when add_scale_bar=True."
+            )
+            x0, x1 = ax.get_xlim()
+            visible_width_px = abs(x1 - x0)
+            bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
+            bar_px = bar_um / pixel_size_um
+            add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
         save_or_show_figure(fig, output_folder, filename)
 
     else:
@@ -184,6 +203,15 @@ def plot_bins_colored_by_feature(
             dpi=dpi,
             ax=ax,
         )
+        if should_add_scale_bar:
+            assert pixel_size_um is not None and pixel_size_um > 0, (
+                "pixel_size_um must be set to a positive number when add_scale_bar=True."
+            )
+            x0, x1 = ax.get_xlim()
+            visible_width_px = abs(x1 - x0)
+            bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
+            bar_px = bar_um / pixel_size_um
+            add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
         save_or_show_figure(fig, output_folder, filename)
 
 
@@ -294,6 +322,8 @@ def plot_bin_gene_counts_and_contour(
     dpi: int | None = None,
     output_folder: str | None = None,
     filename: str | None = None,
+    add_scale_bar: bool = False,
+    pixel_size_um: float | None = None,
 ) -> None:
     # Plot the bin centers, colored by the number of transcripts detected in that bin,
     # together with a given contour over it.
@@ -315,6 +345,15 @@ def plot_bin_gene_counts_and_contour(
     ax.set_xlabel("x [px]")
     ax.set_ylabel("y [px]")
     ax.invert_yaxis()
+    if add_scale_bar:
+        assert pixel_size_um is not None and pixel_size_um > 0, (
+            "pixel_size_um must be set to a positive number when add_scale_bar=True."
+        )
+        x0, x1 = ax.get_xlim()
+        visible_width_px = abs(x1 - x0)
+        bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
+        bar_px = bar_um / pixel_size_um
+        add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
 
     save_or_show_figure(fig, output_folder, filename)
 
@@ -377,17 +416,29 @@ def plot_distances_linearized(
     # Scatter plot of bins: along-boundary position vs distance to boundary.
     x = data.distance_data.closest_along_boundary
     y = data.distance_data.closest_distances
+    counts = np.asarray(data.gene_bins.transcript_counts, dtype=float)
+    positive_counts = counts[counts > 0]
+    norm = None
+    if positive_counts.size > 0:
+        norm = LogNorm(vmin=float(np.min(positive_counts)), vmax=float(np.max(positive_counts)))
+
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
-    ax.scatter(
+    sc = ax.scatter(
         x,
         y,
         s=3.0,
-        alpha=0.6,
-        c="#1f77b4",
+        alpha=0.9,
+        c=counts,
+        cmap="viridis",
+        norm=norm,
         marker=".",
         edgecolors="none",
         linewidths=0,
     )
+    divider = make_axes_locatable(ax)
+    cax = divider.append_axes("right", size="3%", pad=1.2)  # WAS: 0.45
+    cbar = fig.colorbar(sc, cax=cax)
+    cbar.set_label("Transcript count per bin")
     ax.axhline(0, color="red", linewidth=1, linestyle=":", zorder=3)
     ax.set_xlabel("Normalized position along boundary")
     ax.set_ylabel("Distance to boundary [px]")
@@ -400,7 +451,9 @@ def plot_distances_linearized(
                 lambda y_um: y_um / pixel_size_um,
             ),
         )
-        secax.set_ylabel(f"Distance to boundary [{MICROMETER_UNIT}]")
+        secax.yaxis.set_label_position("right")
+        secax.yaxis.tick_right()
+        secax.set_ylabel(f"Distance to boundary [{MICROMETER_UNIT}]", labelpad=14)
 
     ax.set_title(title)
 
