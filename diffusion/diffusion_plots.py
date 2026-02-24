@@ -137,6 +137,36 @@ def add_scalebar(
     ax.add_artist(scalebar)
 
 
+def draw_labeled_rectangles(
+    ax: plt.Axes,
+    rectangles: list[tuple[float, float, float, float]] | None,
+) -> None:
+    if not rectangles:
+        return
+
+    for i, (xmin, ymin, xmax, ymax) in enumerate(rectangles, start=1):
+        rect = Rectangle(
+            (xmin, ymin),
+            xmax - xmin,
+            ymax - ymin,
+            fill=False,
+            edgecolor="yellow",
+            linewidth=2,
+        )
+        ax.add_patch(rect)
+        ax.text(
+            xmin,
+            ymin,
+            f"crop{i}",
+            color="yellow",
+            fontsize=9,
+            fontweight="bold",
+            ha="left",
+            va="bottom",
+            bbox={"facecolor": "black", "alpha": 0.6, "pad": 1.5, "edgecolor": "none"},
+        )
+
+
 def plot_bins_colored_by_feature(
     sdata,
     HE_image: str | None,
@@ -148,6 +178,7 @@ def plot_bins_colored_by_feature(
     filename: str | None = None,
     add_scale_bar: bool | None = None,
     pixel_size_um: float | None = None,
+    rectangles: list[tuple[float, float, float, float]] | None = None,
 ):
     # color can be for example 'total_counts' or the name of a gene.
 
@@ -182,6 +213,7 @@ def plot_bins_colored_by_feature(
             bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
             bar_px = bar_um / pixel_size_um
             add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
+        draw_labeled_rectangles(ax=ax, rectangles=rectangles)
         save_or_show_figure(fig, output_folder, filename)
 
     else:
@@ -212,6 +244,7 @@ def plot_bins_colored_by_feature(
             bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
             bar_px = bar_um / pixel_size_um
             add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
+        draw_labeled_rectangles(ax=ax, rectangles=rectangles)
         save_or_show_figure(fig, output_folder, filename)
 
 
@@ -228,6 +261,7 @@ def plot_tissue_outline_on_HE_image(
     bounds: tuple[float, float, float, float] | None = None,
     add_scale_bar: bool = False,
     pixel_size_um: float | None = None,
+    rectangles: list[tuple[float, float, float, float]] | None = None,
 ):
     # Plot H&E image with tissue outline on top.
     # Optionally restrict the plot to bounds = (xmin, ymin, xmax, ymax).
@@ -272,6 +306,7 @@ def plot_tissue_outline_on_HE_image(
         bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
         bar_px = bar_um / pixel_size_um
         add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
+    draw_labeled_rectangles(ax=ax, rectangles=rectangles)
 
     save_or_show_figure(fig, output_folder, filename)
 
