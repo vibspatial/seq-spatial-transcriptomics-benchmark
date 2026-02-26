@@ -1,0 +1,62 @@
+[W::hts_idx_load3] The index file is older than the data file: /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Nova-ST/Exp93-sampleSPC002/NovaScope/novascope_output/align/NovaSeq6000_20241107/05C2/Exp93-sampleSPC002/bam/sttoolsAligned.sortedByCoord.out.bam.bai
+5,000,000 rows written: 0.82 min
+10,000,000 rows written: 1.54 min
+15,000,000 rows written: 2.32 min
+20,000,000 rows written: 3.05 min
+25,000,000 rows written: 4.55 min
+30,000,000 rows written: 5.02 min
+35,000,000 rows written: 5.48 min
+40,000,000 rows written: 6.12 min
+45,000,000 rows written: 6.91 min
+50,000,000 rows written: 7.59 min
+55,000,000 rows written: 8.19 min
+60,000,000 rows written: 9.19 min
+65,000,000 rows written: 9.91 min
+70,000,000 rows written: 10.64 min
+
+ 72360753/282980514 already included in output CSV.
+Adding 210,619,761 placeholder rows for missing reads...
+75,000,000 rows written: 10.99 min
+80,000,000 rows written: 11.05 min
+85,000,000 rows written: 11.12 min
+90,000,000 rows written: 11.19 min
+95,000,000 rows written: 11.25 min
+100,000,000 rows written: 11.32 min
+105,000,000 rows written: 11.38 min
+110,000,000 rows written: 11.45 min
+115,000,000 rows written: 11.52 min
+120,000,000 rows written: 11.58 min
+125,000,000 rows written: 11.65 min
+130,000,000 rows written: 11.72 min
+135,000,000 rows written: 11.78 min
+140,000,000 rows written: 11.85 min
+145,000,000 rows written: 11.91 min
+150,000,000 rows written: 11.98 min
+155,000,000 rows written: 12.05 min
+160,000,000 rows written: 12.11 min
+165,000,000 rows written: 12.18 min
+170,000,000 rows written: 12.25 min
+175,000,000 rows written: 12.31 min
+180,000,000 rows written: 12.38 min
+185,000,000 rows written: 12.44 min
+190,000,000 rows written: 12.51 min
+195,000,000 rows written: 12.58 min
+200,000,000 rows written: 12.64 min
+205,000,000 rows written: 12.71 min
+210,000,000 rows written: 12.78 min
+215,000,000 rows written: 12.84 min
+220,000,000 rows written: 12.91 min
+225,000,000 rows written: 12.97 min
+230,000,000 rows written: 13.04 min
+235,000,000 rows written: 13.11 min
+240,000,000 rows written: 13.17 min
+245,000,000 rows written: 13.24 min
+250,000,000 rows written: 13.31 min
+255,000,000 rows written: 13.37 min
+260,000,000 rows written: 13.44 min
+265,000,000 rows written: 13.5 min
+270,000,000 rows written: 13.57 min
+275,000,000 rows written: 13.64 min
+280,000,000 rows written: 13.7 min
+
+Done! 282,980,514 rows written: 13.96 min

@@ -38,7 +38,7 @@ def main(
     df["barcode"] = df["x"].astype(str) + "_" + df["y"].astype(str)
     df["gene"] = df["geneID"].map(gene_lookup)
     df.rename(columns={"MIDIndex": "umi"}, inplace=True)
-    df.drop(columns=["x", "y", "geneID", "MIDIndex"], inplace=True)
+    df.drop(columns=["x", "y", "geneID"], inplace=True)
 
     # Expand rows by readCount
     print("Exploding rows by readCount...", flush=True)

@@ -20,10 +20,20 @@ def main(
     # Load tissue barcodes
     with open(tissue_barcodes_path) as f:
         tissue_barcodes = set(line.strip() for line in f)
+        
+    tissue_barcodes_prefix_map = {}
+
+    for bc in tissue_barcodes:
+        prefix = bc[:30]  # Only the first 30 bp of the 32-bp barcodes are stored in the BAM CB-tag
+        tissue_barcodes_prefix_map[prefix] = bc
 
     # Create output CSV
     start = time.time()
+    seen_reads = set()
     reads_included = 0
+    
+    def _valid_tag(x):
+        return x not in (0, None, "", "-", ".")
     
     with open(output_path, "w") as f_out:
         f_out.write("index,included,included_tissue,barcode,umi,gene,random\n")
@@ -31,6 +41,9 @@ def main(
         # Get included reads from BAM
         with pysam.AlignmentFile(bam_path, "rb") as bam:
             for read in bam:
+                if read.query_name in seen_reads:
+                    continue
+                
                 r = random.random()
                 barcode = 0
                 umi = 0
@@ -38,17 +51,19 @@ def main(
                 included = 0
                 included_tissue = 0
 
-                if read.has_tag("CB") and read.has_tag("UB") and read.has_tag("GN"):
-                    if read.has_tag("sM") and read.get_tag("sM") >= 0 and read.has_tag("NH") and read.get_tag("NH") == 1:
+                if read.has_tag("sM") and read.get_tag("sM") >= 0:
+                    if read.has_tag("CB") and read.has_tag("UB") and read.has_tag("GN"):
                         barcode = read.get_tag("CB")
                         umi = read.get_tag("UB")
                         gene = read.get_tag("GN")
-                        
-                if barcode and umi and gene:
+                
+                if _valid_tag(barcode) and _valid_tag(umi) and _valid_tag(gene):
                     included = 1
                     reads_included += 1
-                    if barcode in tissue_barcodes:
+                    if barcode in tissue_barcodes_prefix_map:
                         included_tissue = 1
+                        
+                    seen_reads.add(read.query_name)
 
                     f_out.write(f"{reads_included},{included},{included_tissue},{barcode},{umi},{gene},{r}\n")
                     if reads_included % 5_000_000 == 0 and reads_included > 0:
@@ -57,7 +72,7 @@ def main(
         # Pad missing reads
         n_missing = fastq_read_count - reads_included
         if n_missing > 0:
-            print(f"\n {reads_included}/{fastq_read_count} already included in output CSV.")
+            print(f"\n {reads_included}/{fastq_read_count} already included in output CSV.", flush=True)
             print(f"Adding {n_missing:,} placeholder rows for missing reads...", flush=True)
             for i in range(n_missing):
                 reads_included += 1

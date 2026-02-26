@@ -1,0 +1,130 @@
+Reusing existing full parquet: /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Nova-ST/Exp100-sampleSPC004/bam_output/output_metrics/full_c272bada-f63c-45f9-8566-a40a94c8efc3.parquet
+Total size: 643649644
+All sample sizes: [10000000, 20000000, 30000000, 40000000, 50000000, 60000000, 70000000, 80000000, 90000000, 100000000, 110000000, 120000000, 130000000, 140000000, 150000000, 160000000, 170000000, 180000000, 190000000, 200000000, 210000000, 220000000, 230000000, 240000000, 250000000, 260000000, 270000000, 280000000, 290000000, 300000000, 310000000, 320000000, 330000000, 340000000, 350000000, 360000000, 370000000, 380000000, 390000000, 400000000, 410000000, 420000000, 430000000, 440000000, 450000000, 460000000, 470000000, 480000000, 490000000, 500000000, 510000000, 520000000, 530000000, 540000000, 550000000, 560000000, 570000000, 580000000, 590000000, 600000000, 610000000, 620000000, 630000000, 640000000, 643649644]
+Skipping sample size 10,000,000 (metrics already exist).
+Skipping sample size 20,000,000 (metrics already exist).
+Skipping sample size 30,000,000 (metrics already exist).
+Skipping sample size 40,000,000 (metrics already exist).
+Skipping sample size 50,000,000 (metrics already exist).
+Skipping sample size 60,000,000 (metrics already exist).
+Skipping sample size 70,000,000 (metrics already exist).
+Skipping sample size 80,000,000 (metrics already exist).
+Skipping sample size 90,000,000 (metrics already exist).
+Skipping sample size 100,000,000 (metrics already exist).
+Skipping sample size 110,000,000 (metrics already exist).
+Skipping sample size 120,000,000 (metrics already exist).
+Skipping sample size 130,000,000 (metrics already exist).
+Skipping sample size 140,000,000 (metrics already exist).
+Skipping sample size 150,000,000 (metrics already exist).
+Skipping sample size 160,000,000 (metrics already exist).
+Skipping sample size 170,000,000 (metrics already exist).
+Skipping sample size 180,000,000 (metrics already exist).
+Skipping sample size 190,000,000 (metrics already exist).
+Skipping sample size 200,000,000 (metrics already exist).
+Skipping sample size 210,000,000 (metrics already exist).
+Skipping sample size 220,000,000 (metrics already exist).
+Skipping sample size 230,000,000 (metrics already exist).
+Skipping sample size 240,000,000 (metrics already exist).
+Skipping sample size 250,000,000 (metrics already exist).
+Skipping sample size 260,000,000 (metrics already exist).
+Skipping sample size 270,000,000 (metrics already exist).
+Skipping sample size 280,000,000 (metrics already exist).
+Skipping sample size 290,000,000 (metrics already exist).
+Skipping sample size 300,000,000 (metrics already exist).
+Skipping sample size 310,000,000 (metrics already exist).
+Skipping sample size 320,000,000 (metrics already exist).
+Skipping sample size 330,000,000 (metrics already exist).
+Skipping sample size 340,000,000 (metrics already exist).
+Skipping sample size 350,000,000 (metrics already exist).
+Skipping sample size 360,000,000 (metrics already exist).
+Skipping sample size 370,000,000 (metrics already exist).
+Skipping sample size 380,000,000 (metrics already exist).
+Skipping sample size 390,000,000 (metrics already exist).
+Skipping sample size 400,000,000 (metrics already exist).
+Skipping sample size 410,000,000 (metrics already exist).
+Skipping sample size 420,000,000 (metrics already exist).
+Skipping sample size 430,000,000 (metrics already exist).
+Skipping sample size 440,000,000 (metrics already exist).
+Skipping sample size 450,000,000 (metrics already exist).
+Skipping sample size 460,000,000 (metrics already exist).
+Skipping sample size 470,000,000 (metrics already exist).
+Skipping sample size 480,000,000 (metrics already exist).
+Skipping sample size 490,000,000 (metrics already exist).
+Skipping sample size 500,000,000 (metrics already exist).
+Skipping sample size 510,000,000 (metrics already exist).
+Skipping sample size 520,000,000 (metrics already exist).
+Skipping sample size 530,000,000 (metrics already exist).
+Skipping sample size 540,000,000 (metrics already exist).
+Skipping sample size 550,000,000 (metrics already exist).
+Skipping sample size 560,000,000 (metrics already exist).
+Skipping sample size 570,000,000 (metrics already exist).
+Skipping sample size 580,000,000 (metrics already exist).
+Skipping sample size 590,000,000 (metrics already exist).
+Skipping sample size 600,000,000 (metrics already exist).
+Skipping sample size 610,000,000 (metrics already exist).
+Skipping sample size 620,000,000 (metrics already exist).
+Skipping sample size 630,000,000 (metrics already exist).
+Cleaning up leftover sample parquet: /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Nova-ST/Exp100-sampleSPC004/bam_output/output_metrics/sample_size_640000000/sample_0402727f-bc4f-42b4-841f-3706cfafc830.parquet
+
+Sampling 640,000,000 reads...
+Sampling done - 243 seconds.
+Grouping UMIs...
+Grouping UMIs done - 1844 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 1034 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 14 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 24,142,768
+percentage_spots_recovered: 77.40296963772573
+total_number_of_reads: 639,999,046
+total_number_of_genes: 18,378
+total_number_of_UMIs: 210,941,737
+total_number_of_unique_UMIs: 95,627,172
+number_of_genes_in_tissue: 17,762
+number_of_unique_UMIs_in_tissue: 59,461,201
+percentage_of_genes_in_tissue: 96.64816628577647
+percentage_of_unique_UMIs_in_tissue: 62.1802357597692
+sequencing_saturation_reads: 85.05823210242723
+sequencing_saturation_UMIs: 54.66654756900955
+unique_UMIs_per_mm2_in_tissue: 3,092,106.1362454495
+median_UMIs_per_gene: 758.0
+median_UMIs_per_gene_per_mm2: 39.41757670306812
+median_unique_UMIs_per_gene: 347.5
+median_unique_UMIs_per_gene_per_mm2: 18.070722828913155
+median_unique_UMIs_per_gene_in_tissue: 261.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 13.572542901716067
+percentage_of_reads_with_usable_UMI: 32.959695536796154
+ratio_reads_per_unique_UMI: 6.692648466065691
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 640,000,000 finished! - 54.17 minutes
+Grouping UMIs...
+Grouping UMIs done - 1880 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 1037 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 13 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 24,165,614
+percentage_spots_recovered: 77.47621510172323
+total_number_of_reads: 643,649,644
+total_number_of_genes: 18,381
+total_number_of_UMIs: 212,146,335
+total_number_of_unique_UMIs: 95,925,102
+number_of_genes_in_tissue: 17,767
+number_of_unique_UMIs_in_tissue: 59,643,102
+percentage_of_genes_in_tissue: 96.65959414612915
+percentage_of_unique_UMIs_in_tissue: 62.17674076593632
+sequencing_saturation_reads: 85.09668996259089
+sequencing_saturation_UMIs: 54.78352147822869
+unique_UMIs_per_mm2_in_tissue: 3,101,565.3666146644
+median_UMIs_per_gene: 761.0
+median_UMIs_per_gene_per_mm2: 39.57358294331773
+median_unique_UMIs_per_gene: 348.0
+median_unique_UMIs_per_gene_per_mm2: 18.096723868954758
+median_unique_UMIs_per_gene_in_tissue: 262.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 13.624544981799271
+percentage_of_reads_with_usable_UMI: 32.95990869840363
+ratio_reads_per_unique_UMI: 6.709918786429855
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 0 finished! - 50.73 minutes
