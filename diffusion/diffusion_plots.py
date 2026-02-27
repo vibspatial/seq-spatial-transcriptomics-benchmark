@@ -271,7 +271,7 @@ def plot_tissue_outline_on_HE_image(
     title = f"{technology} {dataset_id}: H&E with tissue outline"
     if bounds is not None:
         xmin, ymin, xmax, ymax = bounds
-        title = f"{title}\n(crop: {xmin}, {ymin}, {xmax}, {ymax})"
+        title = f"{title}\n({xmin} ≤ x ≤ {xmax}, {ymin} ≤ y ≤ {ymax})"
 
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
 

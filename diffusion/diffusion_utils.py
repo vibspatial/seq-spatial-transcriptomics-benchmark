@@ -322,12 +322,13 @@ def get_gene_bin_data(sdata, table_name: str, gene_name: str) -> GeneBinData:
 
 
 def analyze_diffusion(
+    sdata_folder: str,
     experiment: Experiment,
     level: str,
     gene_name: str,
     max_distance_px: float = 400,
     use_signed_distances: bool = False,
-    base_folder: str | None = None,
+    plots_folder: str | None = None,
     plot_settings: DiffusionPlotSettings | None = None,
 ) -> None:
     if plot_settings is None:
@@ -335,7 +336,7 @@ def analyze_diffusion(
 
     print(f"Analyzing diffusion for {experiment.technology} {experiment.dataset_id} at level {level}")
 
-    sdata = sd.read_zarr(experiment.sdata_path)
+    sdata = sd.read_zarr(os.path.join(sdata_folder, experiment.sdata_path))
 
     for crop_idx, crop_rect in enumerate(experiment.crop_rects):
         print(f"Using crop rect: {crop_rect}")
@@ -349,9 +350,9 @@ def analyze_diffusion(
             target_coordinate_system=experiment.dataset_id,
         )
 
-        if base_folder:
+        if plots_folder:
             plot_folder = os.path.join(
-                base_folder,
+                plots_folder,
                 experiment.technology,
                 experiment.dataset_id,
                 "analysis",
@@ -393,7 +394,7 @@ def analyze_diffusion(
         [xmin, ymin, xmax, ymax] = crop_rect
         title = (
             f"{experiment.dataset_id}_{level}: {gene_name} transcript counts per bin\n"
-            f"(crop: {xmin}, {ymin}, {xmax}, {ymax})"
+            f"({xmin} ≤ x ≤ {xmax}, {ymin} ≤ y ≤ {ymax})"
         )
         if plot_settings.bin_gene_counts:
             plot_bin_gene_counts_and_contour(
@@ -428,7 +429,7 @@ def analyze_diffusion(
 
         title = (
             f"{level}: bins and closest point on boundary\n"
-            f"(crop: {xmin}, {ymin}, {xmax}, {ymax})"
+            f"({xmin} ≤ x ≤ {xmax}, {ymin} ≤ y ≤ {ymax})"
         )
         # TODO: add gene name to title?
         if plot_settings.bins_and_closest_points:
@@ -444,7 +445,7 @@ def analyze_diffusion(
 
         title = (
             f"{level}: bin distance to boundary vs position along boundary\n"
-            f"(crop: {xmin}, {ymin}, {xmax}, {ymax})"
+            f"({xmin} ≤ x ≤ {xmax}, {ymin} ≤ y ≤ {ymax})"
         )
         if plot_settings.distances_linearized:
             plot_distances_linearized(
