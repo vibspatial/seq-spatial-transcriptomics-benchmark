@@ -14,7 +14,7 @@ class Experiment:
     species: str  # species of sample
     tissue: str  # tissue type of sample
     dataset_id: str  # shorthand ID of dataset
-    sdata_path: str  # path to SpatialData zarr with analysis output
+    sdata_path: str  # relative path to (subsetted) SpatialData zarr with analysis output
     he_image: str | None  # name of H&E image layer
     pixel_size_um: float | None # pixel size of H&E image in microns
     tissue_mask: str | None  # name of tissue mask shapes layer
