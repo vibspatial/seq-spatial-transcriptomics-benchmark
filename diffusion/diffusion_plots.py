@@ -524,6 +524,7 @@ def plot_distance_histogram(
     if bins.size < 2:
         bins = 10
     ax.hist(distances, bins=bins)
+    ax.axvline(0, color="red", linewidth=1, linestyle=":", zorder=3)
     ax.set_xlabel(f"Distance to boundary [{unit_label}]")
     ax.set_ylabel("Count")
     ax.set_title(title or f"Distance to boundary histogram [{unit_label}]")
