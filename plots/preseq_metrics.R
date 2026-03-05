@@ -175,9 +175,11 @@ all_data <- map_dfr(1:nrow(sample_metadata), function(i) {
 all_data <- all_data %>%
   mutate(
     distinct_per_mm2 = distinct / area,
+    lc_extrap_lower_ci_per_mm2 = lc_extrap_lower_ci / area,
+    lc_extrap_upper_ci_per_mm2 = lc_extrap_upper_ci / area,
     bound_pop_estimation_per_mm2 = bound_pop_estimation / area,
-    bound_pop_lower_ci_per_mm2   = bound_pop_lower_ci / area,
-    bound_pop_upper_ci_per_mm2   = bound_pop_upper_ci / area,
+    bound_pop_lower_ci_per_mm2 = bound_pop_lower_ci / area,
+    bound_pop_upper_ci_per_mm2 = bound_pop_upper_ci / area,
     sequencing_saturation_reads =
       if_else(corrected_reads > 0,
               (1 - (distinct / corrected_reads)) * 100,
@@ -213,8 +215,8 @@ make_line_plot <- function(df, xcol, ycol, outpath, color_by, palette, title, xl
       ribbon_data <- df_plot %>%
         filter(method == "lc_extrap", x_val < 4e9) %>%
         mutate(
-          ymin = if (use_area_corrected) lc_extrap_lower_ci / area else lc_extrap_lower_ci,
-          ymax = if (use_area_corrected) lc_extrap_upper_ci / area else lc_extrap_upper_ci
+          ymin = if (use_area_corrected) lc_extrap_lower_ci_per_mm2 else lc_extrap_lower_ci,
+          ymax = if (use_area_corrected) lc_extrap_upper_ci_per_mm2 else lc_extrap_upper_ci
         )
       
       # Smooth ymin and ymax using loess
@@ -324,10 +326,10 @@ for (i in seq_len(nrow(samples))) {
   
   sub_tissue <- filter(sub, scope == "tissue")
   make_line_plot(sub_tissue, "corrected_reads", "distinct", file.path(outdir, "preseq_UMIs_in_tissue_vs_all_reads.png"), "Technology", tech_colors, "Number of Unique UMIs in tissue", "Reads", "Number of Unique UMIs in tissue")
-  make_line_plot(sub_all, "included_reads", "distinct", file.path(outdir, "preseq_UMIs_in_tissue_vs_UMI_reads.png"), "Technology", tech_colors, "Number of Unique UMIs in tissue", "Total UMIs", "Number of Unique UMIs in tissue")
-  make_line_plot(sub_all, "corrected_reads", "distinct_per_mm2", file.path(outdir, "preseq_UMIs_in_tissue_per_mm2_vs_all_reads.png"), "Technology", tech_colors, "Number of Unique UMIs in tissue per mm2", "Reads", "Number of Unique UMIs in tissue per mm2")
-  make_line_plot(sub_all, "included_reads", "distinct_per_mm2", file.path(outdir, "preseq_UMIs_in_tissue_per_mm2_vs_UMI_reads.png"), "Technology", tech_colors, "Number of Unique UMIs in tissue per mm2", "Total UMIs", "Number of Unique UMIs in tissue per mm2")
-  }
+  make_line_plot(sub_tissue, "included_reads", "distinct", file.path(outdir, "preseq_UMIs_in_tissue_vs_UMI_reads.png"), "Technology", tech_colors, "Number of Unique UMIs in tissue", "Total UMIs", "Number of Unique UMIs in tissue")
+  make_line_plot(sub_tissue, "corrected_reads", "distinct_per_mm2", file.path(outdir, "preseq_UMIs_in_tissue_per_mm2_vs_all_reads.png"), "Technology", tech_colors, "Number of Unique UMIs in tissue per mm2", "Reads", "Number of Unique UMIs in tissue per mm2")
+  make_line_plot(sub_tissue, "included_reads", "distinct_per_mm2", file.path(outdir, "preseq_UMIs_in_tissue_per_mm2_vs_UMI_reads.png"), "Technology", tech_colors, "Number of Unique UMIs in tissue per mm2", "Total UMIs", "Number of Unique UMIs in tissue per mm2")
+}
 
 # Generate plots per technology -------------------------------------------
 tech_list <- unique(all_data$Technology)
@@ -346,10 +348,9 @@ for (tech in tech_list) {
   
   sub_tissue <- filter(sub, scope == "tissue")
   make_line_plot(sub_tissue, "corrected_reads", "distinct", file.path(outdir, "preseq_UMIs_in_tissue_vs_all_reads.png"), "sample_type", sample_type_colors, "Number of Unique UMIs in tissue", "Reads", "Number of Unique UMIs in tissue")
-  make_line_plot(sub_all, "included_reads", "distinct", file.path(outdir, "preseq_UMIs_in_tissue_vs_UMI_reads.png"), "sample_type", sample_type_colors, "Number of Unique UMIs in tissue", "Total UMIs", "Number of Unique UMIs in tissue")
-  make_line_plot(sub_all, "corrected_reads", "distinct_per_mm2", file.path(outdir, "preseq_UMIs_in_tissue_per_mm2_vs_all_reads.png"), "sample_type", sample_type_colors, "Number of Unique UMIs in tissue per mm2", "Reads", "Number of Unique UMIs in tissue per mm2")
-  make_line_plot(sub_all, "included_reads", "distinct_per_mm2", file.path(outdir, "preseq_UMIs_in_tissue_per_mm2_vs_UMI_reads.png"), "sample_type", sample_type_colors, "Number of Unique UMIs in tissue per mm2", "Total UMIs", "Number of Unique UMIs in tissue per mm2")
-  
+  make_line_plot(sub_tissue, "included_reads", "distinct", file.path(outdir, "preseq_UMIs_in_tissue_vs_UMI_reads.png"), "sample_type", sample_type_colors, "Number of Unique UMIs in tissue", "Total UMIs", "Number of Unique UMIs in tissue")
+  make_line_plot(sub_tissue, "corrected_reads", "distinct_per_mm2", file.path(outdir, "preseq_UMIs_in_tissue_per_mm2_vs_all_reads.png"), "sample_type", sample_type_colors, "Number of Unique UMIs in tissue per mm2", "Reads", "Number of Unique UMIs in tissue per mm2")
+  make_line_plot(sub_tissue, "included_reads", "distinct_per_mm2", file.path(outdir, "preseq_UMIs_in_tissue_per_mm2_vs_UMI_reads.png"), "sample_type", sample_type_colors, "Number of Unique UMIs in tissue per mm2", "Total UMIs", "Number of Unique UMIs in tissue per mm2")
 }
 
 # Generate plots per sample type ------------------------------------------
@@ -369,9 +370,7 @@ for (sample_type in sample_type_list) {
   
   sub_tissue <- filter(sub, scope == "tissue")
   make_line_plot(sub_tissue, "corrected_reads", "distinct", file.path(outdir, "preseq_UMIs_in_tissue_vs_all_reads.png"), "Technology", tech_colors, "Number of Unique UMIs in tissue", "Reads", "Number of Unique UMIs in tissue")
-  make_line_plot(sub_all, "included_reads", "distinct", file.path(outdir, "preseq_UMIs_in_tissue_vs_UMI_reads.png"), "Technology", tech_colors, "Number of Unique UMIs in tissue", "Total UMIs", "Number of Unique UMIs in tissue")
-  make_line_plot(sub_all, "corrected_reads", "distinct_per_mm2", file.path(outdir, "preseq_UMIs_in_tissue_per_mm2_vs_all_reads.png"), "Technology", tech_colors, "Number of Unique UMIs in tissue per mm2", "Reads", "Number of Unique UMIs in tissue per mm2")
-  make_line_plot(sub_all, "included_reads", "distinct_per_mm2", file.path(outdir, "preseq_UMIs_in_tissue_per_mm2_vs_UMI_reads.png"), "Technology", tech_colors, "Number of Unique UMIs in tissue per mm2", "Total UMIs", "Number of Unique UMIs in tissue per mm2")
-  
-  
+  make_line_plot(sub_tissue, "included_reads", "distinct", file.path(outdir, "preseq_UMIs_in_tissue_vs_UMI_reads.png"), "Technology", tech_colors, "Number of Unique UMIs in tissue", "Total UMIs", "Number of Unique UMIs in tissue")
+  make_line_plot(sub_tissue, "corrected_reads", "distinct_per_mm2", file.path(outdir, "preseq_UMIs_in_tissue_per_mm2_vs_all_reads.png"), "Technology", tech_colors, "Number of Unique UMIs in tissue per mm2", "Reads", "Number of Unique UMIs in tissue per mm2")
+  make_line_plot(sub_tissue, "included_reads", "distinct_per_mm2", file.path(outdir, "preseq_UMIs_in_tissue_per_mm2_vs_UMI_reads.png"), "Technology", tech_colors, "Number of Unique UMIs in tissue per mm2", "Total UMIs", "Number of Unique UMIs in tissue per mm2")
 }
