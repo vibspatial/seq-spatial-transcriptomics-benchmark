@@ -12,9 +12,12 @@ import xarray as xr
 from matplotlib import font_manager as fm
 from matplotlib.collections import LineCollection
 from matplotlib.colors import LogNorm
+from matplotlib.path import Path
 from matplotlib.patches import Rectangle
+from matplotlib.patches import PathPatch
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
+from shapely.geometry import MultiPolygon, Polygon
 from shapely.geometry.base import BaseGeometry
 
 import sys
@@ -343,6 +346,211 @@ def plot_boundary_geoseries(
     ax.set_xlabel("x [px]")
     ax.set_ylabel("y [px]")
     ax.invert_yaxis()
+
+    save_or_show_figure(fig, output_folder, filename)
+
+
+def _assert_polygon_ring_closed(ring, ring_name: str) -> None:
+    coords = list(ring.coords)
+    assert len(coords) >= 4, f"{ring_name} must have at least 4 points (including closure point)."
+    assert coords[0] == coords[-1], f"{ring_name} is not closed."
+
+
+def _polygon_to_path(polygon: Polygon) -> Path:
+    vertices: list[tuple[float, float]] = []
+    codes: list[int] = []
+
+    def add_ring(ring) -> None:
+        ring_coords = np.asarray(ring.coords, dtype=float)
+        n = ring_coords.shape[0]
+        vertices.extend(ring_coords.tolist())
+        codes.extend([Path.MOVETO] + [Path.LINETO] * (n - 2) + [Path.CLOSEPOLY])
+
+    add_ring(polygon.exterior)
+    for interior in polygon.interiors:
+        add_ring(interior)
+
+    return Path(np.asarray(vertices, dtype=float), codes)
+
+
+def _ring_signed_area(coords: np.ndarray | list[tuple[float, float]]) -> float:
+    ring = np.asarray(coords, dtype=float)
+    if ring.ndim != 2 or ring.shape[0] < 3:
+        return 0.0
+    if np.allclose(ring[0], ring[-1]):
+        ring = ring[:-1]
+    if ring.shape[0] < 3:
+        return 0.0
+    x = ring[:, 0]
+    y = ring[:, 1]
+    return 0.5 * float(np.sum(x * np.roll(y, -1) - np.roll(x, -1) * y))
+
+
+def _ring_as_array(
+    polygon: Polygon,
+    *,
+    tolerance: float = 100.0,
+) -> np.ndarray:
+    """
+    Return the exterior ring used for orientation markers.
+    The tolerance is in pixels, larger values yield coarser polygon approximations.
+    """
+    if tolerance > 0:
+        simplified = polygon.simplify(tolerance, preserve_topology=True)
+        if isinstance(simplified, Polygon):
+            ring = np.asarray(simplified.exterior.coords, dtype=float)
+            if ring.shape[0] >= 4:
+                return ring
+    return np.asarray(polygon.exterior.coords, dtype=float)
+
+
+def _add_polygon_orientation_arrows(
+    ax: plt.Axes,
+    polygon: Polygon,
+    color: tuple[float, ...],
+    base_spacing_px: float = 250.0,
+) -> None:
+    """
+    Draw orientation arrows along the polygon boundary.
+
+    The direction is derived from a simplified polygon to avoid local jitter.
+
+    Code is for debugging / testing purposes only.
+    """
+    coords = np.asarray(polygon.exterior.coords, dtype=float)
+    if coords.shape[0] < 4:
+        return
+
+    ring = coords
+    if np.allclose(ring[0], ring[-1]):
+        ring = ring[:-1]
+    if ring.shape[0] < 3:
+        return
+
+    simplified_ring = _ring_as_array(polygon)
+    if np.allclose(simplified_ring[0], simplified_ring[-1]):
+        simplified_ring = simplified_ring[:-1]
+    if simplified_ring.shape[0] < 3:
+        simplified_ring = ring
+    is_simplified_ccw = _ring_signed_area(simplified_ring) > 0.0
+
+    seg_starts = ring
+    seg_ends = np.vstack([ring[1:], ring[0]])
+    seg_vec = seg_ends - seg_starts
+    seg_len = np.hypot(seg_vec[:, 0], seg_vec[:, 1])
+    seg_len = np.where(seg_len > 0, seg_len, 1e-12)
+    cumulative = np.concatenate(([0.0], np.cumsum(seg_len)))
+    perimeter = float(cumulative[-1])
+    if perimeter <= 0:
+        return
+
+    simp_starts = simplified_ring
+    simp_ends = np.vstack([simplified_ring[1:], simplified_ring[0]])
+    simp_vec = simp_ends - simp_starts
+    simp_len = np.hypot(simp_vec[:, 0], simp_vec[:, 1])
+    simp_len = np.where(simp_len > 0, simp_len, 1e-12)
+    simp_cumulative = np.concatenate(([0.0], np.cumsum(simp_len)))
+    simp_perimeter = float(simp_cumulative[-1])
+    if simp_perimeter <= 0:
+        return
+
+    x0, y0, x1, y1 = polygon.bounds
+    short_side = max(1e-12, min(x1 - x0, y1 - y0))
+    arrow_length = max(6.0, 0.5 * short_side / 20.0)
+    head_length = arrow_length / 3.0
+
+    n_arrows = max(2, int(np.ceil(perimeter / base_spacing_px)))
+    if n_arrows > 12:
+        n_arrows = 12
+
+    fractions = np.linspace(0.0, 1.0, n_arrows + 2, endpoint=True)[1:-1]
+    for frac in fractions:
+        target = frac * perimeter
+        seg_idx = int(np.searchsorted(cumulative, target, side="right") - 1)
+        seg_idx = np.clip(seg_idx, 0, len(seg_vec) - 1)
+        if seg_len[seg_idx] <= 0:
+            continue
+
+        t = (target - cumulative[seg_idx]) / seg_len[seg_idx]
+        p0 = seg_starts[seg_idx] * (1.0 - t) + seg_ends[seg_idx] * t
+        simp_target = frac * simp_perimeter
+        simp_seg_idx = int(np.searchsorted(simp_cumulative, simp_target, side="right") - 1)
+        simp_seg_idx = np.clip(simp_seg_idx, 0, len(simp_vec) - 1)
+        if simp_len[simp_seg_idx] <= 0:
+            continue
+        direction = simp_vec[simp_seg_idx] / simp_len[simp_seg_idx]
+        if not is_simplified_ccw:
+            direction = -direction
+
+        start = p0 - 0.5 * arrow_length * direction
+        ax.arrow(
+            start[0],
+            start[1],
+            arrow_length * direction[0],
+            arrow_length * direction[1],
+            length_includes_head=True,
+            width=0.0,
+            head_width=0.25 * arrow_length,
+            head_length=head_length,
+            fc=color,
+            ec=color,
+            linewidth=1.2,
+            zorder=3,
+            clip_on=False,
+        )
+
+
+def plot_shapely_geometries(
+    sdata,
+    tissue_mask: str | None,
+    figsize: tuple[float, float] = (10, 10),
+    dpi: int | None = 600,
+    title: str | None = None,
+    output_folder: str | None = None,
+    filename: str | None = None,
+):
+    # Code for debugging / testing purpose only.
+
+    if tissue_mask is None or tissue_mask not in sdata.shapes:
+        return
+    gdf = sdata.shapes[tissue_mask]
+    geometries = gdf.geometry
+
+    assert len(geometries) > 0, "geometries must not be empty."
+    for i, geom in enumerate(geometries):
+        assert isinstance(geom, (Polygon, MultiPolygon)), (
+            f"Geometry {i} must be a Polygon or MultiPolygon, got {geom.geom_type}."
+        )
+
+        polygons = geom.geoms if isinstance(geom, MultiPolygon) else [geom]
+        for j, poly in enumerate(polygons):
+            _assert_polygon_ring_closed(poly.exterior, f"Geometry {i}, polygon {j} exterior")
+            for k, interior in enumerate(poly.interiors):
+                _assert_polygon_ring_closed(interior, f"Geometry {i}, polygon {j} hole {k}")
+
+    fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
+    cmap = plt.get_cmap("tab20", len(geometries))
+
+    for i, geom in enumerate(geometries):
+        color = cmap(i)
+        polygons = geom.geoms if isinstance(geom, MultiPolygon) else [geom]
+        for poly in polygons:
+            patch = PathPatch(
+                _polygon_to_path(poly),
+                facecolor=color,
+                edgecolor=color,
+                linewidth=1.5,
+                alpha=0.6,
+            )
+            ax.add_patch(patch)
+            _add_polygon_orientation_arrows(ax, poly, color=color)
+
+    ax.autoscale()
+    ax.set_aspect("equal", adjustable="box")
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    if title is not None:
+        ax.set_title(title)
 
     save_or_show_figure(fig, output_folder, filename)
 

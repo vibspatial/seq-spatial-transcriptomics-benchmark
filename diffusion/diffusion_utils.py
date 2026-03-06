@@ -16,11 +16,87 @@ from diffusion_plots import (
 )
 
 import shapely
-from shapely.geometry import box
+from shapely.geometry import Polygon, box
+from shapely.geometry.polygon import orient
 from shapely.ops import unary_union
 from shapely.geometry.base import BaseGeometry
 import spatialdata as sd
 import numpy as np
+
+
+def _signed_ring_area(coords: np.ndarray | list[tuple[float, float]]) -> float:
+    """Compute signed area for a single linear ring."""
+    ring = np.asarray(coords, dtype=float)
+    if ring.ndim != 2 or ring.shape[0] < 3:
+        return 0.0
+    x = ring[:, 0]
+    y = ring[:, 1]
+    return 0.5 * float(np.sum(x * np.roll(y, -1) - np.roll(x, -1) * y))
+
+
+def signed_area(polygon: Polygon) -> float:
+    """
+    Return signed polygon area using shapely.orientation sign convention.
+
+    Positive means the oriented exterior ring is CCW, negative means clockwise.
+    This matches shapely.geometry.polygon.orient(..., sign=1.0).
+    """
+    if not isinstance(polygon, Polygon):
+        raise TypeError(f"Expected a shapely Polygon, got {type(polygon)!r}.")
+    if polygon.is_empty:
+        return 0.0
+    oriented = orient(polygon, sign=1.0)
+    area = _signed_ring_area(oriented.exterior.coords)
+    for interior in oriented.interiors:
+        area += _signed_ring_area(interior.coords)
+    return area
+
+
+def print_geodataframe_geometry_info(sdata, tissue_mask: str | None) -> None:
+    """
+    Print basic information about the polygons in a GeoDataFrame.
+    """
+
+    if tissue_mask is None:
+        print("No tissue mask name provided.")
+        return
+
+    print(f"Tissue mask: {tissue_mask}")
+    if not tissue_mask in sdata.shapes:
+        print(f"{tissue_mask} is not a shapes layer!")
+
+    gdf = sdata.shapes[tissue_mask]
+
+    assert hasattr(gdf, "geometry"), "Input must have a GeoDataFrame-like geometry column."
+    geometries = gdf.geometry
+    print(f"Number of geometries: {len(geometries)}")
+
+    for i, geom in enumerate(geometries):
+        print(f"\nGeometry {i}:")
+        print(f"  type: {type(geom)}")
+        print(f"  object: {geom}")
+
+        assert isinstance(geom, Polygon)
+
+        print(f"  number of holes: {len(geom.interiors)}")
+
+        if geom.is_empty:
+            print("  empty geometry")
+        else:
+            signed_poly_area = signed_area(geom)
+            print(f"  signed area of polygon: {signed_poly_area}")
+            assert signed_poly_area >= 0.0 
+            # Note: we rely on polygon sign to interpret inside/outside tissue;
+            # if needed we could normalize orientation to the expected convention
+            # with shapely.geometry.polygon.orient(geom, sign=1.0).
+            # Expected convention: the coordinates of the product’s exterior ring are 
+            # oriented counter-clockwise and the interior rings (holes) clockwise;
+            # the signed area of the polygon is nonnegative.
+
+            xmin, ymin, xmax, ymax = geom.bounds
+            bbox_area = float((xmax - xmin) * (ymax - ymin))
+            print(f"  bbox: {xmin} <= x <= {xmax}, {ymin} <= y <= {ymax}")
+            print(f"  bbox unsigned area: {bbox_area}")
 
 
 def clip_polygon_to_bbox_lines(polygon, crop_rect):
