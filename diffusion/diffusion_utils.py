@@ -191,7 +191,14 @@ def signed_distance_to_linestring(
     along_distances: np.ndarray | None = None,
 ) -> np.ndarray:
     """
-    Signed distance to a LineString.
+    Calculates the signed distance to a LineString.
+    
+    Sign convention:
+    Points on the left of the linestring
+    (when moving from its first to its last point) will have a negative distance,
+    points on the right a positive distance.
+
+    Distance:
     - Use closest point on interior segments.
     - If the closest segment is the first and the projection is before the start,
       extend the first segment to infinity.
@@ -254,7 +261,9 @@ def signed_distance_to_linestring(
     dist_ext = np.abs(cross)
     dist = np.where(use_ext, dist_ext, dist_local)
 
-    return dist * np.sign(cross)
+    # Enforce our sign convention for signed distances:
+    # negative on the left, positive on the right of the polyline.
+    return dist * (-np.sign(cross))
 
 
 def closest_points_and_distances(
