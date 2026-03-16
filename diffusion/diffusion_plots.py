@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import csv
 from dataclasses import dataclass
 from typing import TYPE_CHECKING
 
@@ -75,6 +76,8 @@ def get_labels_figure_parameters(sdata, labels_layer, dpi=200, max_dim_for_plots
 
 
 def save_or_show_figure(fig: plt.Figure, output_folder: str | None, filename: str) -> None:
+    # TODO: now that analyze_diffusion requires plot_folder, propagate this requirement through plotting code
+    # (make output_folder non-optional and always save to file; remove plt.show branch).
     if output_folder is not None:
         save_path = os.path.join(output_folder, filename)
         fig.savefig(
@@ -737,6 +740,85 @@ def plot_distance_histogram(
     ax.set_ylabel("Count")
     ax.set_title(title or f"Distance to boundary histogram [{unit_label}]")
     save_or_show_figure(fig, output_folder, filename)
+
+
+def combined_distance_histogram(
+    crop_specs: list[tuple[str, str, float, str]],
+    output_path: str,
+    plots_root: str,
+    title: str | None = None,
+) -> None:
+    """
+    Plot overlaid distance histograms (as lines) for multiple crops, in micrometers.
+
+    Each entry in crop_specs is (technology, dataset_id, pixel_size_um, crop_name).
+    """
+    assert len(crop_specs) > 0, "crop_specs must contain at least one entry."
+
+    data_per_label: list[tuple[str, np.ndarray]] = []
+    all_distances_um: list[np.ndarray] = []
+
+    for technology, dataset_id, pixel_size_um, crop_name in crop_specs:
+        assert pixel_size_um > 0, "pixel_size_um must be > 0."
+        csv_path = os.path.join(
+            plots_root,
+            technology,
+            dataset_id,
+            "analysis",
+            crop_name,
+            "distances.csv",
+        )
+        assert os.path.exists(csv_path), f"Missing file: {csv_path}"
+
+        with open(csv_path, "r", encoding="utf-8", newline="") as csv_file:
+            reader = csv.DictReader(csv_file)
+            assert reader.fieldnames is not None and "closest_distance_px" in reader.fieldnames, (
+                f"{csv_path} must contain a 'closest_distance_px' column"
+            )
+            distances_px = [float(row["closest_distance_px"]) for row in reader if row.get("closest_distance_px")]
+
+        if len(distances_px) == 0:
+            continue
+
+        distances_um = np.asarray(distances_px, dtype=float) * pixel_size_um
+        label = f"{technology}, {dataset_id}, {crop_name}"
+        data_per_label.append((label, distances_um))
+        all_distances_um.append(distances_um)
+
+    if len(all_distances_um) == 0:
+        raise ValueError("No distance rows found in any selected crop.")
+
+    concat = np.concatenate(all_distances_um)
+    dmin = float(np.min(concat))
+    dmax = float(np.max(concat))
+    bin_width = 5.0
+    bins = np.arange(dmin, dmax + bin_width, bin_width)
+    if bins.size < 2:
+        bins = 10
+
+    fig, ax = plt.subplots(figsize=(6, 6))
+    for label, distances_um in data_per_label:
+        counts, edges = np.histogram(distances_um, bins=bins)
+        centers = 0.5 * (edges[:-1] + edges[1:])
+        ax.plot(centers, counts, linewidth=1.5, label=label)
+
+    ax.axvline(0, color="red", linewidth=1, linestyle=":", zorder=3)
+    ax.set_xlabel(f"Distance to boundary [{MICROMETER_UNIT}]")
+    ax.set_ylabel("Count")
+    ax.set_title(title or f"Combined distance histogram")
+    ax.legend(fontsize="small")
+
+    output_dir = os.path.dirname(output_path)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+    fig.savefig(
+        output_path,
+        bbox_inches="tight",
+        pad_inches=max(fig.get_size_inches()) / 100,
+        facecolor="white",
+        transparent=False,
+    )
+    plt.close(fig)
 
 
 def plot_distance_boxplot(
