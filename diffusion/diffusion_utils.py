@@ -1,5 +1,6 @@
 ﻿import os
 import sys
+import csv
 from dataclasses import dataclass
 from time import perf_counter
 sys.path.append(os.path.abspath('..'))
@@ -406,16 +407,51 @@ def get_gene_bin_data(sdata, table_name: str, gene_name: str) -> GeneBinData:
     )
 
 
+def save_filtered_diffusion_data(
+    filtered: DiffusionBinData,
+    output_path: str,
+) -> None:
+    """Persist filtered per-bin distances for later recombination across experiments."""
+    row_count = len(filtered.distance_data.closest_distances)
+    with open(output_path, "w", newline="", encoding="utf-8") as csv_file:
+        writer = csv.writer(csv_file)
+        writer.writerow(
+            [
+                "bin_x",
+                "bin_y",
+                "closest_x",
+                "closest_y",
+                "closest_distance_px",
+                "closest_along_boundary",
+                "transcript_count",
+            ]
+        )
+        for i in range(row_count):
+            writer.writerow(
+                [
+                    float(filtered.gene_bins.bin_centers[i, 0]),
+                    float(filtered.gene_bins.bin_centers[i, 1]),
+                    float(filtered.distance_data.closest_xy[i, 0]),
+                    float(filtered.distance_data.closest_xy[i, 1]),
+                    float(filtered.distance_data.closest_distances[i]),
+                    float(filtered.distance_data.closest_along_boundary[i]),
+                    float(filtered.gene_bins.transcript_counts[i]),
+                ]
+            )
+    print(f"Saved {row_count} filtered diffusion rows to {output_path}")
+
+
 def analyze_diffusion(
     sdata_folder: str,
     experiment: Experiment,
     level: str,
     gene_name: str,
+    plots_folder: str,
     max_distance_px: float = 400,
     use_signed_distances: bool = False,
-    plots_folder: str | None = None,
     plot_settings: DiffusionPlotSettings | None = None,
 ) -> None:
+    assert plots_folder is not None, "plots_folder must be provided to analyze_diffusion()"
     if plot_settings is None:
         plot_settings = DiffusionPlotSettings()
 
@@ -509,6 +545,18 @@ def analyze_diffusion(
 
         # Keep only the bins with at least one transcript of the gene of interest
         filtered = filtered.filter(filtered.gene_bins.transcript_counts > 0)
+        distance_output_folder = (
+            plot_folder
+        )
+        os.makedirs(distance_output_folder, exist_ok=True)
+        distance_output_path = os.path.join(
+            distance_output_folder,
+            "distances.csv",
+        )
+        save_filtered_diffusion_data(
+            filtered,
+            distance_output_path,
+        )
 
         # IMPORTANT FIXME: take number of transcripts in bin into account when analyzing diffusion distances!
 
