@@ -97,7 +97,6 @@ def pick_scalebar_length_um(
     nice_lengths_um: np.ndarray | None = None,
 ) -> float:
     assert visible_width_px > 0, "visible_width_px must be positive."
-    assert pixel_size_um > 0, "pixel_size_um must be positive."
     assert 0 < target_fraction < 1, "target_fraction must be between 0 and 1."
 
     if nice_lengths_um is None:
@@ -175,18 +174,15 @@ def plot_bins_colored_by_feature(
     HE_image: str | None,
     technology: str,
     dataset_id: str,
+    pixel_size_um: float,
     level_info,
     feature: str,
     output_path: str,
-    add_scale_bar: bool | None = None,
-    pixel_size_um: float | None = None,
     rectangles: list[tuple[float, float, float, float]] | None = None,
 ):
     # color can be for example 'total_counts' or the name of a gene.
 
     title = f"{feature} ({technology} {dataset_id} {level_info.name})"
-    should_add_scale_bar = (pixel_size_um is not None) if add_scale_bar is None else add_scale_bar
-
     if HE_image:
         best_scale, dpi, _, figsize = get_image_figure_parameters(sdata, HE_image)
 
@@ -206,15 +202,11 @@ def plot_bins_colored_by_feature(
             dpi=dpi,
             ax=ax,
         )
-        if should_add_scale_bar:
-            assert pixel_size_um is not None and pixel_size_um > 0, (
-                "pixel_size_um must be set to a positive number when add_scale_bar=True."
-            )
-            x0, x1 = ax.get_xlim()
-            visible_width_px = abs(x1 - x0)
-            bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
-            bar_px = bar_um / pixel_size_um
-            add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
+        x0, x1 = ax.get_xlim()
+        visible_width_px = abs(x1 - x0)
+        bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
+        bar_px = bar_um / pixel_size_um
+        add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
         draw_labeled_rectangles(ax=ax, rectangles=rectangles)
         save_or_show_figure(fig, output_path)
 
@@ -237,15 +229,11 @@ def plot_bins_colored_by_feature(
             dpi=dpi,
             ax=ax,
         )
-        if should_add_scale_bar:
-            assert pixel_size_um is not None and pixel_size_um > 0, (
-                "pixel_size_um must be set to a positive number when add_scale_bar=True."
-            )
-            x0, x1 = ax.get_xlim()
-            visible_width_px = abs(x1 - x0)
-            bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
-            bar_px = bar_um / pixel_size_um
-            add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
+        x0, x1 = ax.get_xlim()
+        visible_width_px = abs(x1 - x0)
+        bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
+        bar_px = bar_um / pixel_size_um
+        add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
         draw_labeled_rectangles(ax=ax, rectangles=rectangles)
         save_or_show_figure(fig, output_path)
 
@@ -256,12 +244,11 @@ def plot_tissue_outline_on_HE_image(
     tissue_mask: str,
     technology: str,
     dataset_id: str,
+    pixel_size_um: float,
     output_path: str,
     fill_alpha=0.3,
     outline_width=5,
     bounds: tuple[float, float, float, float] | None = None,
-    add_scale_bar: bool = False,
-    pixel_size_um: float | None = None,
     rectangles: list[tuple[float, float, float, float]] | None = None,
 ):
     # Plot H&E image with tissue outline on top.
@@ -298,15 +285,11 @@ def plot_tissue_outline_on_HE_image(
         xmin, ymin, xmax, ymax = bounds
         ax.set_xlim(xmin, xmax)
         ax.set_ylim(ymax, ymin)
-    if add_scale_bar:
-        assert pixel_size_um is not None and pixel_size_um > 0, (
-            "pixel_size_um must be set to a positive number when add_scale_bar=True."
-        )
-        x0, x1 = ax.get_xlim()
-        visible_width_px = abs(x1 - x0)
-        bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
-        bar_px = bar_um / pixel_size_um
-        add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
+    x0, x1 = ax.get_xlim()
+    visible_width_px = abs(x1 - x0)
+    bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
+    bar_px = bar_um / pixel_size_um
+    add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
     draw_labeled_rectangles(ax=ax, rectangles=rectangles)
 
     save_or_show_figure(fig, output_path)
@@ -555,13 +538,12 @@ def plot_bin_gene_counts_and_contour(
     gene_bin_data: "GeneBinData",
     contour,
     output_path: str,
+    pixel_size_um: float,
     title: str,
     figsize=(10, 10),
     line_width=1,
     marker_size=20,
     dpi: int | None = None,
-    add_scale_bar: bool = False,
-    pixel_size_um: float | None = None,
 ) -> None:
     # Plot the bin centers, colored by the number of transcripts detected in that bin,
     # together with a given contour over it.
@@ -583,15 +565,11 @@ def plot_bin_gene_counts_and_contour(
     ax.set_xlabel("x [px]")
     ax.set_ylabel("y [px]")
     ax.invert_yaxis()
-    if add_scale_bar:
-        assert pixel_size_um is not None and pixel_size_um > 0, (
-            "pixel_size_um must be set to a positive number when add_scale_bar=True."
-        )
-        x0, x1 = ax.get_xlim()
-        visible_width_px = abs(x1 - x0)
-        bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
-        bar_px = bar_um / pixel_size_um
-        add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
+    x0, x1 = ax.get_xlim()
+    visible_width_px = abs(x1 - x0)
+    bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
+    bar_px = bar_um / pixel_size_um
+    add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
 
     save_or_show_figure(fig, output_path)
 
@@ -645,7 +623,7 @@ def plot_distances_linearized(
     data: "DiffusionBinData",
     output_path: str,
     title: str,
-    pixel_size_um: float | None = None,
+    pixel_size_um: float,
     figsize: tuple[float, float] = (10, 2.5),
     dpi: int | None = None,
 ) -> None:
@@ -679,17 +657,16 @@ def plot_distances_linearized(
     ax.set_xlabel("Normalized position along boundary")
     ax.set_ylabel("Distance to boundary [px]")
 
-    if pixel_size_um is not None and pixel_size_um > 0:
-        secax = ax.secondary_yaxis(
-            "right",
-            functions=(
-                lambda y_px: y_px * pixel_size_um,
-                lambda y_um: y_um / pixel_size_um,
-            ),
-        )
-        secax.yaxis.set_label_position("right")
-        secax.yaxis.tick_right()
-        secax.set_ylabel(f"Distance to boundary [{MICROMETER_UNIT}]", labelpad=14)
+    secax = ax.secondary_yaxis(
+        "right",
+        functions=(
+            lambda y_px: y_px * pixel_size_um,
+            lambda y_um: y_um / pixel_size_um,
+        ),
+    )
+    secax.yaxis.set_label_position("right")
+    secax.yaxis.tick_right()
+    secax.set_ylabel(f"Distance to boundary [{MICROMETER_UNIT}]", labelpad=14)
 
     ax.set_title(title)
 
@@ -699,23 +676,19 @@ def plot_distances_linearized(
 def plot_distance_histogram(
     data: "DiffusionBinData",
     output_path: str,
+    pixel_size_um: float,
     unit: str = "px",
-    pixel_size_um: float | None = None,
     title: str | None = None,
 ) -> None:
     distances = np.asarray(data.distance_data.closest_distances, dtype=float)
     assert unit in {"px", "um"}, "unit must be 'px' or 'um'."
-    assert unit == "px" or (pixel_size_um is not None and pixel_size_um > 0), (
-        "pixel_size_um must be set to a positive number when unit='um'."
-    )
     if unit == "um":
         distances = distances * pixel_size_um
         unit_label = MICROMETER_UNIT
         bin_width = 5.0
     else:
         unit_label = "px"
-        # Use a ~5 µm bin width in pixel space when conversion is available.
-        bin_width = 5.0 / pixel_size_um if pixel_size_um is not None and pixel_size_um > 0 else 5.0
+        bin_width = 5.0 / pixel_size_um
 
     fig, ax = plt.subplots(figsize=(6, 6))
     dmin = float(np.min(distances))
@@ -789,7 +762,6 @@ def _read_crop_distance_data(
     data_per_label: list[tuple[str, np.ndarray]] = []
 
     for technology, dataset_id, pixel_size_um, crop_name in crop_specs:
-        assert pixel_size_um > 0, "pixel_size_um must be > 0."
         csv_path = os.path.join(
             plots_root,
             technology,
@@ -849,15 +821,12 @@ def _distance_hist_curves(
 def plot_distance_boxplot(
     data: "DiffusionBinData",
     output_path: str,
+    pixel_size_um: float,
     unit: str = "px",
-    pixel_size_um: float | None = None,
     title: str | None = None,
 ) -> None:
     distances = np.asarray(data.distance_data.closest_distances, dtype=float)
     assert unit in {"px", "um"}, "unit must be 'px' or 'um'."
-    assert unit == "px" or (pixel_size_um is not None and pixel_size_um > 0), (
-        "pixel_size_um must be set to a positive number when unit='um'."
-    )
     if unit == "um":
         distances = distances * pixel_size_um
         unit_label = MICROMETER_UNIT
