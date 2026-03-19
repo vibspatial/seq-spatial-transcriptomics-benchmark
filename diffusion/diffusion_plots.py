@@ -75,21 +75,18 @@ def get_labels_figure_parameters(sdata, labels_layer, dpi=200, max_dim_for_plots
     return dpi, figsize_factor, figsize
 
 
-def save_or_show_figure(fig: plt.Figure, output_folder: str | None, filename: str) -> None:
-    # TODO: now that analyze_diffusion requires plot_folder, propagate this requirement through plotting code
-    # (make output_folder non-optional and always save to file; remove plt.show branch).
-    if output_folder is not None:
-        save_path = os.path.join(output_folder, filename)
-        fig.savefig(
-            save_path,
-            bbox_inches="tight",
-            pad_inches=max(fig.get_size_inches()) / 100,
-            facecolor="white",
-            transparent=False,
-        )
-        print(f"{save_path} saved")
-    else:
-        plt.show()
+def save_or_show_figure(fig: plt.Figure, output_path: str) -> None:
+    output_dir = os.path.dirname(output_path)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+    fig.savefig(
+        output_path,
+        bbox_inches="tight",
+        pad_inches=max(fig.get_size_inches()) / 100,
+        facecolor="white",
+        transparent=False,
+    )
+    print(f"{output_path} saved")
     plt.close(fig)
 
 
@@ -180,8 +177,7 @@ def plot_bins_colored_by_feature(
     dataset_id: str,
     level_info,
     feature: str,
-    output_folder: str | None,
-    filename: str | None = None,
+    output_path: str,
     add_scale_bar: bool | None = None,
     pixel_size_um: float | None = None,
     rectangles: list[tuple[float, float, float, float]] | None = None,
@@ -220,7 +216,7 @@ def plot_bins_colored_by_feature(
             bar_px = bar_um / pixel_size_um
             add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
         draw_labeled_rectangles(ax=ax, rectangles=rectangles)
-        save_or_show_figure(fig, output_folder, filename)
+        save_or_show_figure(fig, output_path)
 
     else:
         dpi, _, figsize = get_labels_figure_parameters(sdata, level_info.labels_layer)
@@ -251,7 +247,7 @@ def plot_bins_colored_by_feature(
             bar_px = bar_um / pixel_size_um
             add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
         draw_labeled_rectangles(ax=ax, rectangles=rectangles)
-        save_or_show_figure(fig, output_folder, filename)
+        save_or_show_figure(fig, output_path)
 
 
 def plot_tissue_outline_on_HE_image(
@@ -260,8 +256,7 @@ def plot_tissue_outline_on_HE_image(
     tissue_mask: str,
     technology: str,
     dataset_id: str,
-    output_folder: str | None,
-    filename: str | None = None,
+    output_path: str,
     fill_alpha=0.3,
     outline_width=5,
     bounds: tuple[float, float, float, float] | None = None,
@@ -314,7 +309,7 @@ def plot_tissue_outline_on_HE_image(
         add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
     draw_labeled_rectangles(ax=ax, rectangles=rectangles)
 
-    save_or_show_figure(fig, output_folder, filename)
+    save_or_show_figure(fig, output_path)
 
 
 def plot_bin_outlines(crop_rect, bins_center_coordinates, bin_outlines_gdf, title: str):
@@ -339,9 +334,8 @@ def plot_bin_outlines(crop_rect, bins_center_coordinates, bin_outlines_gdf, titl
 
 def plot_boundary_geoseries(
     boundary: BaseGeometry,
+    output_path: str,
     figsize: tuple[float, float] = (6, 6),
-    output_folder: str | None = None,
-    filename: str | None = None,
 ):
     fig, ax = plt.subplots(figsize=figsize)
 
@@ -350,7 +344,7 @@ def plot_boundary_geoseries(
     ax.set_ylabel("y [px]")
     ax.invert_yaxis()
 
-    save_or_show_figure(fig, output_folder, filename)
+    save_or_show_figure(fig, output_path)
 
 
 def _assert_polygon_ring_closed(ring, ring_name: str) -> None:
@@ -506,11 +500,10 @@ def _add_polygon_orientation_arrows(
 def plot_shapely_geometries(
     sdata,
     tissue_mask: str | None,
+    output_path: str,
     figsize: tuple[float, float] = (10, 10),
     dpi: int | None = 600,
     title: str | None = None,
-    output_folder: str | None = None,
-    filename: str | None = None,
 ):
     # Code for debugging / testing purpose only.
 
@@ -555,19 +548,18 @@ def plot_shapely_geometries(
     if title is not None:
         ax.set_title(title)
 
-    save_or_show_figure(fig, output_folder, filename)
+    save_or_show_figure(fig, output_path)
 
 
 def plot_bin_gene_counts_and_contour(
     gene_bin_data: "GeneBinData",
     contour,
+    output_path: str,
     title: str,
     figsize=(10, 10),
     line_width=1,
     marker_size=20,
     dpi: int | None = None,
-    output_folder: str | None = None,
-    filename: str | None = None,
     add_scale_bar: bool = False,
     pixel_size_um: float | None = None,
 ) -> None:
@@ -601,16 +593,15 @@ def plot_bin_gene_counts_and_contour(
         bar_px = bar_um / pixel_size_um
         add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
 
-    save_or_show_figure(fig, output_folder, filename)
+    save_or_show_figure(fig, output_path)
 
 
 def plot_bins_and_closest_points_on_contour(
     data: "DiffusionBinData",
     contour,
+    output_path: str,
     title: str,
     line_width=1,
-    output_folder: str | None = None,
-    filename: str | None = None,
     figsize: tuple[float, float] = (6, 6),
     dpi: int | None = None,
 ):
@@ -647,15 +638,14 @@ def plot_bins_and_closest_points_on_contour(
     ax.set_title(title)
     ax.invert_yaxis()
 
-    save_or_show_figure(fig, output_folder, filename)
+    save_or_show_figure(fig, output_path)
 
 
 def plot_distances_linearized(
     data: "DiffusionBinData",
+    output_path: str,
     title: str,
     pixel_size_um: float | None = None,
-    output_folder: str | None = None,
-    filename: str | None = None,
     figsize: tuple[float, float] = (10, 2.5),
     dpi: int | None = None,
 ) -> None:
@@ -703,13 +693,12 @@ def plot_distances_linearized(
 
     ax.set_title(title)
 
-    save_or_show_figure(fig, output_folder, filename)
+    save_or_show_figure(fig, output_path)
 
 
 def plot_distance_histogram(
     data: "DiffusionBinData",
-    output_folder: str | None,
-    filename: str,
+    output_path: str,
     unit: str = "px",
     pixel_size_um: float | None = None,
     title: str | None = None,
@@ -739,7 +728,7 @@ def plot_distance_histogram(
     ax.set_xlabel(f"Distance to boundary [{unit_label}]")
     ax.set_ylabel("Count")
     ax.set_title(title or f"Distance to boundary histogram [{unit_label}]")
-    save_or_show_figure(fig, output_folder, filename)
+    save_or_show_figure(fig, output_path)
 
 
 def combined_distance_histogram(
@@ -747,6 +736,7 @@ def combined_distance_histogram(
     output_path: str,
     plots_root: str,
     title: str | None = None,
+    figsize = (12, 6)
 ) -> None:
     """
     Plot overlaid distance histograms (as lines) for multiple crops, in micrometers.
@@ -796,7 +786,7 @@ def combined_distance_histogram(
     if bins.size < 2:
         bins = 10
 
-    fig, ax = plt.subplots(figsize=(6, 6))
+    fig, ax = plt.subplots(figsize=figsize)
     for label, distances_um in data_per_label:
         counts, edges = np.histogram(distances_um, bins=bins)
         centers = 0.5 * (edges[:-1] + edges[1:])
@@ -823,8 +813,7 @@ def combined_distance_histogram(
 
 def plot_distance_boxplot(
     data: "DiffusionBinData",
-    output_folder: str | None,
-    filename: str,
+    output_path: str,
     unit: str = "px",
     pixel_size_um: float | None = None,
     title: str | None = None,
@@ -844,4 +833,4 @@ def plot_distance_boxplot(
     ax.boxplot(distances)
     ax.set_ylabel(f"Distance to boundary [{unit_label}]")
     ax.set_title(title or f"Distance to boundary boxplot [{unit_label}]")
-    save_or_show_figure(fig, output_folder, filename)
+    save_or_show_figure(fig, output_path)

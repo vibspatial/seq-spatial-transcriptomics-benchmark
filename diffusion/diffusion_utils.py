@@ -451,7 +451,6 @@ def analyze_diffusion(
     use_signed_distances: bool = False,
     plot_settings: DiffusionPlotSettings | None = None,
 ) -> None:
-    assert plots_folder is not None, "plots_folder must be provided to analyze_diffusion()"
     if plot_settings is None:
         plot_settings = DiffusionPlotSettings()
 
@@ -471,17 +470,14 @@ def analyze_diffusion(
             target_coordinate_system=experiment.dataset_id,
         )
 
-        if plots_folder:
-            plot_folder = os.path.join(
-                plots_folder,
-                experiment.technology,
-                experiment.dataset_id,
-                "analysis",
-                f"crop{crop_idx + 1}",
-            )
-            os.makedirs(plot_folder, exist_ok=True)
-        else:
-            plot_folder = None
+        plot_folder = os.path.join(
+            plots_folder,
+            experiment.technology,
+            experiment.dataset_id,
+            "analysis",
+            f"crop{crop_idx + 1}",
+        )
+        os.makedirs(plot_folder, exist_ok=True)
 
         # Plot close-up of cropped area
         if plot_settings.tissue_outline and experiment.he_image:
@@ -491,8 +487,7 @@ def analyze_diffusion(
                 experiment.tissue_mask,
                 experiment.technology,
                 experiment.dataset_id,
-                plot_folder,
-                "tissue.png",
+                os.path.join(plot_folder, "tissue.png"),
                 fill_alpha=0.1,
                 outline_width=1,
                 bounds=crop_rect,
@@ -506,8 +501,7 @@ def analyze_diffusion(
             # TODO? perhaps add title to plot
             plot_boundary_geoseries(
                 boundary,
-                output_folder=plot_folder,
-                filename="boundary.png",
+                output_path=os.path.join(plot_folder, "boundary.png"),
             )
 
         gene_bin_data = get_gene_bin_data(sdata_crop, level, gene_name)
@@ -522,9 +516,8 @@ def analyze_diffusion(
                 gene_bin_data,
                 boundary,
                 title,
+                output_path=os.path.join(plot_folder, f"counts_{gene_name}.png"),
                 dpi=600,
-                output_folder=plot_folder,
-                filename=f"counts_{gene_name}.png",
                 add_scale_bar=experiment.pixel_size_um is not None,
                 pixel_size_um=experiment.pixel_size_um,
             )
@@ -569,11 +562,10 @@ def analyze_diffusion(
             plot_bins_and_closest_points_on_contour(
                 filtered,
                 boundary,
+                os.path.join(plot_folder, "bins_closest_point_on_boundary.png"),
                 title,
                 line_width=0.5,
                 dpi=600,
-                output_folder=plot_folder,
-                filename="bins_closest_point_on_boundary.png",
             )
 
         title = (
@@ -583,25 +575,22 @@ def analyze_diffusion(
         if plot_settings.distances_linearized:
             plot_distances_linearized(
                 filtered,
+                os.path.join(plot_folder, "distances_linearized.png"),
                 title,
                 pixel_size_um=experiment.pixel_size_um,
                 dpi=600,
-                output_folder=plot_folder,
-                filename="distances_linearized.png",
             )
 
         if plot_settings.histogram:
             plot_distance_histogram(
                 filtered,
-                plot_folder,
-                "histogram_px.png",
+                os.path.join(plot_folder, "histogram_px.png"),
                 unit="px",
             )
             if experiment.pixel_size_um is not None and experiment.pixel_size_um > 0:
                 plot_distance_histogram(
                     filtered,
-                    plot_folder,
-                    "histogram_um.png",
+                    os.path.join(plot_folder, "histogram_um.png"),
                     unit="um",
                     pixel_size_um=experiment.pixel_size_um,
                 )
@@ -609,15 +598,13 @@ def analyze_diffusion(
         if plot_settings.boxplot:
             plot_distance_boxplot(
                 filtered,
-                plot_folder,
-                "boxplot_px.png",
+                os.path.join(plot_folder, "boxplot_px.png"),
                 unit="px",
             )
             if experiment.pixel_size_um is not None and experiment.pixel_size_um > 0:
                 plot_distance_boxplot(
                     filtered,
-                    plot_folder,
-                    "boxplot_um.png",
+                    os.path.join(plot_folder, "boxplot_um.png"),
                     unit="um",
                     pixel_size_um=experiment.pixel_size_um,
                 )
