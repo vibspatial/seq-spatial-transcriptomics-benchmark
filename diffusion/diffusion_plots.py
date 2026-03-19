@@ -724,7 +724,7 @@ def plot_distance_histogram(
     if bins.size < 2:
         bins = 10
     ax.hist(distances, bins=bins)
-    ax.axvline(0, color="red", linewidth=1, linestyle=":", zorder=3)
+    ax.axvline(0, color="black", linewidth=1, linestyle=":", zorder=3)
     ax.set_xlabel(f"Distance to boundary [{unit_label}]")
     ax.set_ylabel("Count")
     ax.set_title(title or f"Distance to boundary histogram [{unit_label}]")
@@ -736,17 +736,57 @@ def combined_distance_histogram(
     output_path: str,
     plots_root: str,
     title: str | None = None,
-    figsize = (12, 6)
+    figsize = (12, 6),
+    align_peaks: bool = False,
 ) -> None:
     """
     Plot overlaid distance histograms (as lines) for multiple crops, in micrometers.
 
+    If `align_peaks` is True, each curve is shifted so its histogram peak is placed
+    at x=0.
+
     Each entry in crop_specs is (technology, dataset_id, pixel_size_um, crop_name).
     """
+    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
+    bins = _distance_hist_bins(data_per_label, bin_width=5.0)
+    curves = _distance_hist_curves(data_per_label, bins=bins, align_peaks=align_peaks, density=False)
+
+    fig, ax = plt.subplots(figsize=figsize)
+    for label, centers, counts in curves:
+        ax.plot(centers, counts, linewidth=1.5, label=label)
+
+    ax.axvline(0, color="black", linewidth=1, linestyle=":", zorder=3)
+    x_label = (
+        f"Peak-aligned distance to boundary [{MICROMETER_UNIT}]"
+        if align_peaks
+        else f"Distance to boundary [{MICROMETER_UNIT}]"
+    )
+
+    ax.set_xlabel(x_label)
+    ax.set_ylabel("Count")
+    ax.set_title(title or f"Combined distance histogram")
+    ax.legend(fontsize="small")
+
+    output_dir = os.path.dirname(output_path)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+    fig.savefig(
+        output_path,
+        bbox_inches="tight",
+        pad_inches=max(fig.get_size_inches()) / 100,
+        facecolor="white",
+        transparent=False,
+    )
+    plt.close(fig)
+
+
+def _read_crop_distance_data(
+    crop_specs: list[tuple[str, str, float, str]],
+    plots_root: str,
+) -> list[tuple[str, np.ndarray]]:
     assert len(crop_specs) > 0, "crop_specs must contain at least one entry."
 
     data_per_label: list[tuple[str, np.ndarray]] = []
-    all_distances_um: list[np.ndarray] = []
 
     for technology, dataset_id, pixel_size_um, crop_name in crop_specs:
         assert pixel_size_um > 0, "pixel_size_um must be > 0."
@@ -773,43 +813,38 @@ def combined_distance_histogram(
         distances_um = np.asarray(distances_px, dtype=float) * pixel_size_um
         label = f"{technology}, {dataset_id}, {crop_name}"
         data_per_label.append((label, distances_um))
-        all_distances_um.append(distances_um)
 
-    if len(all_distances_um) == 0:
+    if len(data_per_label) == 0:
         raise ValueError("No distance rows found in any selected crop.")
 
-    concat = np.concatenate(all_distances_um)
+    return data_per_label
+
+
+def _distance_hist_bins(data_per_label: list[tuple[str, np.ndarray]], bin_width: float = 5.0) -> np.ndarray:
+    concat = np.concatenate([distances_um for _, distances_um in data_per_label])
     dmin = float(np.min(concat))
     dmax = float(np.max(concat))
-    bin_width = 5.0
     bins = np.arange(dmin, dmax + bin_width, bin_width)
     if bins.size < 2:
         bins = 10
+    return bins
 
-    fig, ax = plt.subplots(figsize=figsize)
+
+def _distance_hist_curves(
+    data_per_label: list[tuple[str, np.ndarray]],
+    bins: np.ndarray,
+    align_peaks: bool = False,
+    density: bool = False,
+) -> list[tuple[str, np.ndarray, np.ndarray]]:
+    curves: list[tuple[str, np.ndarray, np.ndarray]] = []
     for label, distances_um in data_per_label:
-        counts, edges = np.histogram(distances_um, bins=bins)
+        counts, edges = np.histogram(distances_um, bins=bins, density=density)
         centers = 0.5 * (edges[:-1] + edges[1:])
-        ax.plot(centers, counts, linewidth=1.5, label=label)
-
-    ax.axvline(0, color="red", linewidth=1, linestyle=":", zorder=3)
-    ax.set_xlabel(f"Distance to boundary [{MICROMETER_UNIT}]")
-    ax.set_ylabel("Count")
-    ax.set_title(title or f"Combined distance histogram")
-    ax.legend(fontsize="small")
-
-    output_dir = os.path.dirname(output_path)
-    if output_dir:
-        os.makedirs(output_dir, exist_ok=True)
-    fig.savefig(
-        output_path,
-        bbox_inches="tight",
-        pad_inches=max(fig.get_size_inches()) / 100,
-        facecolor="white",
-        transparent=False,
-    )
-    plt.close(fig)
-
+        if align_peaks:
+            peak_idx = int(np.argmax(counts))
+            centers = centers - centers[peak_idx]
+        curves.append((label, centers, counts))
+    return curves
 
 def plot_distance_boxplot(
     data: "DiffusionBinData",
@@ -834,3 +869,72 @@ def plot_distance_boxplot(
     ax.set_ylabel(f"Distance to boundary [{unit_label}]")
     ax.set_title(title or f"Distance to boundary boxplot [{unit_label}]")
     save_or_show_figure(fig, output_path)
+
+
+def ridgeline_distance_histogram(
+    crop_specs: list[tuple[str, str, float, str]],
+    output_path: str,
+    plots_root: str,
+    title: str | None = None,
+    figsize=(14, 8),
+    align_peaks: bool = False,
+    overlap: float = 0.6,
+    fill_alpha: float = 0.45,
+) -> None:
+    """
+    Plot distance histograms as a ridgeline (joy) plot for multiple crops.
+
+    If `align_peaks` is True, each curve is shifted so its histogram peak is placed
+    at x=0.
+    """
+    assert len(crop_specs) > 0, "crop_specs must contain at least one entry."
+    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
+    bins = _distance_hist_bins(data_per_label, bin_width=5.0)
+    all_curves = _distance_hist_curves(data_per_label, bins=bins, align_peaks=align_peaks, density=True)
+
+    max_height = max(float(np.max(counts)) for _, _, counts in all_curves)
+    if max_height <= 0:
+        raise ValueError("No positive histogram values found.")
+
+    normalized_curves = [
+        (label, centers, counts / max_height)
+        for label, centers, counts in all_curves
+    ]
+
+    cmap = plt.get_cmap("viridis")
+    step = 1.0 - overlap
+    assert 0 <= overlap < 1, "overlap must be in [0, 1)."
+
+    fig, ax = plt.subplots(figsize=figsize)
+    num_curves = len(normalized_curves)
+    for idx, (label, centers, counts) in enumerate(normalized_curves):
+        baseline = (num_curves - 1 - idx) * step
+        color = cmap((idx + 1) / max(len(normalized_curves), 1))
+        filled = baseline + counts
+        ax.plot(centers, filled, color=color, linewidth=1.2, label=label)
+        ax.fill_between(centers, baseline, filled, color=color, alpha=fill_alpha, linewidth=0)
+
+    ax.set_yticks([])
+    ax.tick_params(axis="y", which="both", length=0)
+    ax.set_ylabel("")
+    ax.legend(fontsize="small", bbox_to_anchor=(1.01, 1), loc="upper left")
+
+    ax.set_xlabel(
+        f"Peak-aligned distance to boundary [{MICROMETER_UNIT}]"
+        if align_peaks
+        else f"Distance to boundary [{MICROMETER_UNIT}]"
+    )
+    ax.set_title(title or "Distance ridgeline histogram")
+    ax.axvline(0, color="black", linewidth=1, linestyle=":", zorder=3)
+
+    output_dir = os.path.dirname(output_path)
+    if output_dir:
+        os.makedirs(output_dir, exist_ok=True)
+    fig.savefig(
+        output_path,
+        bbox_inches="tight",
+        pad_inches=max(fig.get_size_inches()) / 100,
+        facecolor="white",
+        transparent=False,
+    )
+    plt.close(fig)
