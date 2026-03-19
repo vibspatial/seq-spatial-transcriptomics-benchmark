@@ -491,7 +491,6 @@ def analyze_diffusion(
                 fill_alpha=0.1,
                 outline_width=1,
                 bounds=crop_rect,
-                add_scale_bar=experiment.pixel_size_um is not None,
                 pixel_size_um=experiment.pixel_size_um,
             )
 
@@ -518,7 +517,6 @@ def analyze_diffusion(
                 title,
                 output_path=os.path.join(plot_folder, f"counts_{gene_name}.png"),
                 dpi=600,
-                add_scale_bar=experiment.pixel_size_um is not None,
                 pixel_size_um=experiment.pixel_size_um,
             )
 
@@ -586,25 +584,25 @@ def analyze_diffusion(
                 filtered,
                 os.path.join(plot_folder, "histogram_px.png"),
                 unit="px",
+                pixel_size_um=experiment.pixel_size_um,
             )
-            if experiment.pixel_size_um is not None and experiment.pixel_size_um > 0:
-                plot_distance_histogram(
-                    filtered,
-                    os.path.join(plot_folder, "histogram_um.png"),
-                    unit="um",
-                    pixel_size_um=experiment.pixel_size_um,
-                )
+            plot_distance_histogram(
+                filtered,
+                os.path.join(plot_folder, "histogram_um.png"),
+                unit="um",
+                pixel_size_um=experiment.pixel_size_um,
+            )
 
         if plot_settings.boxplot:
             plot_distance_boxplot(
                 filtered,
                 os.path.join(plot_folder, "boxplot_px.png"),
                 unit="px",
+                pixel_size_um=experiment.pixel_size_um,
             )
-            if experiment.pixel_size_um is not None and experiment.pixel_size_um > 0:
-                plot_distance_boxplot(
-                    filtered,
-                    os.path.join(plot_folder, "boxplot_um.png"),
-                    unit="um",
-                    pixel_size_um=experiment.pixel_size_um,
-                )
+            plot_distance_boxplot(
+                filtered,
+                os.path.join(plot_folder, "boxplot_um.png"),
+                unit="um",
+                pixel_size_um=experiment.pixel_size_um,
+            )
