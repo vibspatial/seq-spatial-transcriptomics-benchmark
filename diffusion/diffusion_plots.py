@@ -63,7 +63,7 @@ def get_image_figure_parameters(sdata, HE_image, dpi=200, max_dim_for_plots=1000
 def get_labels_figure_parameters(sdata, labels_layer, dpi=200, max_dim_for_plots=10000):
     assert isinstance(
         sdata.labels[labels_layer], xr.DataArray
-    ), f"Expected xarray.DataTree for sdata.labels[{labels_layer!r}], got {type(sdata.labels[labels_layer])}"
+    ), f"Expected xarray.DataArray for sdata.labels[{labels_layer!r}], got {type(sdata.labels[labels_layer])}"
 
     figsize_factor = dpi
     figsize = (
