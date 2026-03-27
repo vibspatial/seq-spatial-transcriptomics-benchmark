@@ -8,12 +8,16 @@ def qc_metrics(sdata, table_layer, species):
     adata.var_names_make_unique()
     if species == 'human':
         adata.var["mt"] = adata.var_names.str.startswith("MT-")
+        qc_vars = ["mt"]
     elif species == 'mouse':
         adata.var["mt"] = adata.var_names.str.startswith("mt-")
+        qc_vars = ["mt"]
+    elif species == 'rice':
+        qc_vars = []
     else:
-        raise ValueError("Species must be either 'human' or 'mouse'.")
+        raise ValueError("Species must be either 'human', 'mouse' or 'rice'.")
 
-    sc.pp.calculate_qc_metrics(adata, qc_vars=["mt"], percent_top=[50], inplace=True)
+    sc.pp.calculate_qc_metrics(adata, qc_vars=qc_vars, percent_top=[50], inplace=True)
     
     # Replace NaN with 0 for all columns starting with 'pct'
     for col in adata.obs.columns:

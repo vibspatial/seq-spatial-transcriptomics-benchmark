@@ -11,38 +11,48 @@ library(viridis)
 library(ggpubr)
 
 # Root directories --------------------------------------------------------
-root_dir <- "E:/2024-07-UTBenchmark-SpC/data/processed"
+root_dir <- "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed"
 out_root <- file.path(root_dir, "plots/bam_plots")
 
 # Define look-up table ------------------------------------------
 sample_metadata <- tribble(
   ~Sample,      ~sample_type,    ~Technology,       ~bam_dir,
-  "SCA013",     "Mouse_lung",     "Visium",         "E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA013/bam_output",
-  #"SCA014",     "Mouse_liver",    "Visium",         "E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA014/bam_output",
-  "SCA016",     "Mouse_brain",    "Visium",         "E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA016/bam_output",
-  "SCA015",     "Human_lung",     "Visium",         "E:/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA015/bam_output",
+  "SCA013",     "Mouse_lung",     "Visium",         "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA013/bam_output",
+  "SCA014",     "Mouse_liver",    "Visium",         "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA014/bam_output",
+  "SCA016",     "Mouse_brain",    "Visium",         "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA016/bam_output",
+  "SCA015",     "Human_lung",     "Visium",         "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium/SCA015/bam_output",
   
-  "SCA001",     "Mouse_lung",     "Visium_HD_FFPE", "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA001/bam_output",
-  "SCA002",     "Mouse_liver",    "Visium_HD_FFPE", "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA002/bam_output",
-  "SCA003",     "Mouse_brain",    "Visium_HD_FFPE", "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA003/bam_output",
-  "SCA010",     "Human_lung",     "Visium_HD_FFPE", "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA010/bam_output",
+  "SCA001",     "Mouse_lung",     "Visium_HD_FFPE", "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA001/bam_output",
+  "SCA002",     "Mouse_liver",    "Visium_HD_FFPE", "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA002/bam_output",
+  "SCA003",     "Mouse_brain",    "Visium_HD_FFPE", "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA003/bam_output",
+  "SCA010",     "Human_lung",     "Visium_HD_FFPE", "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA010/bam_output",
   
-  "SCA017",     "Mouse_lung",     "Visium_HD_FF",   "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA017/bam_output",
-  "SCA018",     "Mouse_liver",    "Visium_HD_FF",   "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA018/bam_output",
-  "SCA019",     "Mouse_brain",    "Visium_HD_FF",   "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA019/bam_output",
-  "SCA020",     "Human_lung",     "Visium_HD_FF",   "E:/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA020/bam_output",
+  "SCA017",     "Mouse_lung",     "Visium_HD_FF",   "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA017/bam_output",
+  "SCA018",     "Mouse_liver",    "Visium_HD_FF",   "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA018/bam_output",
+  "SCA019",     "Mouse_brain",    "Visium_HD_FF",   "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA019/bam_output",
+  "SCA020",     "Human_lung",     "Visium_HD_FF",   "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Visium_HD/SCA020/bam_output",
   
-  "Exp74",      "Mouse_brain",    "BMKMANU_S1000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S1000/Exp74/bam_output",
+  "Exp74",      "Mouse_brain",    "BMKMANU_S1000",  "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S1000/exp74/bam_output",
   
-  "Exp101",     "Mouse_lung",     "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp101/bam_output",
-  #"Exp100",     "Mouse_liver",    "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/bam_output",
-  "Exp99",      "Mouse_brain",    "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp99/bam_output",
-  "Exp102",     "Human_lung",     "BMKMANU_S3000",  "E:/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp102/bam_output",
+  "Exp101",     "Mouse_lung",     "BMKMANU_S3000",  "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp101/bam_output",
+  "Exp100",     "Mouse_liver",    "BMKMANU_S3000",  "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp100/bam_output",
+  "Exp99",      "Mouse_brain",    "BMKMANU_S3000",  "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp99/bam_output",
+  "Exp102",     "Human_lung",     "BMKMANU_S3000",  "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/BMK_S3000/Exp102/bam_output",
   
-  "SC12",       "Mouse_lung",     "Curio_Seeker",   "E:/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC12/bam_output",
-  "SC13",       "Mouse_liver",    "Curio_Seeker",   "E:/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC13/bam_output",
-  "SC11",       "Mouse_brain",    "Curio_Seeker",   "E:/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/bam_output",
-  "SC14",       "Human_lung",     "Curio_Seeker",   "E:/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC14/bam_output",
+  "SC12",       "Mouse_lung",     "Curio_Seeker",   "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC12/bam_output",
+  "SC13",       "Mouse_liver",    "Curio_Seeker",   "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC13/bam_output",
+  "SC11",       "Mouse_brain",    "Curio_Seeker",   "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC11/bam_output",
+  "SC14",       "Human_lung",     "Curio_Seeker",   "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Curio_seeker/SC14/bam_output",
+  
+  "Exp93-sampleSPC002",     "Mouse_lung",     "Nova-ST",        "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Nova-ST/Exp93-sampleSPC002/bam_output",
+  "Exp100-sampleSPC004",    "Mouse_liver",    "Nova-ST",        "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Nova-ST/Exp100-sampleSPC004/bam_output",
+  "Exp65-sampleSPC014",     "Mouse_brain",    "Nova-ST",        "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Nova-ST/Exp65-sampleSPC014/bam_output",
+  "Exp93-sampleSPC022",     "Human_lung",     "Nova-ST",        "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Nova-ST/Exp93-sampleSPC022/bam_output",
+  
+  "spc002",     "Mouse_lung",     "Stereo-Seq",     "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc002/bam_output",
+  "spc004",     "Mouse_liver",    "Stereo-Seq",     "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc004/bam_output",
+  "spc014",     "Mouse_brain",    "Stereo-Seq",     "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc014/bam_output",
+  "spc022",     "Human_lung",     "Stereo-Seq",     "/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/spc022/bam_output",
 )
 
 # Read gene_counts per technology and subsample ---------------

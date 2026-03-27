@@ -1,0 +1,1453 @@
+Writing full dataset to parquet file...
+Done writing parquet file
+Total size: 431485173
+All sample sizes: [10000000, 20000000, 30000000, 40000000, 50000000, 60000000, 70000000, 80000000, 90000000, 100000000, 110000000, 120000000, 130000000, 140000000, 150000000, 160000000, 170000000, 180000000, 190000000, 200000000, 210000000, 220000000, 230000000, 240000000, 250000000, 260000000, 270000000, 280000000, 290000000, 300000000, 310000000, 320000000, 330000000, 340000000, 350000000, 360000000, 370000000, 380000000, 390000000, 400000000, 410000000, 420000000, 430000000, 431485173]
+
+Sampling 10,000,000 reads...
+Sampling done - 68 seconds.
+Grouping UMIs...
+Grouping UMIs done - 15 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 18 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 0 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 1,212,646
+percentage_spots_recovered: 1.3734543632279754
+total_number_of_reads: 9,998,548
+total_number_of_genes: 17,262
+total_number_of_UMIs: 1,461,790
+total_number_of_unique_UMIs: 1,399,325
+number_of_genes_in_tissue: 16,933
+number_of_unique_UMIs_in_tissue: 1,246,035
+percentage_of_genes_in_tissue: 98.09407948094079
+percentage_of_unique_UMIs_in_tissue: 89.0454326192986
+sequencing_saturation_reads: 86.00471788503691
+sequencing_saturation_UMIs: 4.273185614896802
+unique_UMIs_per_mm2_in_tissue: 26,471.95666029318
+median_UMIs_per_gene: 21.0
+median_UMIs_per_gene_per_mm2: 0.4461440407903123
+median_unique_UMIs_per_gene: 20.0
+median_unique_UMIs_per_gene_per_mm2: 0.4248990864669641
+median_unique_UMIs_per_gene_in_tissue: 19.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 0.4036541321436159
+percentage_of_reads_with_usable_UMI: 14.620022827314527
+ratio_reads_per_unique_UMI: 7.145265038500706
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 10,000,000 finished! - 2.24 minutes
+
+Sampling 20,000,000 reads...
+Sampling done - 65 seconds.
+Grouping UMIs...
+Grouping UMIs done - 36 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 27 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 1 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 2,273,276
+percentage_spots_recovered: 2.5747339627735046
+total_number_of_reads: 19,994,880
+total_number_of_genes: 18,829
+total_number_of_UMIs: 2,924,858
+total_number_of_unique_UMIs: 2,686,736
+number_of_genes_in_tissue: 18,489
+number_of_unique_UMIs_in_tissue: 2,391,847
+percentage_of_genes_in_tissue: 98.19427478888947
+percentage_of_unique_UMIs_in_tissue: 89.02426587502457
+sequencing_saturation_reads: 86.56288009730491
+sequencing_saturation_UMIs: 8.141318313572832
+unique_UMIs_per_mm2_in_tissue: 50,814.68026343743
+median_UMIs_per_gene: 34.0
+median_UMIs_per_gene_per_mm2: 0.7223284469938389
+median_unique_UMIs_per_gene: 31.0
+median_unique_UMIs_per_gene_per_mm2: 0.6585935840237943
+median_unique_UMIs_per_gene_in_tissue: 29.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 0.616103675377098
+percentage_of_reads_with_usable_UMI: 14.628034776902886
+ratio_reads_per_unique_UMI: 7.442070973850799
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 20,000,000 finished! - 2.69 minutes
+
+Sampling 30,000,000 reads...
+Sampling done - 69 seconds.
+Grouping UMIs...
+Grouping UMIs done - 55 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 48 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 1 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 3,212,884
+percentage_spots_recovered: 3.6389428970576336
+total_number_of_reads: 29,991,914
+total_number_of_genes: 19,732
+total_number_of_UMIs: 4,389,841
+total_number_of_unique_UMIs: 3,878,254
+number_of_genes_in_tissue: 19,375
+number_of_unique_UMIs_in_tissue: 3,451,871
+percentage_of_genes_in_tissue: 98.1907561321711
+percentage_of_unique_UMIs_in_tissue: 89.00580003269512
+sequencing_saturation_reads: 87.06900133149222
+sequencing_saturation_UMIs: 11.653884502878354
+unique_UMIs_per_mm2_in_tissue: 73,334.84172509029
+median_UMIs_per_gene: 44.0
+median_UMIs_per_gene_per_mm2: 0.934777990227321
+median_unique_UMIs_per_gene: 39.0
+median_unique_UMIs_per_gene_per_mm2: 0.82855321861058
+median_unique_UMIs_per_gene_in_tissue: 36.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 0.7648183556405354
+percentage_of_reads_with_usable_UMI: 14.636748424925464
+ratio_reads_per_unique_UMI: 7.733354751906399
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 30,000,000 finished! - 3.43 minutes
+
+Sampling 40,000,000 reads...
+Sampling done - 67 seconds.
+Grouping UMIs...
+Grouping UMIs done - 71 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 61 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 1 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 4,053,721
+percentage_spots_recovered: 4.591282859761936
+total_number_of_reads: 39,992,936
+total_number_of_genes: 20,388
+total_number_of_UMIs: 5,854,882
+total_number_of_unique_UMIs: 4,985,426
+number_of_genes_in_tissue: 19,990
+number_of_unique_UMIs_in_tissue: 4,436,283
+percentage_of_genes_in_tissue: 98.04787129684128
+percentage_of_unique_UMIs_in_tissue: 88.98503357586694
+sequencing_saturation_reads: 87.53423354564416
+sequencing_saturation_UMIs: 14.850102871415682
+unique_UMIs_per_mm2_in_tissue: 94,248.62970044614
+median_UMIs_per_gene: 53.0
+median_UMIs_per_gene_per_mm2: 1.125982579137455
+median_unique_UMIs_per_gene: 45.0
+median_unique_UMIs_per_gene_per_mm2: 0.9560229445506692
+median_unique_UMIs_per_gene_in_tissue: 42.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 0.8922880815806246
+percentage_of_reads_with_usable_UMI: 14.639790386982341
+ratio_reads_per_unique_UMI: 8.021969637098215
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 40,000,000 finished! - 3.93 minutes
+
+Sampling 50,000,000 reads...
+Sampling done - 73 seconds.
+Grouping UMIs...
+Grouping UMIs done - 85 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 75 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 1 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 4,812,295
+percentage_spots_recovered: 5.4504509682876705
+total_number_of_reads: 49,990,042
+total_number_of_genes: 20,912
+total_number_of_UMIs: 7,317,342
+total_number_of_unique_UMIs: 6,017,623
+number_of_genes_in_tissue: 20,499
+number_of_unique_UMIs_in_tissue: 5,353,417
+percentage_of_genes_in_tissue: 98.02505738332059
+percentage_of_unique_UMIs_in_tissue: 88.96231950722071
+sequencing_saturation_reads: 87.96235658293706
+sequencing_saturation_UMIs: 17.76217375106972
+unique_UMIs_per_mm2_in_tissue: 113,733.09963883577
+median_UMIs_per_gene: 61.0
+median_UMIs_per_gene_per_mm2: 1.2959422137242405
+median_unique_UMIs_per_gene: 49.0
+median_unique_UMIs_per_gene_per_mm2: 1.041002761844062
+median_unique_UMIs_per_gene_in_tissue: 47.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 0.9985128531973656
+percentage_of_reads_with_usable_UMI: 14.637599224261505
+ratio_reads_per_unique_UMI: 8.307273818914878
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 50,000,000 finished! - 4.51 minutes
+
+Sampling 60,000,000 reads...
+Sampling done - 74 seconds.
+Grouping UMIs...
+Grouping UMIs done - 100 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 86 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 1 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 5,503,420
+percentage_spots_recovered: 6.23322569956616
+total_number_of_reads: 59,989,982
+total_number_of_genes: 21,302
+total_number_of_UMIs: 8,779,473
+total_number_of_unique_UMIs: 6,985,840
+number_of_genes_in_tissue: 20,877
+number_of_unique_UMIs_in_tissue: 6,213,473
+percentage_of_genes_in_tissue: 98.0048821706882
+percentage_of_unique_UMIs_in_tissue: 88.94382064290049
+sequencing_saturation_reads: 88.35498900466415
+sequencing_saturation_UMIs: 20.429848124141394
+unique_UMIs_per_mm2_in_tissue: 132,004.95007435733
+median_UMIs_per_gene: 68.0
+median_UMIs_per_gene_per_mm2: 1.4446568939876778
+median_unique_UMIs_per_gene: 53.0
+median_unique_UMIs_per_gene_per_mm2: 1.125982579137455
+median_unique_UMIs_per_gene_in_tissue: 51.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.0834926704907584
+percentage_of_reads_with_usable_UMI: 14.634898540226265
+ratio_reads_per_unique_UMI: 8.587368448175166
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 60,000,000 finished! - 5.0 minutes
+
+Sampling 70,000,000 reads...
+Sampling done - 76 seconds.
+Grouping UMIs...
+Grouping UMIs done - 113 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 99 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 1 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 6,137,651
+percentage_spots_recovered: 6.951561746726206
+total_number_of_reads: 69,991,571
+total_number_of_genes: 21,666
+total_number_of_UMIs: 10,240,881
+total_number_of_unique_UMIs: 7,898,400
+number_of_genes_in_tissue: 21,229
+number_of_unique_UMIs_in_tissue: 7,023,281
+percentage_of_genes_in_tissue: 97.98301486199576
+percentage_of_unique_UMIs_in_tissue: 88.92030031398764
+sequencing_saturation_reads: 88.71521257895468
+sequencing_saturation_UMIs: 22.873823062683762
+unique_UMIs_per_mm2_in_tissue: 149,209.2840450393
+median_UMIs_per_gene: 74.0
+median_UMIs_per_gene_per_mm2: 1.5721266199277673
+median_unique_UMIs_per_gene: 56.0
+median_unique_UMIs_per_gene_per_mm2: 1.1897174421074994
+median_unique_UMIs_per_gene_in_tissue: 54.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.147227533460803
+percentage_of_reads_with_usable_UMI: 14.631591852681803
+ratio_reads_per_unique_UMI: 8.86148726324319
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 70,000,000 finished! - 5.48 minutes
+
+Sampling 80,000,000 reads...
+Sampling done - 79 seconds.
+Grouping UMIs...
+Grouping UMIs done - 128 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 110 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 2 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 6,722,380
+percentage_spots_recovered: 7.613831359091177
+total_number_of_reads: 79,992,751
+total_number_of_genes: 21,941
+total_number_of_UMIs: 11,703,412
+total_number_of_unique_UMIs: 8,761,645
+number_of_genes_in_tissue: 21,492
+number_of_unique_UMIs_in_tissue: 7,788,497
+percentage_of_genes_in_tissue: 97.95360284399071
+percentage_of_unique_UMIs_in_tissue: 88.89309028156242
+sequencing_saturation_reads: 89.04695126687166
+sequencing_saturation_UMIs: 25.13597743974151
+unique_UMIs_per_mm2_in_tissue: 165,466.26301253453
+median_UMIs_per_gene: 79.0
+median_UMIs_per_gene_per_mm2: 1.678351391544508
+median_unique_UMIs_per_gene: 59.0
+median_unique_UMIs_per_gene_per_mm2: 1.2534523050775441
+median_unique_UMIs_per_gene_in_tissue: 57.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.2109623964308476
+percentage_of_reads_with_usable_UMI: 14.630590714401109
+ratio_reads_per_unique_UMI: 9.129878122201939
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 80,000,000 finished! - 6.0 minutes
+
+Sampling 90,000,000 reads...
+Sampling done - 87 seconds.
+Grouping UMIs...
+Grouping UMIs done - 135 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 121 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 2 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 7,264,927
+percentage_spots_recovered: 8.228325238101414
+total_number_of_reads: 89,992,133
+total_number_of_genes: 22,200
+total_number_of_UMIs: 13,166,457
+total_number_of_unique_UMIs: 9,580,361
+number_of_genes_in_tissue: 21,734
+number_of_unique_UMIs_in_tissue: 8,514,160
+percentage_of_genes_in_tissue: 97.9009009009009
+percentage_of_unique_UMIs_in_tissue: 88.87097260739965
+sequencing_saturation_reads: 89.35422388532562
+sequencing_saturation_UMIs: 27.23660586898966
+unique_UMIs_per_mm2_in_tissue: 180,882.94030167835
+median_UMIs_per_gene: 85.0
+median_UMIs_per_gene_per_mm2: 1.8058211174845975
+median_unique_UMIs_per_gene: 61.5
+median_unique_UMIs_per_gene_per_mm2: 1.3065646908859145
+median_unique_UMIs_per_gene_in_tissue: 59.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.2534523050775441
+percentage_of_reads_with_usable_UMI: 14.630675550272823
+ratio_reads_per_unique_UMI: 9.393396866777776
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 90,000,000 finished! - 6.45 minutes
+
+Sampling 100,000,000 reads...
+Sampling done - 88 seconds.
+Grouping UMIs...
+Grouping UMIs done - 152 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 125 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 2 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 7,771,784
+percentage_spots_recovered: 8.802396284542537
+total_number_of_reads: 99,991,463
+total_number_of_genes: 22,399
+total_number_of_UMIs: 14,628,980
+total_number_of_unique_UMIs: 10,360,898
+number_of_genes_in_tissue: 21,947
+number_of_unique_UMIs_in_tissue: 9,205,025
+percentage_of_genes_in_tissue: 97.98205277021296
+percentage_of_unique_UMIs_in_tissue: 88.84389171672186
+sequencing_saturation_reads: 89.63821741462068
+sequencing_saturation_UMIs: 29.1755269335251
+unique_UMIs_per_mm2_in_tissue: 195,560.33567027832
+median_UMIs_per_gene: 91.0
+median_UMIs_per_gene_per_mm2: 1.9332908434246867
+median_unique_UMIs_per_gene: 64.0
+median_unique_UMIs_per_gene_per_mm2: 1.3596770766942852
+median_unique_UMIs_per_gene_in_tissue: 61.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.2959422137242405
+percentage_of_reads_with_usable_UMI: 14.63022898264825
+ratio_reads_per_unique_UMI: 9.650849086633224
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 100,000,000 finished! - 6.87 minutes
+
+Sampling 110,000,000 reads...
+Sampling done - 90 seconds.
+Grouping UMIs...
+Grouping UMIs done - 164 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 142 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 2 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 8,247,993
+percentage_spots_recovered: 9.341755115444903
+total_number_of_reads: 109,990,940
+total_number_of_genes: 22,579
+total_number_of_UMIs: 16,093,394
+total_number_of_unique_UMIs: 11,106,272
+number_of_genes_in_tissue: 22,125
+number_of_unique_UMIs_in_tissue: 9,865,138
+percentage_of_genes_in_tissue: 97.98928207626557
+percentage_of_unique_UMIs_in_tissue: 88.82492703222107
+sequencing_saturation_reads: 89.90255742882096
+sequencing_saturation_UMIs: 30.98862800475772
+unique_UMIs_per_mm2_in_tissue: 209,584.40620352665
+median_UMIs_per_gene: 96.0
+median_UMIs_per_gene_per_mm2: 2.0395156150414278
+median_unique_UMIs_per_gene: 66.0
+median_unique_UMIs_per_gene_per_mm2: 1.4021669853409815
+median_unique_UMIs_per_gene_in_tissue: 64.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.3596770766942852
+percentage_of_reads_with_usable_UMI: 14.63156329057648
+ratio_reads_per_unique_UMI: 9.903497771349379
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 110,000,000 finished! - 7.4 minutes
+
+Sampling 120,000,000 reads...
+Sampling done - 84 seconds.
+Grouping UMIs...
+Grouping UMIs done - 176 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 151 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 2 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 8,694,835
+percentage_spots_recovered: 9.847852603560574
+total_number_of_reads: 119,995,766
+total_number_of_genes: 22,744
+total_number_of_UMIs: 17,557,642
+total_number_of_unique_UMIs: 11,819,920
+number_of_genes_in_tissue: 22,287
+number_of_unique_UMIs_in_tissue: 10,496,566
+percentage_of_genes_in_tissue: 97.99067886035877
+percentage_of_unique_UMIs_in_tissue: 88.80403589872013
+sequencing_saturation_reads: 90.1497191159228
+sequencing_saturation_UMIs: 32.67934270444744
+unique_UMIs_per_mm2_in_tissue: 222,999.06522200978
+median_UMIs_per_gene: 102.0
+median_UMIs_per_gene_per_mm2: 2.1669853409815167
+median_unique_UMIs_per_gene: 67.0
+median_unique_UMIs_per_gene_per_mm2: 1.4234119396643297
+median_unique_UMIs_per_gene_in_tissue: 65.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.3809220310176333
+percentage_of_reads_with_usable_UMI: 14.631884594994792
+ratio_reads_per_unique_UMI: 10.151994768154099
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 120,000,000 finished! - 7.67 minutes
+
+Sampling 130,000,000 reads...
+Sampling done - 88 seconds.
+Grouping UMIs...
+Grouping UMIs done - 185 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 160 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 2 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 9,118,195
+percentage_spots_recovered: 10.327354155716929
+total_number_of_reads: 129,999,199
+total_number_of_genes: 22,880
+total_number_of_UMIs: 19,019,918
+total_number_of_unique_UMIs: 12,505,478
+number_of_genes_in_tissue: 22,424
+number_of_unique_UMIs_in_tissue: 11,103,427
+percentage_of_genes_in_tissue: 98.006993006993
+percentage_of_unique_UMIs_in_tissue: 88.78850532542619
+sequencing_saturation_reads: 90.38034226657042
+sequencing_saturation_UMIs: 34.25062084915403
+unique_UMIs_per_mm2_in_tissue: 235,891.79944763117
+median_UMIs_per_gene: 107.0
+median_UMIs_per_gene_per_mm2: 2.273210112598258
+median_unique_UMIs_per_gene: 69.0
+median_unique_UMIs_per_gene_per_mm2: 1.4659018483110262
+median_unique_UMIs_per_gene_in_tissue: 67.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.4234119396643297
+percentage_of_reads_with_usable_UMI: 14.630796302060292
+ratio_reads_per_unique_UMI: 10.39538024855987
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 130,000,000 finished! - 8.04 minutes
+
+Sampling 140,000,000 reads...
+Sampling done - 90 seconds.
+Grouping UMIs...
+Grouping UMIs done - 197 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 170 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 2 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 9,519,232
+percentage_spots_recovered: 10.78157246630869
+total_number_of_reads: 139,998,206
+total_number_of_genes: 23,014
+total_number_of_UMIs: 20,483,814
+total_number_of_unique_UMIs: 13,166,810
+number_of_genes_in_tissue: 22,558
+number_of_unique_UMIs_in_tissue: 11,687,775
+percentage_of_genes_in_tissue: 98.01859737551057
+percentage_of_unique_UMIs_in_tissue: 88.76694506869926
+sequencing_saturation_reads: 90.5950151961233
+sequencing_saturation_UMIs: 35.72090627263067
+unique_UMIs_per_mm2_in_tissue: 248,306.24601657107
+median_UMIs_per_gene: 113.0
+median_UMIs_per_gene_per_mm2: 2.400679838538347
+median_unique_UMIs_per_gene: 70.0
+median_unique_UMIs_per_gene_per_mm2: 1.4871468026343744
+median_unique_UMIs_per_gene_in_tissue: 68.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.4446568939876778
+percentage_of_reads_with_usable_UMI: 14.631483206291943
+ratio_reads_per_unique_UMI: 10.632659391302829
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 140,000,000 finished! - 8.53 minutes
+
+Sampling 150,000,000 reads...
+Sampling done - 91 seconds.
+Grouping UMIs...
+Grouping UMIs done - 205 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 178 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 2 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 9,901,063
+percentage_spots_recovered: 11.214037879104923
+total_number_of_reads: 149,998,127
+total_number_of_genes: 23,134
+total_number_of_UMIs: 21,948,618
+total_number_of_unique_UMIs: 13,804,675
+number_of_genes_in_tissue: 22,677
+number_of_unique_UMIs_in_tissue: 12,251,607
+percentage_of_genes_in_tissue: 98.02455260655313
+percentage_of_unique_UMIs_in_tissue: 88.74969530249716
+sequencing_saturation_reads: 90.79676841564829
+sequencing_saturation_UMIs: 37.10458216549215
+unique_UMIs_per_mm2_in_tissue: 260,284.83110261313
+median_UMIs_per_gene: 118.0
+median_UMIs_per_gene_per_mm2: 2.5069046101550883
+median_unique_UMIs_per_gene: 72.0
+median_unique_UMIs_per_gene_per_mm2: 1.5296367112810707
+median_unique_UMIs_per_gene_in_tissue: 69.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.4659018483110262
+percentage_of_reads_with_usable_UMI: 14.632594712332642
+ratio_reads_per_unique_UMI: 10.865748523597984
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 150,000,000 finished! - 8.76 minutes
+
+Sampling 160,000,000 reads...
+Sampling done - 92 seconds.
+Grouping UMIs...
+Grouping UMIs done - 211 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 183 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 3 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 10,264,551
+percentage_spots_recovered: 11.625727836092379
+total_number_of_reads: 159,997,661
+total_number_of_genes: 23,225
+total_number_of_UMIs: 23,411,298
+total_number_of_unique_UMIs: 14,420,698
+number_of_genes_in_tissue: 22,766
+number_of_unique_UMIs_in_tissue: 12,795,313
+percentage_of_genes_in_tissue: 98.02368137782562
+percentage_of_unique_UMIs_in_tissue: 88.72880494411575
+sequencing_saturation_reads: 90.98693199021203
+sequencing_saturation_UMIs: 38.40282584929721
+unique_UMIs_per_mm2_in_tissue: 271,835.8402379435
+median_UMIs_per_gene: 124.0
+median_UMIs_per_gene_per_mm2: 2.6343743360951772
+median_unique_UMIs_per_gene: 74.0
+median_unique_UMIs_per_gene_per_mm2: 1.5721266199277673
+median_unique_UMIs_per_gene_in_tissue: 71.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.5083917569577225
+percentage_of_reads_with_usable_UMI: 14.63227515557243
+ratio_reads_per_unique_UMI: 11.095001157364228
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 160,000,000 finished! - 8.96 minutes
+
+Sampling 170,000,000 reads...
+Sampling done - 93 seconds.
+Grouping UMIs...
+Grouping UMIs done - 219 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 196 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 3 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 10,612,637
+percentage_spots_recovered: 12.01997334177052
+total_number_of_reads: 169,997,260
+total_number_of_genes: 23,342
+total_number_of_UMIs: 24,875,099
+total_number_of_unique_UMIs: 15,018,237
+number_of_genes_in_tissue: 22,877
+number_of_unique_UMIs_in_tissue: 13,323,247
+percentage_of_genes_in_tissue: 98.00788278639362
+percentage_of_unique_UMIs_in_tissue: 88.71378844267805
+sequencing_saturation_reads: 91.16560055144419
+sequencing_saturation_UMIs: 39.62541817421511
+unique_UMIs_per_mm2_in_tissue: 283,051.773953686
+median_UMIs_per_gene: 129.0
+median_UMIs_per_gene_per_mm2: 2.7405991077119185
+median_unique_UMIs_per_gene: 74.0
+median_unique_UMIs_per_gene_per_mm2: 1.5721266199277673
+median_unique_UMIs_per_gene_in_tissue: 72.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.5296367112810707
+percentage_of_reads_with_usable_UMI: 14.632647020310799
+ratio_reads_per_unique_UMI: 11.319388554062638
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 170,000,000 finished! - 9.34 minutes
+
+Sampling 180,000,000 reads...
+Sampling done - 100 seconds.
+Grouping UMIs...
+Grouping UMIs done - 225 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 202 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 3 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 10,945,958
+percentage_spots_recovered: 12.39749586838217
+total_number_of_reads: 179,996,643
+total_number_of_genes: 23,436
+total_number_of_UMIs: 26,338,604
+total_number_of_unique_UMIs: 15,597,697
+number_of_genes_in_tissue: 22,977
+number_of_unique_UMIs_in_tissue: 13,834,666
+percentage_of_genes_in_tissue: 98.04147465437788
+percentage_of_unique_UMIs_in_tissue: 88.69685056710615
+sequencing_saturation_reads: 91.33445116529201
+sequencing_saturation_UMIs: 40.780092217491855
+unique_UMIs_per_mm2_in_tissue: 293,916.8472487784
+median_UMIs_per_gene: 133.0
+median_UMIs_per_gene_per_mm2: 2.825578925005311
+median_unique_UMIs_per_gene: 75.0
+median_unique_UMIs_per_gene_per_mm2: 1.5933715742511154
+median_unique_UMIs_per_gene_in_tissue: 73.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.5508816656044189
+percentage_of_reads_with_usable_UMI: 14.632830680069961
+ratio_reads_per_unique_UMI: 11.539949968254929
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 180,000,000 finished! - 9.68 minutes
+
+Sampling 190,000,000 reads...
+Sampling done - 103 seconds.
+Grouping UMIs...
+Grouping UMIs done - 239 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 204 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 3 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 11,266,230
+percentage_spots_recovered: 12.76023897380597
+total_number_of_reads: 189,996,992
+total_number_of_genes: 23,511
+total_number_of_UMIs: 27,802,335
+total_number_of_unique_UMIs: 16,161,005
+number_of_genes_in_tissue: 23,056
+number_of_unique_UMIs_in_tissue: 14,331,449
+percentage_of_genes_in_tissue: 98.06473565565055
+percentage_of_unique_UMIs_in_tissue: 88.67919414665116
+sequencing_saturation_reads: 91.4940732324857
+sequencing_saturation_UMIs: 41.871770842269186
+unique_UMIs_per_mm2_in_tissue: 304,470.9793923943
+median_UMIs_per_gene: 138.0
+median_UMIs_per_gene_per_mm2: 2.9318036966220524
+median_unique_UMIs_per_gene: 77.0
+median_unique_UMIs_per_gene_per_mm2: 1.6358614828978117
+median_unique_UMIs_per_gene_in_tissue: 75.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.5933715742511154
+percentage_of_reads_with_usable_UMI: 14.633039558857858
+ratio_reads_per_unique_UMI: 11.756508459715223
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 190,000,000 finished! - 10.01 minutes
+
+Sampling 200,000,000 reads...
+Sampling done - 103 seconds.
+Grouping UMIs...
+Grouping UMIs done - 243 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 213 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 3 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 11,574,278
+percentage_spots_recovered: 13.10913706086819
+total_number_of_reads: 200,003,459
+total_number_of_genes: 23,587
+total_number_of_UMIs: 29,268,353
+total_number_of_unique_UMIs: 16,710,596
+number_of_genes_in_tissue: 23,130
+number_of_unique_UMIs_in_tissue: 14,815,887
+percentage_of_genes_in_tissue: 98.0624920507059
+percentage_of_unique_UMIs_in_tissue: 88.66163121889848
+sequencing_saturation_reads: 91.64484650237974
+sequencing_saturation_UMIs: 42.90558132874781
+unique_UMIs_per_mm2_in_tissue: 314,762.8425748885
+median_UMIs_per_gene: 142.0
+median_UMIs_per_gene_per_mm2: 3.016783513915445
+median_unique_UMIs_per_gene: 78.0
+median_unique_UMIs_per_gene_per_mm2: 1.65710643722116
+median_unique_UMIs_per_gene_in_tissue: 76.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.6146165285744636
+percentage_of_reads_with_usable_UMI: 14.633923406294688
+ratio_reads_per_unique_UMI: 11.96866102202459
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 200,000,000 finished! - 10.24 minutes
+
+Sampling 210,000,000 reads...
+Sampling done - 99 seconds.
+Grouping UMIs...
+Grouping UMIs done - 256 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 223 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 3 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 11,870,701
+percentage_spots_recovered: 13.444868562651171
+total_number_of_reads: 210,001,931
+total_number_of_genes: 23,666
+total_number_of_UMIs: 30,731,375
+total_number_of_unique_UMIs: 17,244,634
+number_of_genes_in_tissue: 23,210
+number_of_unique_UMIs_in_tissue: 15,286,677
+percentage_of_genes_in_tissue: 98.07318516014536
+percentage_of_unique_UMIs_in_tissue: 88.64599271866251
+sequencing_saturation_reads: 91.78834503193212
+sequencing_saturation_UMIs: 43.88590162334096
+unique_UMIs_per_mm2_in_tissue: 324,764.75462077756
+median_UMIs_per_gene: 146.0
+median_UMIs_per_gene_per_mm2: 3.1017633312088377
+median_unique_UMIs_per_gene: 80.0
+median_unique_UMIs_per_gene_per_mm2: 1.6995963458678565
+median_unique_UMIs_per_gene_in_tissue: 77.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.6358614828978117
+percentage_of_reads_with_usable_UMI: 14.633853533470603
+ratio_reads_per_unique_UMI: 12.177813167852678
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 210,000,000 finished! - 10.56 minutes
+
+Sampling 220,000,000 reads...
+Sampling done - 96 seconds.
+Grouping UMIs...
+Grouping UMIs done - 266 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 229 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 3 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 12,156,746
+percentage_spots_recovered: 13.76884584318444
+total_number_of_reads: 220,000,832
+total_number_of_genes: 23,731
+total_number_of_UMIs: 32,194,458
+total_number_of_unique_UMIs: 17,766,053
+number_of_genes_in_tissue: 23,278
+number_of_unique_UMIs_in_tissue: 15,746,118
+percentage_of_genes_in_tissue: 98.0911044625174
+percentage_of_unique_UMIs_in_tissue: 88.63036713894752
+sequencing_saturation_reads: 91.92455190351279
+sequencing_saturation_UMIs: 44.81642461569007
+unique_UMIs_per_mm2_in_tissue: 334,525.55768005096
+median_UMIs_per_gene: 151.0
+median_UMIs_per_gene_per_mm2: 3.207988102825579
+median_unique_UMIs_per_gene: 81.0
+median_unique_UMIs_per_gene_per_mm2: 1.7208413001912046
+median_unique_UMIs_per_gene_in_tissue: 78.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.65710643722116
+percentage_of_reads_with_usable_UMI: 14.633789203124467
+ratio_reads_per_unique_UMI: 12.383213761661073
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 220,000,000 finished! - 10.8 minutes
+
+Sampling 230,000,000 reads...
+Sampling done - 103 seconds.
+Grouping UMIs...
+Grouping UMIs done - 272 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 237 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 3 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 12,432,742
+percentage_spots_recovered: 14.081441530989016
+total_number_of_reads: 229,998,595
+total_number_of_genes: 23,797
+total_number_of_UMIs: 33,657,876
+total_number_of_unique_UMIs: 18,275,403
+number_of_genes_in_tissue: 23,355
+number_of_unique_UMIs_in_tissue: 16,194,376
+percentage_of_genes_in_tissue: 98.14262301970837
+percentage_of_unique_UMIs_in_tissue: 88.61296246107403
+sequencing_saturation_reads: 92.0541240697579
+sequencing_saturation_UMIs: 45.70244717759374
+unique_UMIs_per_mm2_in_tissue: 344,048.7784151264
+median_UMIs_per_gene: 155.0
+median_UMIs_per_gene_per_mm2: 3.2929679201189717
+median_unique_UMIs_per_gene: 82.0
+median_unique_UMIs_per_gene_per_mm2: 1.7420862545145528
+median_unique_UMIs_per_gene_in_tissue: 79.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.678351391544508
+percentage_of_reads_with_usable_UMI: 14.63394852477251
+ratio_reads_per_unique_UMI: 12.585144907611614
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 230,000,000 finished! - 11.19 minutes
+
+Sampling 240,000,000 reads...
+Sampling done - 107 seconds.
+Grouping UMIs...
+Grouping UMIs done - 282 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 244 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 3 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 12,699,397
+percentage_spots_recovered: 14.383457513581263
+total_number_of_reads: 239,999,764
+total_number_of_genes: 23,875
+total_number_of_UMIs: 35,122,058
+total_number_of_unique_UMIs: 18,773,078
+number_of_genes_in_tissue: 23,423
+number_of_unique_UMIs_in_tissue: 16,632,501
+percentage_of_genes_in_tissue: 98.10680628272252
+percentage_of_unique_UMIs_in_tissue: 88.59762368216869
+sequencing_saturation_reads: 92.17787647491187
+sequencing_saturation_UMIs: 46.54903764466194
+unique_UMIs_per_mm2_in_tissue: 353,356.72402804333
+median_UMIs_per_gene: 160.0
+median_UMIs_per_gene_per_mm2: 3.399192691735713
+median_unique_UMIs_per_gene: 83.0
+median_unique_UMIs_per_gene_per_mm2: 1.763331208837901
+median_unique_UMIs_per_gene_in_tissue: 79.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.678351391544508
+percentage_of_reads_with_usable_UMI: 14.634205223635135
+ratio_reads_per_unique_UMI: 12.784252214793973
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 240,000,000 finished! - 11.56 minutes
+
+Sampling 250,000,000 reads...
+Sampling done - 114 seconds.
+Grouping UMIs...
+Grouping UMIs done - 281 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 249 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 3 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 12,957,881
+percentage_spots_recovered: 14.676218944060249
+total_number_of_reads: 249,992,204
+total_number_of_genes: 23,941
+total_number_of_UMIs: 36,582,779
+total_number_of_unique_UMIs: 19,260,131
+number_of_genes_in_tissue: 23,490
+number_of_unique_UMIs_in_tissue: 17,060,876
+percentage_of_genes_in_tissue: 98.1162023307297
+percentage_of_unique_UMIs_in_tissue: 88.58130819567116
+sequencing_saturation_reads: 92.29570734933799
+sequencing_saturation_UMIs: 47.35191932794389
+unique_UMIs_per_mm2_in_tissue: 362,457.53133630764
+median_UMIs_per_gene: 164.0
+median_UMIs_per_gene_per_mm2: 3.4841725090291056
+median_unique_UMIs_per_gene: 84.0
+median_unique_UMIs_per_gene_per_mm2: 1.7845761631612491
+median_unique_UMIs_per_gene_in_tissue: 80.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.6995963458678565
+percentage_of_reads_with_usable_UMI: 14.633567933182428
+ratio_reads_per_unique_UMI: 12.979776928827743
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 250,000,000 finished! - 11.81 minutes
+
+Sampling 260,000,000 reads...
+Sampling done - 124 seconds.
+Grouping UMIs...
+Grouping UMIs done - 307 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 253 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 3 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 13,210,105
+percentage_spots_recovered: 14.961890239154457
+total_number_of_reads: 259,990,343
+total_number_of_genes: 24,005
+total_number_of_UMIs: 38,047,106
+total_number_of_unique_UMIs: 19,739,116
+number_of_genes_in_tissue: 23,552
+number_of_unique_UMIs_in_tissue: 17,482,427
+percentage_of_genes_in_tissue: 98.11289314726098
+percentage_of_unique_UMIs_in_tissue: 88.56742622111344
+sequencing_saturation_reads: 92.4077503140184
+sequencing_saturation_UMIs: 48.11927088488675
+unique_UMIs_per_mm2_in_tissue: 371,413.3630762694
+median_UMIs_per_gene: 168.0
+median_UMIs_per_gene_per_mm2: 3.5691523263224982
+median_unique_UMIs_per_gene: 84.0
+median_unique_UMIs_per_gene_per_mm2: 1.7845761631612491
+median_unique_UMIs_per_gene_in_tissue: 81.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.7208413001912046
+percentage_of_reads_with_usable_UMI: 14.63404584992605
+ratio_reads_per_unique_UMI: 13.171326568018548
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 260,000,000 finished! - 12.53 minutes
+
+Sampling 270,000,000 reads...
+Sampling done - 121 seconds.
+Grouping UMIs...
+Grouping UMIs done - 309 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 251 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 3 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 13,453,861
+percentage_spots_recovered: 15.23797059711795
+total_number_of_reads: 269,989,411
+total_number_of_genes: 24,066
+total_number_of_UMIs: 39,509,627
+total_number_of_unique_UMIs: 20,207,828
+number_of_genes_in_tissue: 23,609
+number_of_unique_UMIs_in_tissue: 17,894,452
+percentage_of_genes_in_tissue: 98.10105543089837
+percentage_of_unique_UMIs_in_tissue: 88.55207991675306
+sequencing_saturation_reads: 92.51532572142246
+sequencing_saturation_UMIs: 48.853407297416396
+unique_UMIs_per_mm2_in_tissue: 380,166.8153813469
+median_UMIs_per_gene: 172.0
+median_UMIs_per_gene_per_mm2: 3.6541321436158913
+median_unique_UMIs_per_gene: 85.0
+median_unique_UMIs_per_gene_per_mm2: 1.8058211174845975
+median_unique_UMIs_per_gene_in_tissue: 82.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.7420862545145528
+percentage_of_reads_with_usable_UMI: 14.633769099929628
+ratio_reads_per_unique_UMI: 13.360634849029791
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 270,000,000 finished! - 12.52 minutes
+
+Sampling 280,000,000 reads...
+Sampling done - 111 seconds.
+Grouping UMIs...
+Grouping UMIs done - 312 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 264 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 3 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 13,691,306
+percentage_spots_recovered: 15.506903056612861
+total_number_of_reads: 279,992,131
+total_number_of_genes: 24,120
+total_number_of_UMIs: 40,972,161
+total_number_of_unique_UMIs: 20,667,196
+number_of_genes_in_tissue: 23,670
+number_of_unique_UMIs_in_tissue: 18,298,544
+percentage_of_genes_in_tissue: 98.13432835820896
+percentage_of_unique_UMIs_in_tissue: 88.53907419274488
+sequencing_saturation_reads: 92.61865112916334
+sequencing_saturation_UMIs: 49.557954729309984
+unique_UMIs_per_mm2_in_tissue: 388,751.73146377737
+median_UMIs_per_gene: 176.0
+median_UMIs_per_gene_per_mm2: 3.739111960909284
+median_unique_UMIs_per_gene: 86.0
+median_unique_UMIs_per_gene_per_mm2: 1.8270660718079457
+median_unique_UMIs_per_gene_in_tissue: 83.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.763331208837901
+percentage_of_reads_with_usable_UMI: 14.633325891576574
+ratio_reads_per_unique_UMI: 13.547659343821968
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 280,000,000 finished! - 12.52 minutes
+
+Sampling 290,000,000 reads...
+Sampling done - 113 seconds.
+Grouping UMIs...
+Grouping UMIs done - 314 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 271 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 4 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 13,922,981
+percentage_spots_recovered: 15.769300359371327
+total_number_of_reads: 289,996,294
+total_number_of_genes: 24,176
+total_number_of_UMIs: 42,437,489
+total_number_of_unique_UMIs: 21,120,152
+number_of_genes_in_tissue: 23,718
+number_of_unique_UMIs_in_tissue: 18,696,369
+percentage_of_genes_in_tissue: 98.10555923229649
+percentage_of_unique_UMIs_in_tissue: 88.52383732844346
+sequencing_saturation_reads: 92.71709589502547
+sequencing_saturation_UMIs: 50.232324066110515
+unique_UMIs_per_mm2_in_tissue: 397,203.50541746337
+median_UMIs_per_gene: 180.0
+median_UMIs_per_gene_per_mm2: 3.8240917782026767
+median_unique_UMIs_per_gene: 87.0
+median_unique_UMIs_per_gene_per_mm2: 1.8483110261312938
+median_unique_UMIs_per_gene_in_tissue: 84.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.7845761631612491
+percentage_of_reads_with_usable_UMI: 14.63380390647337
+ratio_reads_per_unique_UMI: 13.730786312522751
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 290,000,000 finished! - 12.69 minutes
+
+Sampling 300,000,000 reads...
+Sampling done - 113 seconds.
+Grouping UMIs...
+Grouping UMIs done - 327 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 280 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 4 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 14,147,865
+percentage_spots_recovered: 16.024006111107745
+total_number_of_reads: 299,997,465
+total_number_of_genes: 24,233
+total_number_of_UMIs: 43,901,201
+total_number_of_unique_UMIs: 21,564,227
+number_of_genes_in_tissue: 23,772
+number_of_unique_UMIs_in_tissue: 19,086,944
+percentage_of_genes_in_tissue: 98.09763545578343
+percentage_of_unique_UMIs_in_tissue: 88.51207140418249
+sequencing_saturation_reads: 92.8118635935807
+sequencing_saturation_UMIs: 50.880097790490964
+unique_UMIs_per_mm2_in_tissue: 405,501.2534523051
+median_UMIs_per_gene: 185.0
+median_UMIs_per_gene_per_mm2: 3.930316549819418
+median_unique_UMIs_per_gene: 88.0
+median_unique_UMIs_per_gene_per_mm2: 1.869555980454642
+median_unique_UMIs_per_gene_in_tissue: 85.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.8058211174845975
+percentage_of_reads_with_usable_UMI: 14.633857322761044
+ratio_reads_per_unique_UMI: 13.91181167773832
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 300,000,000 finished! - 13.18 minutes
+
+Sampling 310,000,000 reads...
+Sampling done - 114 seconds.
+Grouping UMIs...
+Grouping UMIs done - 332 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 289 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 4 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 14,367,091
+percentage_spots_recovered: 16.27230355837019
+total_number_of_reads: 309,996,657
+total_number_of_genes: 24,282
+total_number_of_UMIs: 45,365,212
+total_number_of_unique_UMIs: 22,002,050
+number_of_genes_in_tissue: 23,821
+number_of_unique_UMIs_in_tissue: 19,471,395
+percentage_of_genes_in_tissue: 98.10147434313483
+percentage_of_unique_UMIs_in_tissue: 88.49809449574016
+sequencing_saturation_reads: 92.90248797747519
+sequencing_saturation_UMIs: 51.50017154113598
+unique_UMIs_per_mm2_in_tissue: 413,668.89738687064
+median_UMIs_per_gene: 189.0
+median_UMIs_per_gene_per_mm2: 4.015296367112811
+median_unique_UMIs_per_gene: 88.5
+median_unique_UMIs_per_gene_per_mm2: 1.880178457616316
+median_unique_UMIs_per_gene_in_tissue: 85.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.8058211174845975
+percentage_of_reads_with_usable_UMI: 14.63409716705429
+ratio_reads_per_unique_UMI: 14.08944425633066
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 310,000,000 finished! - 13.35 minutes
+
+Sampling 320,000,000 reads...
+Sampling done - 118 seconds.
+Grouping UMIs...
+Grouping UMIs done - 338 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 295 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 4 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 14,581,964
+percentage_spots_recovered: 16.515670756538398
+total_number_of_reads: 319,994,128
+total_number_of_genes: 24,331
+total_number_of_UMIs: 46,830,087
+total_number_of_unique_UMIs: 22,433,293
+number_of_genes_in_tissue: 23,867
+number_of_unique_UMIs_in_tissue: 19,849,815
+percentage_of_genes_in_tissue: 98.09296781883194
+percentage_of_unique_UMIs_in_tissue: 88.48373263791454
+sequencing_saturation_reads: 92.98946729422485
+sequencing_saturation_UMIs: 52.09640972907012
+unique_UMIs_per_mm2_in_tissue: 421,708.41300191206
+median_UMIs_per_gene: 193.0
+median_UMIs_per_gene_per_mm2: 4.100276184406203
+median_unique_UMIs_per_gene: 89.0
+median_unique_UMIs_per_gene_per_mm2: 1.8908009347779902
+median_unique_UMIs_per_gene_in_tissue: 86.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.8270660718079457
+percentage_of_reads_with_usable_UMI: 14.634670733707964
+ratio_reads_per_unique_UMI: 14.26425126262114
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 320,000,000 finished! - 13.61 minutes
+
+Sampling 330,000,000 reads...
+Sampling done - 117 seconds.
+Grouping UMIs...
+Grouping UMIs done - 336 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 298 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 4 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 14,791,442
+percentage_spots_recovered: 16.752927526527557
+total_number_of_reads: 329,998,785
+total_number_of_genes: 24,373
+total_number_of_UMIs: 48,293,049
+total_number_of_unique_UMIs: 22,856,713
+number_of_genes_in_tissue: 23,911
+number_of_unique_UMIs_in_tissue: 20,221,835
+percentage_of_genes_in_tissue: 98.10445985311615
+percentage_of_unique_UMIs_in_tissue: 88.47219195515996
+sequencing_saturation_reads: 93.07369783194808
+sequencing_saturation_UMIs: 52.670801547444235
+unique_UMIs_per_mm2_in_tissue: 429,611.96090928407
+median_UMIs_per_gene: 197.0
+median_UMIs_per_gene_per_mm2: 4.185256001699596
+median_unique_UMIs_per_gene: 90.0
+median_unique_UMIs_per_gene_per_mm2: 1.9120458891013383
+median_unique_UMIs_per_gene_in_tissue: 87.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.8483110261312938
+percentage_of_reads_with_usable_UMI: 14.634311153600157
+ratio_reads_per_unique_UMI: 14.437718363090966
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 330,000,000 finished! - 13.65 minutes
+
+Sampling 340,000,000 reads...
+Sampling done - 127 seconds.
+Grouping UMIs...
+Grouping UMIs done - 349 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 294 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 4 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 14,995,532
+percentage_spots_recovered: 16.984081796604062
+total_number_of_reads: 340,000,367
+total_number_of_genes: 24,411
+total_number_of_UMIs: 49,756,756
+total_number_of_unique_UMIs: 23,274,032
+number_of_genes_in_tissue: 23,947
+number_of_unique_UMIs_in_tissue: 20,587,606
+percentage_of_genes_in_tissue: 98.09921756585146
+percentage_of_unique_UMIs_in_tissue: 88.45741038768014
+sequencing_saturation_reads: 93.15470385948143
+sequencing_saturation_UMIs: 53.22437821308126
+unique_UMIs_per_mm2_in_tissue: 437,382.74909708946
+median_UMIs_per_gene: 201.0
+median_UMIs_per_gene_per_mm2: 4.270235818992989
+median_unique_UMIs_per_gene: 91.0
+median_unique_UMIs_per_gene_per_mm2: 1.9332908434246867
+median_unique_UMIs_per_gene_in_tissue: 88.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.869555980454642
+percentage_of_reads_with_usable_UMI: 14.634324203538288
+ratio_reads_per_unique_UMI: 14.608571776476031
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 340,000,000 finished! - 13.95 minutes
+
+Sampling 350,000,000 reads...
+Sampling done - 126 seconds.
+Grouping UMIs...
+Grouping UMIs done - 362 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 315 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 4 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 15,195,658
+percentage_spots_recovered: 17.210746402676538
+total_number_of_reads: 350,001,794
+total_number_of_genes: 24,447
+total_number_of_UMIs: 51,220,906
+total_number_of_unique_UMIs: 23,686,664
+number_of_genes_in_tissue: 23,981
+number_of_unique_UMIs_in_tissue: 20,949,535
+percentage_of_genes_in_tissue: 98.09383564445535
+percentage_of_unique_UMIs_in_tissue: 88.4444301654298
+sequencing_saturation_reads: 93.23241640298563
+sequencing_saturation_UMIs: 53.75586679392199
+unique_UMIs_per_mm2_in_tissue: 445,071.9141703845
+median_UMIs_per_gene: 206.0
+median_UMIs_per_gene_per_mm2: 4.37646059060973
+median_unique_UMIs_per_gene: 91.0
+median_unique_UMIs_per_gene_per_mm2: 1.9332908434246867
+median_unique_UMIs_per_gene_in_tissue: 89.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.8908009347779902
+percentage_of_reads_with_usable_UMI: 14.63446955931889
+ratio_reads_per_unique_UMI: 14.776322828744478
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 350,000,000 finished! - 14.53 minutes
+
+Sampling 360,000,000 reads...
+Sampling done - 124 seconds.
+Grouping UMIs...
+Grouping UMIs done - 370 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 323 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 4 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 15,391,100
+percentage_spots_recovered: 17.432105865914778
+total_number_of_reads: 360,006,758
+total_number_of_genes: 24,474
+total_number_of_UMIs: 52,683,489
+total_number_of_unique_UMIs: 24,093,433
+number_of_genes_in_tissue: 24,008
+number_of_unique_UMIs_in_tissue: 21,306,268
+percentage_of_genes_in_tissue: 98.0959385470295
+percentage_of_unique_UMIs_in_tissue: 88.43184779852668
+sequencing_saturation_reads: 93.30750535521891
+sequencing_saturation_UMIs: 54.26758277152069
+unique_UMIs_per_mm2_in_tissue: 452,650.6904610155
+median_UMIs_per_gene: 211.0
+median_UMIs_per_gene_per_mm2: 4.482685362226471
+median_unique_UMIs_per_gene: 93.0
+median_unique_UMIs_per_gene_per_mm2: 1.975780752071383
+median_unique_UMIs_per_gene_in_tissue: 90.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.9120458891013383
+percentage_of_reads_with_usable_UMI: 14.63402778677838
+ratio_reads_per_unique_UMI: 14.942111321371263
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 360,000,000 finished! - 14.78 minutes
+
+Sampling 370,000,000 reads...
+Sampling done - 126 seconds.
+Grouping UMIs...
+Grouping UMIs done - 373 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 321 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 4 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 15,581,862
+percentage_spots_recovered: 17.648164716756735
+total_number_of_reads: 370,005,191
+total_number_of_genes: 24,509
+total_number_of_UMIs: 54,146,001
+total_number_of_unique_UMIs: 24,493,806
+number_of_genes_in_tissue: 24,041
+number_of_unique_UMIs_in_tissue: 21,657,390
+percentage_of_genes_in_tissue: 98.09049736831368
+percentage_of_unique_UMIs_in_tissue: 88.41986418933831
+sequencing_saturation_reads: 93.38014530720461
+sequencing_saturation_UMIs: 54.76340718126165
+unique_UMIs_per_mm2_in_tissue: 460,110.2613129382
+median_UMIs_per_gene: 215.0
+median_UMIs_per_gene_per_mm2: 4.567665179519864
+median_unique_UMIs_per_gene: 93.0
+median_unique_UMIs_per_gene_per_mm2: 1.975780752071383
+median_unique_UMIs_per_gene_in_tissue: 91.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.9332908434246867
+percentage_of_reads_with_usable_UMI: 14.633849015377734
+ratio_reads_per_unique_UMI: 15.10607175544707
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 370,000,000 finished! - 14.83 minutes
+
+Sampling 380,000,000 reads...
+Sampling done - 124 seconds.
+Grouping UMIs...
+Grouping UMIs done - 379 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 331 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 4 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 15,768,334
+percentage_spots_recovered: 17.859364672902096
+total_number_of_reads: 380,007,942
+total_number_of_genes: 24,539
+total_number_of_UMIs: 55,607,931
+total_number_of_unique_UMIs: 24,888,192
+number_of_genes_in_tissue: 24,069
+number_of_unique_UMIs_in_tissue: 22,003,370
+percentage_of_genes_in_tissue: 98.08468152736461
+percentage_of_unique_UMIs_in_tissue: 88.40887276986614
+sequencing_saturation_reads: 93.45061267166884
+sequencing_saturation_UMIs: 55.24344899651095
+unique_UMIs_per_mm2_in_tissue: 467,460.59060973016
+median_UMIs_per_gene: 219.0
+median_UMIs_per_gene_per_mm2: 4.652644996813256
+median_unique_UMIs_per_gene: 94.0
+median_unique_UMIs_per_gene_per_mm2: 1.9970257063947312
+median_unique_UMIs_per_gene_in_tissue: 91.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.9332908434246867
+percentage_of_reads_with_usable_UMI: 14.633360215403076
+ratio_reads_per_unique_UMI: 15.268603761976763
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 380,000,000 finished! - 15.06 minutes
+
+Sampling 390,000,000 reads...
+Sampling done - 132 seconds.
+Grouping UMIs...
+Grouping UMIs done - 393 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 331 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 4 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 15,951,492
+percentage_spots_recovered: 18.066811161209575
+total_number_of_reads: 390,005,787
+total_number_of_genes: 24,563
+total_number_of_UMIs: 57,070,684
+total_number_of_unique_UMIs: 25,278,531
+number_of_genes_in_tissue: 24,096
+number_of_unique_UMIs_in_tissue: 22,345,272
+percentage_of_genes_in_tissue: 98.09876643732444
+percentage_of_unique_UMIs_in_tissue: 88.39624422795771
+sequencing_saturation_reads: 93.51842156126776
+sequencing_saturation_UMIs: 55.706626890962085
+unique_UMIs_per_mm2_in_tissue: 474,724.2829827916
+median_UMIs_per_gene: 223.0
+median_UMIs_per_gene_per_mm2: 4.73762481410665
+median_unique_UMIs_per_gene: 95.0
+median_unique_UMIs_per_gene_per_mm2: 2.0182706607180796
+median_unique_UMIs_per_gene_in_tissue: 92.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.9545357977480349
+percentage_of_reads_with_usable_UMI: 14.63329158241439
+ratio_reads_per_unique_UMI: 15.428340634192708
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 390,000,000 finished! - 15.44 minutes
+
+Sampling 400,000,000 reads...
+Sampling done - 139 seconds.
+Grouping UMIs...
+Grouping UMIs done - 389 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 333 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 4 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 16,131,551
+percentage_spots_recovered: 18.270747692718743
+total_number_of_reads: 400,008,690
+total_number_of_genes: 24,595
+total_number_of_UMIs: 58,532,615
+total_number_of_unique_UMIs: 25,665,179
+number_of_genes_in_tissue: 24,134
+number_of_unique_UMIs_in_tissue: 22,683,948
+percentage_of_genes_in_tissue: 98.12563529172597
+percentage_of_unique_UMIs_in_tissue: 88.38414101845929
+sequencing_saturation_reads: 93.58384464097517
+sequencing_saturation_UMIs: 56.15234514979384
+unique_UMIs_per_mm2_in_tissue: 481,919.43913320586
+median_UMIs_per_gene: 227.0
+median_UMIs_per_gene_per_mm2: 4.822604631400043
+median_unique_UMIs_per_gene: 95.0
+median_unique_UMIs_per_gene_per_mm2: 2.0182706607180796
+median_unique_UMIs_per_gene_in_tissue: 92.5
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.965158274909709
+percentage_of_reads_with_usable_UMI: 14.632835851641124
+ratio_reads_per_unique_UMI: 15.585657516746718
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 400,000,000 finished! - 15.52 minutes
+
+Sampling 410,000,000 reads...
+Sampling done - 139 seconds.
+Grouping UMIs...
+Grouping UMIs done - 388 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 333 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 4 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 16,307,513
+percentage_spots_recovered: 18.470043923162187
+total_number_of_reads: 409,995,898
+total_number_of_genes: 24,640
+total_number_of_UMIs: 59,994,108
+total_number_of_unique_UMIs: 26,046,283
+number_of_genes_in_tissue: 24,180
+number_of_unique_UMIs_in_tissue: 23,017,746
+percentage_of_genes_in_tissue: 98.13311688311688
+percentage_of_unique_UMIs_in_tissue: 88.37247909807323
+sequencing_saturation_reads: 93.64718448963603
+sequencing_saturation_UMIs: 56.585265006356956
+unique_UMIs_per_mm2_in_tissue: 489,010.96239643084
+median_UMIs_per_gene: 230.0
+median_UMIs_per_gene_per_mm2: 4.886339494370087
+median_unique_UMIs_per_gene: 95.5
+median_unique_UMIs_per_gene_per_mm2: 2.0288931378797534
+median_unique_UMIs_per_gene_in_tissue: 93.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.975780752071383
+percentage_of_reads_with_usable_UMI: 14.63285566822915
+ratio_reads_per_unique_UMI: 15.741052110967235
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 410,000,000 finished! - 15.53 minutes
+
+Sampling 420,000,000 reads...
+Sampling done - 137 seconds.
+Grouping UMIs...
+Grouping UMIs done - 393 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 346 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 4 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 16,479,965
+percentage_spots_recovered: 18.665364694308415
+total_number_of_reads: 420,000,135
+total_number_of_genes: 24,662
+total_number_of_UMIs: 61,458,385
+total_number_of_unique_UMIs: 26,423,113
+number_of_genes_in_tissue: 24,201
+number_of_unique_UMIs_in_tissue: 23,347,748
+percentage_of_genes_in_tissue: 98.13072743492012
+percentage_of_unique_UMIs_in_tissue: 88.36107993785592
+sequencing_saturation_reads: 93.70878464122399
+sequencing_saturation_UMIs: 57.00649634708104
+unique_UMIs_per_mm2_in_tissue: 496,021.8398130444
+median_UMIs_per_gene: 234.0
+median_UMIs_per_gene_per_mm2: 4.97131931166348
+median_unique_UMIs_per_gene: 96.0
+median_unique_UMIs_per_gene_per_mm2: 2.0395156150414278
+median_unique_UMIs_per_gene_in_tissue: 94.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 1.9970257063947312
+percentage_of_reads_with_usable_UMI: 14.632944106077488
+ratio_reads_per_unique_UMI: 15.895179913131356
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 420,000,000 finished! - 15.78 minutes
+
+Sampling 430,000,000 reads...
+Sampling done - 136 seconds.
+Grouping UMIs...
+Grouping UMIs done - 407 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 355 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 4 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 16,650,027
+percentage_spots_recovered: 18.857978528782184
+total_number_of_reads: 430,001,656
+total_number_of_genes: 24,689
+total_number_of_UMIs: 62,921,458
+total_number_of_unique_UMIs: 26,796,770
+number_of_genes_in_tissue: 24,229
+number_of_unique_UMIs_in_tissue: 23,674,691
+percentage_of_genes_in_tissue: 98.13682206650736
+percentage_of_unique_UMIs_in_tissue: 88.34904729189375
+sequencing_saturation_reads: 93.76821702286654
+sequencing_saturation_UMIs: 57.412350489399024
+unique_UMIs_per_mm2_in_tissue: 502,967.7289143828
+median_UMIs_per_gene: 239.0
+median_UMIs_per_gene_per_mm2: 5.0775440832802206
+median_unique_UMIs_per_gene: 97.0
+median_unique_UMIs_per_gene_per_mm2: 2.060760569364776
+median_unique_UMIs_per_gene_in_tissue: 95.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 2.0182706607180796
+percentage_of_reads_with_usable_UMI: 14.632840855850098
+ratio_reads_per_unique_UMI: 16.046771905718487
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 430,000,000 finished! - 16.17 minutes
+Grouping UMIs...
+Grouping UMIs done - 416 seconds
+Grouping UMIs in tissue...
+Grouping UMIs in tissue done - 351 seconds
+Calculating capture efficiency metrics...
+Calculating capture efficiency metrics done - 4 seconds
+number_of_spots_with_at_least_1_UMI_in_tissue: 16,675,078
+percentage_spots_recovered: 18.88635152902564
+total_number_of_reads: 431,485,173
+total_number_of_genes: 24,696
+total_number_of_UMIs: 63,138,586
+total_number_of_unique_UMIs: 26,851,839
+number_of_genes_in_tissue: 24,236
+number_of_unique_UMIs_in_tissue: 23,722,915
+percentage_of_genes_in_tissue: 98.1373501781665
+percentage_of_unique_UMIs_in_tissue: 88.34744987112428
+sequencing_saturation_reads: 93.77688025446938
+sequencing_saturation_UMIs: 57.471586392511234
+unique_UMIs_per_mm2_in_tissue: 503,992.24559167196
+median_UMIs_per_gene: 239.0
+median_UMIs_per_gene_per_mm2: 5.0775440832802206
+median_unique_UMIs_per_gene: 97.0
+median_unique_UMIs_per_gene_per_mm2: 2.060760569364776
+median_unique_UMIs_per_gene_in_tissue: 95.0
+median_unique_UMIs_per_gene_in_tissue_per_mm2: 2.0182706607180796
+percentage_of_reads_with_usable_UMI: 14.632851822233995
+ratio_reads_per_unique_UMI: 16.069110685491598
+median_reads_per_unique_UMI: 1.0
+median_reads_per_unique_UMI_tissue: 1.0
+Sample size 0 finished! - 13.93 minutes
