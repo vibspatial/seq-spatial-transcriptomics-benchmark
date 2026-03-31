@@ -681,6 +681,8 @@ def plot_distance_histogram(
     title: str | None = None,
 ) -> None:
     distances = np.asarray(data.distance_data.closest_distances, dtype=float)
+    weights = np.asarray(data.gene_bins.transcript_counts, dtype=float)
+    distances, weights = _sanitize_distance_weights(distances, weights, label="distance histogram")
     assert unit in {"px", "um"}, "unit must be 'px' or 'um'."
     if unit == "um":
         distances = distances * pixel_size_um
@@ -696,11 +698,11 @@ def plot_distance_histogram(
     bins = np.arange(dmin, dmax + bin_width, bin_width)
     if bins.size < 2:
         bins = 10
-    ax.hist(distances, bins=bins)
+    ax.hist(distances, bins=bins, weights=weights)
     ax.axvline(0, color="black", linewidth=1, linestyle=":", zorder=3)
     ax.set_xlabel(f"Distance to boundary [{unit_label}]")
     ax.set_ylabel("Count")
-    ax.set_title(title or f"Distance to boundary histogram [{unit_label}]")
+    ax.set_title(title or f"Distance to boundary histogram [{unit_label}]\nCounts weighted by # transcripts in bin")
     save_or_show_figure(fig, output_path)
 
 
@@ -736,8 +738,8 @@ def combined_distance_histogram(
     )
 
     ax.set_xlabel(x_label)
-    ax.set_ylabel("Count")
-    ax.set_title(title or f"Combined distance histogram")
+    ax.set_ylabel("Counts")
+    ax.set_title(title or f"Combined distance histogram\nCounts weighted by # transcripts in bin")
     ax.legend(fontsize="small")
 
     output_dir = os.path.dirname(output_path)
@@ -756,10 +758,10 @@ def combined_distance_histogram(
 def _read_crop_distance_data(
     crop_specs: list[tuple[str, str, float, str]],
     plots_root: str,
-) -> list[tuple[str, np.ndarray]]:
+) -> list[tuple[str, np.ndarray, np.ndarray]]:
     assert len(crop_specs) > 0, "crop_specs must contain at least one entry."
 
-    data_per_label: list[tuple[str, np.ndarray]] = []
+    data_per_label: list[tuple[str, np.ndarray, np.ndarray]] = []
 
     for technology, dataset_id, pixel_size_um, crop_name in crop_specs:
         csv_path = os.path.join(
@@ -777,14 +779,19 @@ def _read_crop_distance_data(
             assert reader.fieldnames is not None and "closest_distance_px" in reader.fieldnames, (
                 f"{csv_path} must contain a 'closest_distance_px' column"
             )
-            distances_px = [float(row["closest_distance_px"]) for row in reader if row.get("closest_distance_px")]
+            distances_px = []
+            transcript_counts = []
+            for row in reader:
+                distances_px.append(float(row["closest_distance_px"]))
+                transcript_counts.append(float(row["transcript_count"]))
 
-        if len(distances_px) == 0:
-            continue
+            if len(distances_px) == 0:
+                continue
 
-        distances_um = np.asarray(distances_px, dtype=float) * pixel_size_um
-        label = f"{technology}, {dataset_id}, {crop_name}"
-        data_per_label.append((label, distances_um))
+            distances_um = np.asarray(distances_px, dtype=float) * pixel_size_um
+            counts = np.asarray(transcript_counts, dtype=float)
+            label = f"{technology}, {dataset_id}, {crop_name}"
+            data_per_label.append((label, distances_um, counts))
 
     if len(data_per_label) == 0:
         raise ValueError("No distance rows found in any selected crop.")
@@ -792,8 +799,8 @@ def _read_crop_distance_data(
     return data_per_label
 
 
-def _distance_hist_bins(data_per_label: list[tuple[str, np.ndarray]], bin_width: float = 5.0) -> np.ndarray:
-    concat = np.concatenate([distances_um for _, distances_um in data_per_label])
+def _distance_hist_bins(data_per_label: list[tuple[str, np.ndarray, np.ndarray]], bin_width: float = 5.0) -> np.ndarray:
+    concat = np.concatenate([distances_um for _, distances_um, _ in data_per_label])
     dmin = float(np.min(concat))
     dmax = float(np.max(concat))
     bins = np.arange(dmin, dmax + bin_width, bin_width)
@@ -803,20 +810,22 @@ def _distance_hist_bins(data_per_label: list[tuple[str, np.ndarray]], bin_width:
 
 
 def _distance_hist_curves(
-    data_per_label: list[tuple[str, np.ndarray]],
+    data_per_label: list[tuple[str, np.ndarray, np.ndarray]],
     bins: np.ndarray,
     align_peaks: bool = False,
     density: bool = False,
 ) -> list[tuple[str, np.ndarray, np.ndarray]]:
     curves: list[tuple[str, np.ndarray, np.ndarray]] = []
-    for label, distances_um in data_per_label:
-        counts, edges = np.histogram(distances_um, bins=bins, density=density)
+    for label, distances_um, weights in data_per_label:
+        distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
+        counts, edges = np.histogram(distances_um, bins=bins, weights=weights, density=density)
         centers = 0.5 * (edges[:-1] + edges[1:])
         if align_peaks:
             peak_idx = int(np.argmax(counts))
             centers = centers - centers[peak_idx]
         curves.append((label, centers, counts))
     return curves
+
 
 def plot_distance_boxplot(
     data: "DiffusionBinData",
@@ -826,18 +835,41 @@ def plot_distance_boxplot(
     title: str | None = None,
 ) -> None:
     distances = np.asarray(data.distance_data.closest_distances, dtype=float)
+    weights = np.asarray(data.gene_bins.transcript_counts, dtype=float)
+    distances, weights = _sanitize_distance_weights(distances, weights, label="distance boxplot")
     assert unit in {"px", "um"}, "unit must be 'px' or 'um'."
     if unit == "um":
         distances = distances * pixel_size_um
         unit_label = MICROMETER_UNIT
     else:
         unit_label = "px"
+    if not np.all(np.isclose(weights, np.rint(weights))):
+        raise ValueError("Transcript counts must be integer to expand-by-count.")
+    repeats = np.rint(weights).astype(int)
+    expanded_distances = np.repeat(distances, repeats)
+    if expanded_distances.size == 0:
+        raise ValueError("No transcript-expanded distances available for boxplot.")
 
     fig, ax = plt.subplots(figsize=(6, 6))
-    ax.boxplot(distances)
+    ax.boxplot(expanded_distances)
     ax.set_ylabel(f"Distance to boundary [{unit_label}]")
     ax.set_title(title or f"Distance to boundary boxplot [{unit_label}]")
     save_or_show_figure(fig, output_path)
+
+
+def _sanitize_distance_weights(
+    distances: np.ndarray,
+    weights: np.ndarray,
+    label: str,
+) -> tuple[np.ndarray, np.ndarray]:
+    distances = np.asarray(distances, dtype=float)
+    weights = np.asarray(weights, dtype=float)
+    if distances.shape[0] != weights.shape[0]:
+        raise ValueError(f"Distance and weight arrays must align for {label}.")
+    valid = np.isfinite(distances) & np.isfinite(weights) & (weights > 0)
+    if not np.any(valid):
+        raise ValueError(f"No valid positive weights found for {label}.")
+    return distances[valid], weights[valid]
 
 
 def ridgeline_distance_histogram(

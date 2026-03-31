@@ -268,7 +268,7 @@ def signed_distance_to_linestring(
 
 
 def closest_points_and_distances(
-    points: np.ndarray,
+    points: np.ndarray,  # bin centers
     line: shapely.LineString,
     use_signed_distances: bool = False,
 ) -> "DistanceData":
@@ -356,19 +356,22 @@ def get_experiment_by_id(experiments: list[Experiment], dataset_id: str) -> Expe
 
 @dataclass
 class DistanceData:
-    closest_xy: np.ndarray
-    closest_distances: np.ndarray
-    closest_along_boundary: np.ndarray
+    closest_xy: np.ndarray  # closest_xy[i] = (x,y) coordinate of the point on the tissue outline closest to the i-th bin; shape = n x 2 (with n the number of bins)
+    closest_distances: np.ndarray  # closest_distances[i] = distance from bin i to the closest point on the tissue outline; shape = n x 1
+    closest_along_boundary: np.ndarray  # distance measured along the tissue outline contour between closest_xy[i] and the start of the contour; shape = n x 1
 
 
 @dataclass
 class GeneBinData:
-    bin_centers: np.ndarray
-    transcript_counts: np.ndarray
+    bin_centers: np.ndarray  # bin_centers[i] = (x,y) coordinates a the i-th bin; shape = n x 2 (with n the number of bins)
+    transcript_counts: np.ndarray  # transcript_counts[i] = number of transcripts of our gene of interest (ptgds) in bin i; shape = n x 1
 
 
 @dataclass
 class DiffusionBinData:
+    # Information about transcripts in bins and distance of bins to tissue boundary,
+    # for a subset of the bins (the bins in the neighborhood of the tissue boundary,
+    # where we analyze diffusion).
     gene_bins: GeneBinData
     distance_data: DistanceData
 
@@ -400,6 +403,7 @@ def get_gene_bin_data(sdata, table_name: str, gene_name: str) -> GeneBinData:
 
     # We must have a transcript count for exactly each bin
     assert transcript_counts.shape[0] == bin_centers.shape[0]
+    assert bin_centers.shape[1] == 2  # (x,y)
 
     return GeneBinData(
         bin_centers=bin_centers,
@@ -487,11 +491,11 @@ def analyze_diffusion(
                 experiment.tissue_mask,
                 experiment.technology,
                 experiment.dataset_id,
+                experiment.pixel_size_um,
                 os.path.join(plot_folder, "tissue.png"),
                 fill_alpha=0.1,
                 outline_width=1,
                 bounds=crop_rect,
-                pixel_size_um=experiment.pixel_size_um,
             )
 
         # Calculate tissue boundary against which we will calculate diffusion distances
@@ -514,10 +518,10 @@ def analyze_diffusion(
             plot_bin_gene_counts_and_contour(
                 gene_bin_data,
                 boundary,
+                os.path.join(plot_folder, f"counts_{gene_name}.png"),
+                experiment.pixel_size_um,
                 title,
-                output_path=os.path.join(plot_folder, f"counts_{gene_name}.png"),
                 dpi=600,
-                pixel_size_um=experiment.pixel_size_um,
             )
 
         # Calculate closest points on contour and distances
@@ -549,8 +553,6 @@ def analyze_diffusion(
             distance_output_path,
         )
 
-        # IMPORTANT FIXME: take number of transcripts in bin into account when analyzing diffusion distances!
-
         title = (
             f"{level}: bins and closest point on boundary\n"
             f"({xmin} ≤ x ≤ {xmax}, {ymin} ≤ y ≤ {ymax})"
@@ -575,7 +577,7 @@ def analyze_diffusion(
                 filtered,
                 os.path.join(plot_folder, "distances_linearized.png"),
                 title,
-                pixel_size_um=experiment.pixel_size_um,
+                experiment.pixel_size_um,
                 dpi=600,
             )
 
@@ -583,26 +585,26 @@ def analyze_diffusion(
             plot_distance_histogram(
                 filtered,
                 os.path.join(plot_folder, "histogram_px.png"),
+                experiment.pixel_size_um,
                 unit="px",
-                pixel_size_um=experiment.pixel_size_um,
             )
             plot_distance_histogram(
                 filtered,
                 os.path.join(plot_folder, "histogram_um.png"),
+                experiment.pixel_size_um,
                 unit="um",
-                pixel_size_um=experiment.pixel_size_um,
             )
 
         if plot_settings.boxplot:
             plot_distance_boxplot(
                 filtered,
                 os.path.join(plot_folder, "boxplot_px.png"),
+                experiment.pixel_size_um,
                 unit="px",
-                pixel_size_um=experiment.pixel_size_um,
             )
             plot_distance_boxplot(
                 filtered,
                 os.path.join(plot_folder, "boxplot_um.png"),
+                experiment.pixel_size_um,
                 unit="um",
-                pixel_size_um=experiment.pixel_size_um,
             )
