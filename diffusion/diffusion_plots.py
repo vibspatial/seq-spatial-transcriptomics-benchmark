@@ -526,8 +526,9 @@ def plot_shapely_geometries(
 
     ax.autoscale()
     ax.set_aspect("equal", adjustable="box")
-    ax.set_xlabel("x")
-    ax.set_ylabel("y")
+    ax.set_xlabel("x [px]")
+    ax.set_ylabel("y [px]")
+    ax.invert_yaxis()
     if title is not None:
         ax.set_title(title)
 
