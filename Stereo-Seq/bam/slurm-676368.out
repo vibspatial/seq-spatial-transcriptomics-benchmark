@@ -1,0 +1,49 @@
+Reading <SN>_raw_barcode_gene_exp.txt...
+Reading <SN>.raw.gem...
+Collapsed rows: 17,937,794
+Exploding rows by readCount...
+Rows after explosion: 43,057,840
+Adding 156,306,758 placeholder rows for missing reads...
+Final row count: 199,364,598 (should match FASTQ)
+
+Writing CSV to /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/psb/bam_output/preprocessed_reads.csv
+5,000,000 rows written: 4.98 min
+10,000,000 rows written: 9.57 min
+15,000,000 rows written: 14.15 min
+20,000,000 rows written: 18.7 min
+25,000,000 rows written: 23.2 min
+30,000,000 rows written: 27.7 min
+35,000,000 rows written: 32.21 min
+40,000,000 rows written: 36.72 min
+45,000,000 rows written: 41.22 min
+50,000,000 rows written: 45.74 min
+55,000,000 rows written: 50.26 min
+60,000,000 rows written: 54.77 min
+65,000,000 rows written: 59.28 min
+70,000,000 rows written: 63.78 min
+75,000,000 rows written: 68.29 min
+80,000,000 rows written: 72.81 min
+85,000,000 rows written: 77.33 min
+90,000,000 rows written: 81.84 min
+95,000,000 rows written: 86.35 min
+100,000,000 rows written: 90.86 min
+105,000,000 rows written: 95.37 min
+110,000,000 rows written: 99.89 min
+115,000,000 rows written: 104.43 min
+120,000,000 rows written: 108.97 min
+125,000,000 rows written: 113.48 min
+130,000,000 rows written: 117.99 min
+135,000,000 rows written: 122.5 min
+140,000,000 rows written: 127.01 min
+145,000,000 rows written: 131.52 min
+150,000,000 rows written: 136.03 min
+155,000,000 rows written: 140.54 min
+160,000,000 rows written: 145.05 min
+165,000,000 rows written: 149.57 min
+170,000,000 rows written: 154.08 min
+175,000,000 rows written: 158.59 min
+180,000,000 rows written: 163.1 min
+185,000,000 rows written: 167.6 min
+190,000,000 rows written: 172.11 min
+195,000,000 rows written: 176.62 min
+Done!

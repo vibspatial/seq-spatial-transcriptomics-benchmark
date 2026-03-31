@@ -1,0 +1,26 @@
+#!/bin/bash
+#SBATCH --job-name=psb_preprocess
+#SBATCH --partition=gp_64C_128T_512GB
+#SBATCH --nodes=1
+#SBATCH --ntasks-per-node=1
+#SBATCH --mem=500G
+#SBATCH --time=12:00:00
+
+source ~/.bashrc
+conda activate bamtools
+
+ID=psb
+SN=Y01632GE
+
+RAW_BARCODE_GENE_EXP="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/${ID}/SAW/${ID}/outs/feature_expression/${SN}_raw_barcode_gene_exp.txt"
+GEM="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/${ID}/SAW/${ID}/outs/feature_expression/${SN}.raw.gem"
+TISSUE_BARCODES_PATH="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/${ID}/harpy/barcodes_in_tissue.txt"
+OUTPUT_PATH="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Stereo-Seq/${ID}/bam_output/preprocessed_reads.csv"
+FASTQ_READ_COUNT=199364598
+
+python /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/scripts/2024-07-UTBenchmark-SpC/Stereo-Seq/bam/stereoseq_preprocess.py \
+  --raw_barcode_gene_exp_path "$RAW_BARCODE_GENE_EXP" \
+  --gem_path "$GEM" \
+  --tissue_barcodes_path "$TISSUE_BARCODES_PATH" \
+  --output_path "$OUTPUT_PATH" \
+  --fastq_read_count "$FASTQ_READ_COUNT"
