@@ -582,12 +582,12 @@ def analyze_diffusion(
             )
 
         if plot_settings.histogram:
-            plot_distance_histogram(
-                filtered,
-                os.path.join(plot_folder, "histogram_px.png"),
-                experiment.pixel_size_um,
-                unit="px",
-            )
+            # plot_distance_histogram(
+            #     filtered,
+            #     os.path.join(plot_folder, "histogram_px.png"),
+            #     experiment.pixel_size_um,
+            #     unit="px",
+            # )
             plot_distance_histogram(
                 filtered,
                 os.path.join(plot_folder, "histogram_um.png"),
@@ -596,12 +596,12 @@ def analyze_diffusion(
             )
 
         if plot_settings.boxplot:
-            plot_distance_boxplot(
-                filtered,
-                os.path.join(plot_folder, "boxplot_px.png"),
-                experiment.pixel_size_um,
-                unit="px",
-            )
+            # plot_distance_boxplot(
+            #     filtered,
+            #     os.path.join(plot_folder, "boxplot_px.png"),
+            #     experiment.pixel_size_um,
+            #     unit="px",
+            # )
             plot_distance_boxplot(
                 filtered,
                 os.path.join(plot_folder, "boxplot_um.png"),
