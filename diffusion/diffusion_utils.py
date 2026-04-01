@@ -17,9 +17,9 @@ from diffusion_plots import (
 )
 
 import shapely
-from shapely.geometry import Polygon, box
+from shapely.geometry import LineString, Point, Polygon
 from shapely.geometry.polygon import orient
-from shapely.ops import unary_union
+from shapely.ops import substring
 from shapely.geometry.base import BaseGeometry
 import spatialdata as sd
 import numpy as np
@@ -51,6 +51,145 @@ def signed_area(polygon: Polygon) -> float:
     for interior in oriented.interiors:
         area += _signed_ring_area(interior.coords)
     return area
+
+
+def _iter_lines(geometry: BaseGeometry):
+    if geometry is None or geometry.is_empty:
+        return
+    for part in shapely.get_parts(geometry):
+        if part.geom_type == "LineString":
+            yield part
+        elif part.geom_type == "LinearRing":
+            yield LineString(part.coords)
+
+
+def _shape_boundary_lines(geom: BaseGeometry) -> list[LineString]:
+    if geom is None or geom.is_empty:
+        return []
+    boundary = geom.boundary
+    if boundary is None or boundary.is_empty:
+        return []
+    return list(_iter_lines(boundary))
+
+
+def longest_shape_contour(
+    sdata,
+    shapes_layer: str,
+) -> LineString | None:
+    """Return the longest contour (LineString) from a shapes layer."""
+    gdf = sdata.shapes[shapes_layer]
+    if gdf.empty:
+        return None
+    lines = [line for geom in gdf.geometry for line in _shape_boundary_lines(geom)]
+    if not lines:
+        return None
+    return max(lines, key=lambda line: line.length)
+
+
+def _is_closed_linestring(line: LineString, atol: float = 1e-8) -> bool:
+    coords = np.asarray(line.coords, dtype=float)
+    return coords.shape[0] >= 2 and np.allclose(coords[0], coords[-1], atol=atol)
+
+
+def _project_point_to_line(point_xy: tuple[float, float], line: LineString) -> tuple[float, np.ndarray]:
+    p = Point(float(point_xy[0]), float(point_xy[1]))
+    d = float(shapely.line_locate_point(line, p, normalized=False))
+    snapped_geom = shapely.line_interpolate_point(line, d, normalized=False)
+    snapped_xy = np.asarray(shapely.get_coordinates(snapped_geom), dtype=float).reshape(-1, 2)[0]
+    return d, snapped_xy
+
+
+def _concatenate_lines(line_a: LineString, line_b: LineString) -> LineString:
+    coords_a = np.asarray(line_a.coords, dtype=float)
+    coords_b = np.asarray(line_b.coords, dtype=float)
+    if coords_a.shape[0] == 0:
+        return LineString(coords_b)
+    if coords_b.shape[0] == 0:
+        return LineString(coords_a)
+    if np.allclose(coords_a[-1], coords_b[0], atol=1e-8):
+        coords = np.vstack([coords_a, coords_b[1:]])
+    else:
+        coords = np.vstack([coords_a, coords_b])
+    return LineString(coords)
+
+
+def oriented_boundary_section(
+    contour: LineString,
+    start_distance: float,
+    end_distance: float,
+) -> LineString:
+    """
+    Extract boundary arc from start to end following the existing contour orientation.
+
+    For closed contours and end < start, the arc wraps around contour end.
+    """
+    length = float(contour.length)
+    if length <= 0:
+        raise ValueError("Contour length must be positive.")
+    if _is_closed_linestring(contour):
+        start_distance = float(start_distance % length)
+        end_distance = float(end_distance % length)
+        if np.isclose(start_distance, end_distance):
+            raise ValueError("Snapped start and end points are too close on the contour.")
+        if end_distance >= start_distance:
+            segment = substring(contour, start_distance, end_distance, normalized=False)
+            assert isinstance(segment, LineString)
+            return segment
+        tail = substring(contour, start_distance, length, normalized=False)
+        head = substring(contour, 0.0, end_distance, normalized=False)
+        assert isinstance(tail, LineString)
+        assert isinstance(head, LineString)
+        return _concatenate_lines(tail, head)
+
+    start_distance = float(np.clip(start_distance, 0.0, length))
+    end_distance = float(np.clip(end_distance, 0.0, length))
+    if np.isclose(start_distance, end_distance):
+        raise ValueError("Snapped start and end points are too close on the contour.")
+    if end_distance < start_distance:
+        raise ValueError(
+            "Open contour cannot wrap around. Ensure start precedes end in contour orientation."
+        )
+    segment = substring(contour, start_distance, end_distance, normalized=False)
+    assert isinstance(segment, LineString)
+    return segment
+
+
+@dataclass(frozen=True)
+class BoundarySectionGeometry:
+    approx_start_xy: np.ndarray
+    approx_end_xy: np.ndarray
+    snapped_start_xy: np.ndarray
+    snapped_end_xy: np.ndarray
+    boundary_section: LineString
+    thickened_section: BaseGeometry
+    crop_rect: tuple[float, float, float, float]
+
+
+def build_boundary_section_geometry(
+    contour: LineString,
+    approx_start_xy: tuple[float, float],
+    approx_end_xy: tuple[float, float],
+    max_distance_px: float,
+    crop_margin_px: float,
+) -> BoundarySectionGeometry:
+    start_d, snapped_start = _project_point_to_line(approx_start_xy, contour)
+    end_d, snapped_end = _project_point_to_line(approx_end_xy, contour)
+    section = oriented_boundary_section(contour, start_d, end_d)
+    thickened = section.buffer(float(max_distance_px), cap_style=1, join_style=1)
+    if thickened is None or thickened.is_empty:
+        raise ValueError("Failed to create thickened contour section.")
+    xmin, ymin, xmax, ymax = thickened.bounds
+    margin = float(crop_margin_px)
+    crop_rect = (xmin - margin, ymin - margin, xmax + margin, ymax + margin)
+    return BoundarySectionGeometry(
+        approx_start_xy=np.asarray(approx_start_xy, dtype=float),
+        approx_end_xy=np.asarray(approx_end_xy, dtype=float),
+        snapped_start_xy=snapped_start,
+        snapped_end_xy=snapped_end,
+        boundary_section=section,
+        thickened_section=thickened,
+        crop_rect=crop_rect,
+    )
 
 
 def print_geodataframe_geometry_info(sdata, tissue_mask: str | None) -> None:
@@ -100,93 +239,9 @@ def print_geodataframe_geometry_info(sdata, tissue_mask: str | None) -> None:
             print(f"  bbox unsigned area: {bbox_area}")
 
 
-def clip_polygon_to_bbox_lines(polygon, crop_rect):
-    """
-    Clip a polygon to a rectangle and return only the generated polylines,
-    excluding any parts that lie on the rectangle edges.
-
-    Returns a LineString or MultiLineString (or empty geometry).
-    """
-    xmin, ymin, xmax, ymax = crop_rect
-    bbox = box(xmin, ymin, xmax, ymax)
-
-    # Clip polygon
-    clipped = polygon.intersection(bbox)
-
-    if clipped.is_empty:
-        return clipped
-
-    # Extract boundary of clipped geometry
-    clipped_boundary = clipped.boundary
-
-    # Remove rectangle edges
-    result = clipped_boundary.difference(bbox.boundary)
-
-    return result
-
-
-def _cropped_shape_boundary(
-    geom: BaseGeometry,
-    crop_rect: tuple[float, float, float, float],
-) -> list[shapely.LineString]:
-    def _iter_lines_local(geometry: BaseGeometry):
-        if geometry.is_empty:
-            return
-        for part in shapely.get_parts(geometry):
-            if part.geom_type == "LineString":
-                yield part
-
-    bbox = box(*crop_rect)
-    if geom is None or geom.is_empty:
-        return []
-    if not geom.intersects(bbox):
-        return []
-
-    clipped = geom.intersection(bbox)
-    if clipped.is_empty:
-        return []
-
-    # Remove bbox edges so only interior polygon boundaries remain.
-    parts = list(shapely.get_parts(clipped))
-    poly_parts = [p for p in parts if p.geom_type in {"Polygon", "MultiPolygon"}]
-    if poly_parts:
-        boundary_geom = unary_union(poly_parts).boundary
-    else:
-        boundary_geom = clipped
-
-    if boundary_geom is None or boundary_geom.is_empty:
-        return []
-    boundary_geom = boundary_geom.difference(bbox.boundary)
-    if boundary_geom is None or boundary_geom.is_empty:
-        return []
-
-    return list(_iter_lines_local(boundary_geom))
-
-
-def longest_cropped_shape_contour(
-    sdata,
-    shapes_layer: str,
-    crop_rect: tuple[float, float, float, float],
-) -> shapely.LineString | None:
-    """
-    Return the longest clipped contour (LineString) from a shapes layer.
-
-    If no shape overlaps the crop rectangle, return None.
-    """
-    gdf = sdata.shapes[shapes_layer]
-    if gdf.empty:
-        return None
-
-    lines = [line for geom in gdf.geometry for line in _cropped_shape_boundary(geom, crop_rect)]
-
-    if not lines:
-        return None
-    return max(lines, key=lambda line: line.length)
-
-
 def signed_distance_to_linestring(
     points: np.ndarray,
-    line: shapely.LineString,
+    line: LineString,
     nearest_on_line: BaseGeometry | None = None,
     closest_xy: np.ndarray | None = None,
     along_distances: np.ndarray | None = None,
@@ -269,7 +324,7 @@ def signed_distance_to_linestring(
 
 def closest_points_and_distances(
     points: np.ndarray,  # bin centers
-    line: shapely.LineString,
+    line: LineString,
     use_signed_distances: bool = False,
 ) -> "DistanceData":
     print("Calculating distances to and along boundary contour...")
@@ -452,6 +507,7 @@ def analyze_diffusion(
     gene_name: str,
     plots_folder: str,
     max_distance_px: float = 400,
+    crop_margin_px: float = 0.0,
     use_signed_distances: bool = False,
     plot_settings: DiffusionPlotSettings | None = None,
 ) -> None:
@@ -462,11 +518,31 @@ def analyze_diffusion(
 
     sdata = sd.read_zarr(os.path.join(sdata_folder, experiment.sdata_path))
 
-    for crop_idx, crop_rect in enumerate(experiment.crop_rects):
-        print(f"Using crop rect: {crop_rect}")
+    if experiment.tissue_mask is None:
+        raise ValueError("tissue_mask must be set when using boundary_point_pairs.")
+    if not experiment.boundary_point_pairs:
+        raise ValueError(
+            f"No boundary_point_pairs provided for experiment {experiment.dataset_id!r}."
+        )
 
-        # Create a cropped spatial data
-        crop_rect = np.array(crop_rect)
+    contour = longest_shape_contour(sdata, experiment.tissue_mask)
+    if contour is None or contour.is_empty:
+        raise ValueError(f"No tissue contour found in shapes layer {experiment.tissue_mask!r}.")
+
+    for crop_idx, (approx_start, approx_end) in enumerate(experiment.boundary_point_pairs):
+        section = build_boundary_section_geometry(
+            contour=contour,
+            approx_start_xy=approx_start,
+            approx_end_xy=approx_end,
+            max_distance_px=max_distance_px,
+            crop_margin_px=crop_margin_px,
+        )
+        crop_rect = np.asarray(section.crop_rect, dtype=float)
+        print(
+            f"Using computed crop{crop_idx + 1} rect: "
+            f"{tuple(np.round(crop_rect, 3).tolist())}"
+        )
+
         sdata_crop = sdata.query.bounding_box(
             min_coordinate=crop_rect[:2],
             max_coordinate=crop_rect[2:],
@@ -483,7 +559,6 @@ def analyze_diffusion(
         )
         os.makedirs(plot_folder, exist_ok=True)
 
-        # Plot close-up of cropped area
         if plot_settings.tissue_outline and experiment.he_image:
             plot_tissue_outline_on_HE_image(
                 sdata_crop,
@@ -495,24 +570,25 @@ def analyze_diffusion(
                 os.path.join(plot_folder, "tissue.png"),
                 fill_alpha=0.1,
                 outline_width=1,
-                bounds=crop_rect,
+                bounds=tuple(crop_rect),
+                overlay_contour=section.boundary_section,
+                overlay_region=section.thickened_section,
+                approx_points=np.vstack([section.approx_start_xy, section.approx_end_xy]),
+                snapped_points=np.vstack([section.snapped_start_xy, section.snapped_end_xy]),
             )
 
-        # Calculate tissue boundary against which we will calculate diffusion distances
-        boundary = longest_cropped_shape_contour(sdata_crop, experiment.tissue_mask, crop_rect)
+        boundary = section.boundary_section
         if plot_settings.boundary:
-            # TODO? perhaps add title to plot
             plot_boundary_geoseries(
                 boundary,
                 output_path=os.path.join(plot_folder, "boundary.png"),
             )
 
         gene_bin_data = get_gene_bin_data(sdata_crop, level, gene_name)
-
         [xmin, ymin, xmax, ymax] = crop_rect
         title = (
             f"{experiment.dataset_id}_{level}: {gene_name} transcript counts per bin\n"
-            f"({xmin} ≤ x ≤ {xmax}, {ymin} ≤ y ≤ {ymax})"
+            f"({xmin:.1f} ≤ x ≤ {xmax:.1f}, {ymin:.1f} ≤ y ≤ {ymax:.1f})"
         )
         if plot_settings.bin_gene_counts:
             plot_bin_gene_counts_and_contour(
@@ -524,7 +600,6 @@ def analyze_diffusion(
                 dpi=600,
             )
 
-        # Calculate closest points on contour and distances
         distance_data = closest_points_and_distances(
             gene_bin_data.bin_centers,
             boundary,
@@ -535,29 +610,24 @@ def analyze_diffusion(
             gene_bins=gene_bin_data,
         )
 
-        # Keep only the bins that are within a certain maximum distance to the contour
-        filtered = filtered.filter(np.abs(filtered.distance_data.closest_distances) <= max_distance_px)
+        points_geom = shapely.points(filtered.gene_bins.bin_centers)
+        inside_thickened_mask = np.asarray(
+            shapely.covers(section.thickened_section, points_geom),
+            dtype=bool,
+        )
+        filtered = filtered.filter(inside_thickened_mask)
 
-        # Keep only the bins with at least one transcript of the gene of interest
+        # Numerical guard: keep expected max-distance neighborhood only.
+        filtered = filtered.filter(np.abs(filtered.distance_data.closest_distances) <= (max_distance_px + 1e-6))
+
         filtered = filtered.filter(filtered.gene_bins.transcript_counts > 0)
-        distance_output_folder = (
-            plot_folder
-        )
-        os.makedirs(distance_output_folder, exist_ok=True)
-        distance_output_path = os.path.join(
-            distance_output_folder,
-            "distances.csv",
-        )
-        save_filtered_diffusion_data(
-            filtered,
-            distance_output_path,
-        )
+        distance_output_path = os.path.join(plot_folder, "distances.csv")
+        save_filtered_diffusion_data(filtered, distance_output_path)
 
         title = (
             f"{level}: bins and closest point on boundary\n"
-            f"({xmin} ≤ x ≤ {xmax}, {ymin} ≤ y ≤ {ymax})"
+            f"({xmin:.1f} ≤ x ≤ {xmax:.1f}, {ymin:.1f} ≤ y ≤ {ymax:.1f})"
         )
-        # TODO: add gene name to title?
         if plot_settings.bins_and_closest_points:
             plot_bins_and_closest_points_on_contour(
                 filtered,
@@ -570,7 +640,7 @@ def analyze_diffusion(
 
         title = (
             f"{level}: bin distance to boundary vs position along boundary\n"
-            f"({xmin} ≤ x ≤ {xmax}, {ymin} ≤ y ≤ {ymax})"
+            f"({xmin:.1f} ≤ x ≤ {xmax:.1f}, {ymin:.1f} ≤ y ≤ {ymax:.1f})"
         )
         if plot_settings.distances_linearized:
             plot_distances_linearized(
@@ -582,12 +652,6 @@ def analyze_diffusion(
             )
 
         if plot_settings.histogram:
-            # plot_distance_histogram(
-            #     filtered,
-            #     os.path.join(plot_folder, "histogram_px.png"),
-            #     experiment.pixel_size_um,
-            #     unit="px",
-            # )
             plot_distance_histogram(
                 filtered,
                 os.path.join(plot_folder, "histogram_um.png"),
@@ -596,12 +660,6 @@ def analyze_diffusion(
             )
 
         if plot_settings.boxplot:
-            # plot_distance_boxplot(
-            #     filtered,
-            #     os.path.join(plot_folder, "boxplot_px.png"),
-            #     experiment.pixel_size_um,
-            #     unit="px",
-            # )
             plot_distance_boxplot(
                 filtered,
                 os.path.join(plot_folder, "boxplot_um.png"),
