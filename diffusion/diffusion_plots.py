@@ -169,6 +169,78 @@ def draw_labeled_rectangles(
         )
 
 
+def draw_boundary_section_overlays(
+    ax: plt.Axes,
+    overlay_region: BaseGeometry | None = None,
+    overlay_contour: BaseGeometry | None = None,
+    approx_points: np.ndarray | None = None,
+    snapped_points: np.ndarray | None = None,
+) -> None:
+    legend_handles = []
+    legend_labels = []
+
+    if overlay_region is not None and not overlay_region.is_empty:
+        region_artist = gpd.GeoSeries([overlay_region]).plot(
+            ax=ax,
+            facecolor="#ffd966",
+            edgecolor="#f39c12",
+            alpha=0.25,
+            linewidth=1.5,
+            zorder=6,
+        )
+        legend_handles.append(region_artist.collections[-1])
+        legend_labels.append("Thickened contour")
+
+    if overlay_contour is not None and not overlay_contour.is_empty:
+        contour_artist = gpd.GeoSeries([overlay_contour]).plot(
+            ax=ax,
+            color="#00e5ff",
+            linewidth=2.0,
+            zorder=7,
+        )
+        legend_handles.append(contour_artist.collections[-1])
+        legend_labels.append("Boundary section")
+
+    if approx_points is not None and approx_points.size > 0:
+        approx_points = np.asarray(approx_points, dtype=float).reshape(-1, 2)
+        h_approx = ax.scatter(
+            approx_points[:, 0],
+            approx_points[:, 1],
+            c="black",
+            marker="x",
+            s=45,
+            linewidths=1.6,
+            zorder=8,
+        )
+        legend_handles.append(h_approx)
+        legend_labels.append("Approx. points")
+
+    if snapped_points is not None and snapped_points.size > 0:
+        snapped_points = np.asarray(snapped_points, dtype=float).reshape(-1, 2)
+        h_snapped = ax.scatter(
+            snapped_points[:, 0],
+            snapped_points[:, 1],
+            c="#ff00aa",
+            marker="o",
+            s=28,
+            edgecolors="black",
+            linewidths=0.7,
+            zorder=9,
+        )
+        legend_handles.append(h_snapped)
+        legend_labels.append("Snapped points")
+
+    if legend_handles:
+        ax.legend(
+            legend_handles,
+            legend_labels,
+            loc="upper right",
+            fontsize=8,
+            frameon=True,
+            facecolor="white",
+        )
+
+
 def plot_bins_colored_by_feature(
     sdata,
     HE_image: str | None,
@@ -250,6 +322,10 @@ def plot_tissue_outline_on_HE_image(
     outline_width=5,
     bounds: tuple[float, float, float, float] | None = None,
     rectangles: list[tuple[float, float, float, float]] | None = None,
+    overlay_region: BaseGeometry | None = None,
+    overlay_contour: BaseGeometry | None = None,
+    approx_points: np.ndarray | None = None,
+    snapped_points: np.ndarray | None = None,
 ):
     # Plot H&E image with tissue outline on top.
     # Optionally restrict the plot to bounds = (xmin, ymin, xmax, ymax).
@@ -259,7 +335,7 @@ def plot_tissue_outline_on_HE_image(
     title = f"{technology} {dataset_id}: H&E with tissue outline"
     if bounds is not None:
         xmin, ymin, xmax, ymax = bounds
-        title = f"{title}\n({xmin} ≤ x ≤ {xmax}, {ymin} ≤ y ≤ {ymax})"
+        title = f"{title}\n({xmin:.1f} ≤ x ≤ {xmax:.1f}, {ymin:.1f} ≤ y ≤ {ymax:.1f})"
 
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
 
@@ -291,6 +367,13 @@ def plot_tissue_outline_on_HE_image(
     bar_px = bar_um / pixel_size_um
     add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
     draw_labeled_rectangles(ax=ax, rectangles=rectangles)
+    draw_boundary_section_overlays(
+        ax=ax,
+        overlay_region=overlay_region,
+        overlay_contour=overlay_contour,
+        approx_points=approx_points,
+        snapped_points=snapped_points,
+    )
 
     save_or_show_figure(fig, output_path)
 
@@ -412,7 +495,6 @@ def _add_polygon_orientation_arrows(
         simplified_ring = simplified_ring[:-1]
     if simplified_ring.shape[0] < 3:
         simplified_ring = ring
-    is_simplified_ccw = _ring_signed_area(simplified_ring) > 0.0
 
     seg_starts = ring
     seg_ends = np.vstack([ring[1:], ring[0]])
@@ -459,7 +541,11 @@ def _add_polygon_orientation_arrows(
         if simp_len[simp_seg_idx] <= 0:
             continue
         direction = simp_vec[simp_seg_idx] / simp_len[simp_seg_idx]
-        if not is_simplified_ccw:
+
+        # Ensure arrows follow the traversal direction of the original exterior ring
+        # (from the first point through subsequent vertices), regardless of CW/CCW orientation.
+        local_direction = seg_vec[seg_idx] / seg_len[seg_idx]
+        if float(np.dot(direction, local_direction)) < 0.0:
             direction = -direction
 
         start = p0 - 0.5 * arrow_length * direction
