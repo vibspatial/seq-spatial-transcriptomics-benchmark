@@ -45,14 +45,9 @@ class DiffusionPlotSettings:
 @dataclass(frozen=True)
 class DistanceHistogramHWHM:
     label: str
-    peak_position_um: float
-    peak_count: float
-    half_max_count: float
-    left_half_max_um: float
-    right_half_max_um: float
     left_hwhm_um: float
     right_hwhm_um: float
-    bin_width_um: float
+    peak_position_um: float
 
 
 def get_image_figure_parameters(sdata, HE_image, dpi=200, max_dim_for_plots=10000):
@@ -943,7 +938,7 @@ def _linear_interpolate_x_at_y(
 def _find_hwhm_from_histogram(
     centers: np.ndarray,
     counts: np.ndarray,
-) -> tuple[float, float, float, float, float]:
+) -> tuple[float, float, float]:
     """
     Compute half-width at half-maximum (HWHM) on both sides of a histogram peak.
 
@@ -970,11 +965,9 @@ def _find_hwhm_from_histogram(
 
     Returns
     -------
-    tuple[float, float, float, float, float]
-        `(peak_x, peak_count, half_max, left_hwhm, right_hwhm)`, where:
+    tuple[float, float, float]
+        `(peak_x, left_hwhm, right_hwhm)`, where:
         - `peak_x` is the peak x-position as defined above,
-        - `peak_count` is the global maximum histogram value,
-        - `half_max` is half of `peak_count`,
         - `left_hwhm` is `peak_x - left_halfmax_x` (or `np.nan` if not found),
         - `right_hwhm` is `right_halfmax_x - peak_x` (or `np.nan` if not found).
     """
@@ -1025,7 +1018,7 @@ def _find_hwhm_from_histogram(
 
     left_hwhm = float(peak_x - left_x) if np.isfinite(left_x) else np.nan
     right_hwhm = float(right_x - peak_x) if np.isfinite(right_x) else np.nan
-    return peak_x, peak_count, half_max, left_hwhm, right_hwhm
+    return peak_x, left_hwhm, right_hwhm
 
 
 def calculate_distance_histogram_hwhm(
@@ -1051,18 +1044,13 @@ def calculate_distance_histogram_hwhm(
         bin_counts, bin_edges = np.histogram(distances_um, bins=bins, weights=weights, density=density)
         bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
 
-        peak_x, peak_count, half_max, left_hwhm, right_hwhm = _find_hwhm_from_histogram(bin_centers, bin_counts)
+        peak_x, left_hwhm, right_hwhm = _find_hwhm_from_histogram(bin_centers, bin_counts)
         rows.append(
             DistanceHistogramHWHM(
                 label=label,
-                peak_position_um=peak_x,
-                peak_count=peak_count,
-                half_max_count=half_max,
-                left_half_max_um=peak_x - left_hwhm if np.isfinite(left_hwhm) else np.nan,
-                right_half_max_um=peak_x + right_hwhm if np.isfinite(right_hwhm) else np.nan,
                 left_hwhm_um=left_hwhm,
                 right_hwhm_um=right_hwhm,
-                bin_width_um=float(bin_width_um),
+                peak_position_um=peak_x,
             )
         )
 
