@@ -1103,6 +1103,7 @@ def plot_distance_histogram_hwhm_bars(
 
     ax.set_yticks(y)
     ax.set_yticklabels(labels, fontsize=8)
+    ax.invert_yaxis()
     ax.set_xlabel(f"HWHM [{MICROMETER_UNIT}]")
     ax.set_ylabel("Experiment crop")
     ax.set_title(title or "Distance histogram half-width at half-maximum")

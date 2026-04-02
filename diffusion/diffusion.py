@@ -11,7 +11,6 @@ class LevelInfo:
 @dataclass(frozen=True)
 class Experiment:
     technology: str  # spatial omics technology used to analyze sample
-    species: str  # species of sample
     tissue: str  # tissue type of sample
     dataset_id: str  # shorthand ID of dataset
     sdata_path: str  # relative path to (subsetted) SpatialData zarr with analysis output
