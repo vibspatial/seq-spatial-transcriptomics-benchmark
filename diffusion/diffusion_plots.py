@@ -885,7 +885,7 @@ def _read_crop_distance_data(
 
             distances_um = np.asarray(distances_px, dtype=float) * pixel_size_um
             counts = np.asarray(transcript_counts, dtype=float)
-            label = f"{technology}, {dataset_id}, {crop_name}"
+            label = f"{technology}, {crop_name}"
             data_per_label.append((label, distances_um, counts))
 
     if len(data_per_label) == 0:
@@ -1092,8 +1092,8 @@ def plot_distance_histogram_hwhm_bars(
 
     y = np.arange(len(labels))
     fig, ax = plt.subplots(figsize=figsize)
-    ax.barh(y, -left_hwhm, color="#4e79a7", alpha=0.9, label="Left HWHM")
-    ax.barh(y, right_hwhm, color="#e15759", alpha=0.9, label="Right HWHM")
+    ax.barh(y, -left_hwhm, color="#4e79a7", alpha=0.9, label="Inside")
+    ax.barh(y, right_hwhm, color="#e15759", alpha=0.9, label="Outside")
 
     max_abs = float(np.max(np.concatenate([left_hwhm, right_hwhm])))
     margin = max(0.5, 0.1 * max_abs)
@@ -1105,7 +1105,6 @@ def plot_distance_histogram_hwhm_bars(
     ax.set_yticklabels(labels, fontsize=8)
     ax.invert_yaxis()
     ax.set_xlabel(f"HWHM [{MICROMETER_UNIT}]")
-    ax.set_ylabel("Experiment crop")
     ax.set_title(title or "Distance histogram half-width at half-maximum")
     ax.legend(loc="lower right")
 
