@@ -42,6 +42,19 @@ class DiffusionPlotSettings:
     boxplot: bool = True
 
 
+@dataclass(frozen=True)
+class DistanceHistogramHWHM:
+    label: str
+    peak_position_um: float
+    peak_count: float
+    half_max_count: float
+    left_half_max_um: float
+    right_half_max_um: float
+    left_hwhm_um: float
+    right_hwhm_um: float
+    bin_width_um: float
+
+
 def get_image_figure_parameters(sdata, HE_image, dpi=200, max_dim_for_plots=10000):
     assert isinstance(
         sdata[HE_image], xr.DataTree
@@ -912,6 +925,202 @@ def _distance_hist_curves(
             centers = centers - centers[peak_idx]
         curves.append((label, centers, counts))
     return curves
+
+
+def _linear_interpolate_x_at_y(
+    x0: float,
+    y0: float,
+    x1: float,
+    y1: float,
+    target_y: float,
+) -> float:
+    if np.isclose(y1, y0):
+        return 0.5 * (x0 + x1)
+    t = (target_y - y0) / (y1 - y0)
+    return x0 + t * (x1 - x0)
+
+
+def _find_hwhm_from_histogram(
+    centers: np.ndarray,
+    counts: np.ndarray,
+) -> tuple[float, float, float, float, float]:
+    """
+    Compute half-width at half-maximum (HWHM) on both sides of a histogram peak.
+
+    The peak height is defined as the global maximum of `counts`. Half-maximum is
+    `0.5 * peak_count`. Peak bins are identified as all bins whose value is
+    `np.isclose` to the global maximum.
+
+    If multiple bins share the maximum:
+    - `peak_left_idx` is the first (leftmost) max bin index.
+    - `peak_right_idx` is the last (rightmost) max bin index.
+    - `peak_x` is the mean of the corresponding peak-bin centers.
+
+    Left and right half-maximum crossing positions are found by scanning outward
+    from the peak edges and taking the first interval that brackets `half_max`.
+    Crossing x-coordinates are linearly interpolated between neighboring bin centers.
+    If no crossing exists on a side, that side's HWHM is returned as `np.nan`.
+
+    Parameters
+    ----------
+    centers : np.ndarray
+        1D array of histogram bin centers (x positions).
+    counts : np.ndarray
+        1D array of histogram values at `centers` (same length as `centers`).
+
+    Returns
+    -------
+    tuple[float, float, float, float, float]
+        `(peak_x, peak_count, half_max, left_hwhm, right_hwhm)`, where:
+        - `peak_x` is the peak x-position as defined above,
+        - `peak_count` is the global maximum histogram value,
+        - `half_max` is half of `peak_count`,
+        - `left_hwhm` is `peak_x - left_halfmax_x` (or `np.nan` if not found),
+        - `right_hwhm` is `right_halfmax_x - peak_x` (or `np.nan` if not found).
+    """
+    if centers.ndim != 1 or counts.ndim != 1 or centers.size != counts.size:
+        raise ValueError("centers and counts must be 1D arrays with equal length.")
+    if centers.size == 0:
+        raise ValueError("Histogram must contain at least one bin.")
+
+    peak_count = float(np.max(counts))
+    if not np.isfinite(peak_count) or peak_count <= 0:
+        raise ValueError("Histogram peak must be finite and positive.")
+    half_max = 0.5 * peak_count
+
+    peak_indices = np.flatnonzero(np.isclose(counts, peak_count))
+    if peak_indices.size == 0:
+        raise ValueError("No peak index found in histogram.")
+    peak_left_idx = int(peak_indices[0])
+    peak_right_idx = int(peak_indices[-1])
+    peak_x = float(np.mean(centers[peak_indices]))
+
+    left_x = np.nan
+    for i in range(peak_left_idx - 1, -1, -1):
+        if counts[i] <= half_max <= counts[i + 1]:
+            left_x = float(
+                _linear_interpolate_x_at_y(
+                    float(centers[i]),
+                    float(counts[i]),
+                    float(centers[i + 1]),
+                    float(counts[i + 1]),
+                    half_max,
+                )
+            )
+            break
+
+    right_x = np.nan
+    for i in range(peak_right_idx + 1, counts.size):
+        if counts[i] <= half_max <= counts[i - 1]:
+            right_x = float(
+                _linear_interpolate_x_at_y(
+                    float(centers[i - 1]),
+                    float(counts[i - 1]),
+                    float(centers[i]),
+                    float(counts[i]),
+                    half_max,
+                )
+            )
+            break
+
+    left_hwhm = float(peak_x - left_x) if np.isfinite(left_x) else np.nan
+    right_hwhm = float(right_x - peak_x) if np.isfinite(right_x) else np.nan
+    return peak_x, peak_count, half_max, left_hwhm, right_hwhm
+
+
+def calculate_distance_histogram_hwhm(
+    crop_specs: list[tuple[str, str, float, str]],
+    plots_root: str,
+    bin_width_um: float = 5.0,
+    density: bool = False,
+) -> list[DistanceHistogramHWHM]:
+    """
+    Calculate left/right HWHM from weighted distance histograms for each crop.
+
+    Each entry in crop_specs is (technology, dataset_id, pixel_size_um, crop_name).
+    """
+    if bin_width_um <= 0:
+        raise ValueError("bin_width_um must be positive.")
+
+    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
+    rows: list[DistanceHistogramHWHM] = []
+
+    for label, distances_um, weights in data_per_label:
+        distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
+        bins = _distance_hist_bins([(label, distances_um, weights)], bin_width=bin_width_um)
+        bin_counts, bin_edges = np.histogram(distances_um, bins=bins, weights=weights, density=density)
+        bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
+
+        peak_x, peak_count, half_max, left_hwhm, right_hwhm = _find_hwhm_from_histogram(bin_centers, bin_counts)
+        rows.append(
+            DistanceHistogramHWHM(
+                label=label,
+                peak_position_um=peak_x,
+                peak_count=peak_count,
+                half_max_count=half_max,
+                left_half_max_um=peak_x - left_hwhm if np.isfinite(left_hwhm) else np.nan,
+                right_half_max_um=peak_x + right_hwhm if np.isfinite(right_hwhm) else np.nan,
+                left_hwhm_um=left_hwhm,
+                right_hwhm_um=right_hwhm,
+                bin_width_um=float(bin_width_um),
+            )
+        )
+
+    return rows
+
+
+def plot_distance_histogram_hwhm_bars(
+    hwhm_rows: list[DistanceHistogramHWHM],
+    output_path: str,
+    title: str | None = None,
+    figsize: tuple[float, float] | None = None,
+) -> None:
+    """
+    Plot left/right HWHM per crop as bidirectional horizontal bars.
+
+    Left HWHM is drawn towards negative x; right HWHM towards positive x.
+    """
+    if len(hwhm_rows) == 0:
+        raise ValueError("hwhm_rows must contain at least one row.")
+
+    labels = [row.label for row in hwhm_rows]
+    left_hwhm = np.asarray([row.left_hwhm_um for row in hwhm_rows], dtype=float)
+    right_hwhm = np.asarray([row.right_hwhm_um for row in hwhm_rows], dtype=float)
+    valid = np.isfinite(left_hwhm) & np.isfinite(right_hwhm) & (left_hwhm >= 0) & (right_hwhm >= 0)
+    if not np.any(valid):
+        raise ValueError("No finite non-negative left/right HWHM pairs available to plot.")
+
+    dropped = int(np.sum(~valid))
+    if dropped > 0:
+        print(f"Dropping {dropped} rows with invalid HWHM values before plotting.")
+
+    keep_idx = np.flatnonzero(valid)
+    labels = [labels[i] for i in keep_idx]
+    left_hwhm = left_hwhm[keep_idx]
+    right_hwhm = right_hwhm[keep_idx]
+
+    if figsize is None:
+        figsize = (12, max(4.5, 0.45 * len(labels) + 1.5))
+
+    y = np.arange(len(labels))
+    fig, ax = plt.subplots(figsize=figsize)
+    ax.barh(y, -left_hwhm, color="#4e79a7", alpha=0.9, label="Left HWHM")
+    ax.barh(y, right_hwhm, color="#e15759", alpha=0.9, label="Right HWHM")
+
+    max_abs = float(np.max(np.concatenate([left_hwhm, right_hwhm])))
+    margin = max(0.5, 0.1 * max_abs)
+    ax.set_xlim(-(max_abs + margin), max_abs + margin)
+    ax.axvline(0.0, color="black", linewidth=1, linestyle=":", zorder=3)
+    ax.grid(axis="x", alpha=0.25)
+
+    ax.set_yticks(y)
+    ax.set_yticklabels(labels, fontsize=8)
+    ax.set_xlabel(f"HWHM [{MICROMETER_UNIT}]")
+    ax.set_ylabel("Experiment crop")
+    ax.set_title(title or "Distance histogram half-width at half-maximum")
+    ax.legend(loc="lower right")
+
+    save_or_show_figure(fig, output_path)
 
 
 def plot_distance_boxplot(
