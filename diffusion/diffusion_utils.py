@@ -175,7 +175,7 @@ def build_boundary_section_geometry(
     start_d, snapped_start = _project_point_to_line(approx_start_xy, contour)
     end_d, snapped_end = _project_point_to_line(approx_end_xy, contour)
     section = oriented_boundary_section(contour, start_d, end_d)
-    thickened = section.buffer(float(max_distance_px), cap_style=1, join_style=1)
+    thickened = section.buffer(float(max_distance_px), cap_style="round", join_style="round")
     if thickened is None or thickened.is_empty:
         raise ValueError("Failed to create thickened contour section.")
     xmin, ymin, xmax, ymax = thickened.bounds
