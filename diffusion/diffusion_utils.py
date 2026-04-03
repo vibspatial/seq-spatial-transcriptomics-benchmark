@@ -577,32 +577,26 @@ def analyze_diffusion(
                 snapped_points=np.vstack([section.snapped_start_xy, section.snapped_end_xy]),
             )
 
-        boundary = section.boundary_section
         if plot_settings.boundary:
             plot_boundary_geoseries(
-                boundary,
+                section.boundary_section,
                 output_path=os.path.join(plot_folder, "boundary.png"),
             )
 
         gene_bin_data = get_gene_bin_data(sdata_crop, level, gene_name)
-        [xmin, ymin, xmax, ymax] = crop_rect
-        title = (
-            f"{experiment.dataset_id}_{level}: {gene_name} transcript counts per bin\n"
-            f"({xmin:.1f} ≤ x ≤ {xmax:.1f}, {ymin:.1f} ≤ y ≤ {ymax:.1f})"
-        )
         if plot_settings.bin_gene_counts:
             plot_bin_gene_counts_and_contour(
                 gene_bin_data,
-                boundary,
+                section.boundary_section,
                 os.path.join(plot_folder, f"counts_{gene_name}.png"),
                 experiment.pixel_size_um,
-                title,
+                f"{experiment.technology}\n{gene_name} transcript counts per bin\n",
                 dpi=600,
             )
 
         distance_data = closest_points_and_distances(
             gene_bin_data.bin_centers,
-            boundary,
+            section.boundary_section,
             use_signed_distances=use_signed_distances,
         )
         filtered = DiffusionBinData(
@@ -624,29 +618,21 @@ def analyze_diffusion(
         distance_output_path = os.path.join(plot_folder, "distances.csv")
         save_filtered_diffusion_data(filtered, distance_output_path)
 
-        title = (
-            f"{level}: bins and closest point on boundary\n"
-            f"({xmin:.1f} ≤ x ≤ {xmax:.1f}, {ymin:.1f} ≤ y ≤ {ymax:.1f})"
-        )
         if plot_settings.bins_and_closest_points:
             plot_bins_and_closest_points_on_contour(
                 filtered,
-                boundary,
+                section.boundary_section,
                 os.path.join(plot_folder, "bins_closest_point_on_boundary.png"),
-                title,
+                f"{experiment.technology}\nBins and closest point on boundary\n",
                 line_width=0.5,
                 dpi=600,
             )
 
-        title = (
-            f"{level}: bin distance to boundary vs position along boundary\n"
-            f"({xmin:.1f} ≤ x ≤ {xmax:.1f}, {ymin:.1f} ≤ y ≤ {ymax:.1f})"
-        )
         if plot_settings.distances_linearized:
             plot_distances_linearized(
                 filtered,
                 os.path.join(plot_folder, "distances_linearized.png"),
-                title,
+                f"{experiment.technology}\nBin distance to boundary vs position along boundary\n",
                 experiment.pixel_size_um,
                 dpi=600,
             )
