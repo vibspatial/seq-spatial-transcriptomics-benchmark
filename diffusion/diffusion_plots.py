@@ -340,10 +340,7 @@ def plot_tissue_outline_on_HE_image(
 
     best_scale, dpi, _, figsize = get_image_figure_parameters(sdata, HE_image)
 
-    title = f"{technology} {dataset_id}: H&E with tissue outline"
-    if bounds is not None:
-        xmin, ymin, xmax, ymax = bounds
-        title = f"{title}\n({xmin:.1f} ≤ x ≤ {xmax:.1f}, {ymin:.1f} ≤ y ≤ {ymax:.1f})"
+    title = f"{technology}\nH&E with tissue outline"
 
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
 
