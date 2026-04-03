@@ -407,6 +407,22 @@ def closest_points_and_distances(
     )
 
 
+def mask_excluding_contour_endpoint_closest_points(
+    closest_xy: np.ndarray,
+    contour: LineString,
+    atol: float = 1e-8,
+) -> np.ndarray:
+    """
+    Avoid edge artifact: keep only points whose closest contour point is not the first/last contour coordinate.
+    """
+    boundary_coords = np.asarray(contour.coords, dtype=float)
+    boundary_start = boundary_coords[0]
+    boundary_end = boundary_coords[-1]
+    closest_is_start = np.all(np.isclose(closest_xy, boundary_start, atol=atol), axis=1)
+    closest_is_end = np.all(np.isclose(closest_xy, boundary_end, atol=atol), axis=1)
+    return ~(closest_is_start | closest_is_end)
+
+
 def get_experiment_by_id(experiments: list[Experiment], dataset_id: str) -> Experiment | None:
     for experiment in experiments:
         if experiment.dataset_id == dataset_id:
@@ -619,6 +635,13 @@ def analyze_diffusion(
         filtered = filtered.filter(np.abs(filtered.distance_data.closest_distances) <= (max_distance_px + 1e-6))
 
         filtered = filtered.filter(filtered.gene_bins.transcript_counts > 0)
+
+        endpoint_mask = mask_excluding_contour_endpoint_closest_points(
+            filtered.distance_data.closest_xy,
+            section.boundary_section,
+        )
+        filtered = filtered.filter(endpoint_mask)
+
         distance_output_path = os.path.join(plot_folder, "distances.csv")
         save_filtered_diffusion_data(filtered, distance_output_path)
 
