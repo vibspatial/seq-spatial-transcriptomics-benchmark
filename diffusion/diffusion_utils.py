@@ -338,17 +338,21 @@ def closest_points_and_distances(
     points_geom = shapely.points(points_xy)
     t_points_geom = perf_counter() - t0
 
+    print("  Stage: nearest points (started)")
     t0 = perf_counter()
     _, nearest_on_line = shapely.ops.nearest_points(points_geom, line)
     t_nearest = perf_counter() - t0
+    print("  Stage: nearest points (done)")
 
     t0 = perf_counter()
     closest_xy: np.ndarray = shapely.get_coordinates(nearest_on_line)
     t_get_coords = perf_counter() - t0
     if use_signed_distances:
+        print("  Stage: distance along curve (started)")
         t0 = perf_counter()
         along_distances_abs = shapely.line_locate_point(line, nearest_on_line, normalized=False)
         t_along_abs = perf_counter() - t0
+        print("  Stage: distance along curve (done)")
 
         t0 = perf_counter()
         distances = signed_distance_to_linestring(
