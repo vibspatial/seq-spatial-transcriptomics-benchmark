@@ -634,21 +634,28 @@ def plot_bin_gene_counts_and_contour(
     title: str,
     figsize=(10, 10),
     line_width=1,
-    marker_size=20,
+    marker_size=0.5,
     dpi: int | None = None,
 ) -> None:
-    # Plot the bin centers, colored by the number of transcripts detected in that bin,
-    # together with a given contour over it.
+    """Scatter plot non-zero gene bin counts, overlaid with the given contour."""
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
     ax.set_title(title)
+    counts = np.asarray(gene_bin_data.transcript_counts)
+    nonzero_mask = counts > 0
     sc = ax.scatter(
-        gene_bin_data.bin_centers[:, 0],
-        gene_bin_data.bin_centers[:, 1],
-        c=gene_bin_data.transcript_counts,
+        gene_bin_data.bin_centers[nonzero_mask, 0],
+        gene_bin_data.bin_centers[nonzero_mask, 1],
+        c=counts[nonzero_mask],
         s=marker_size,
+        marker="o",
+        linewidths=0,
+        edgecolors="none",
     )
-    cbar = fig.colorbar(sc, ax=ax, shrink=0.4)
-    cbar.set_label("Counts")
+
+    if np.any(nonzero_mask):
+        cbar = fig.colorbar(sc, ax=ax, shrink=0.4)
+        cbar.set_label("Counts")
+
     gpd.GeoSeries([contour]).plot(
         ax=ax,
         color="red",
