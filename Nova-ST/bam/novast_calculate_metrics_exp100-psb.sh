@@ -12,7 +12,7 @@ conda activate bamtools
 INPUT_PATH="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Nova-ST/Exp100-samplePSB/bam_output/preprocessed_reads.csv"
 TISSUE_BARCODES_PATH="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Nova-ST/Exp100-samplePSB/harpy/barcodes_in_tissue.txt"
 OUTPUT_DIR="/data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/data/processed/Nova-ST/Exp100-samplePSB/bam_output/output_metrics"
-TISSUE_AREA=80.12
+TISSUE_AREA=0.45
 STEP_SIZE=10000000
 
 python /data/groups/technologies/spatial.catalyst/Projects/2024-07-UTBenchmark-SpC/scripts/2024-07-UTBenchmark-SpC/Nova-ST/bam/novast_calculate_metrics.py \
