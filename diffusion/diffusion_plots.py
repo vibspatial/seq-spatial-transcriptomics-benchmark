@@ -184,12 +184,10 @@ def draw_boundary_section_overlays(
     overlay_contour: BaseGeometry | None = None,
     approx_points: np.ndarray | None = None,
     snapped_points: np.ndarray | None = None,
+    show_approx_points: bool = False,
 ) -> None:
-    legend_handles = []
-    legend_labels = []
-
     if overlay_region is not None and not overlay_region.is_empty:
-        region_artist = gpd.GeoSeries([overlay_region]).plot(
+        gpd.GeoSeries([overlay_region]).plot(
             ax=ax,
             facecolor="#ffd966",
             edgecolor="#f39c12",
@@ -197,22 +195,18 @@ def draw_boundary_section_overlays(
             linewidth=1.5,
             zorder=6,
         )
-        legend_handles.append(region_artist.collections[-1])
-        legend_labels.append("Thickened contour")
 
     if overlay_contour is not None and not overlay_contour.is_empty:
-        contour_artist = gpd.GeoSeries([overlay_contour]).plot(
+        gpd.GeoSeries([overlay_contour]).plot(
             ax=ax,
-            color="#00e5ff",
+            color="red",
             linewidth=2.0,
             zorder=7,
         )
-        legend_handles.append(contour_artist.collections[-1])
-        legend_labels.append("Boundary section")
 
-    if approx_points is not None and approx_points.size > 0:
+    if show_approx_points and approx_points is not None and approx_points.size > 0:
         approx_points = np.asarray(approx_points, dtype=float).reshape(-1, 2)
-        h_approx = ax.scatter(
+        ax.scatter(
             approx_points[:, 0],
             approx_points[:, 1],
             c="black",
@@ -221,12 +215,10 @@ def draw_boundary_section_overlays(
             linewidths=1.6,
             zorder=8,
         )
-        legend_handles.append(h_approx)
-        legend_labels.append("Approx. points")
 
     if snapped_points is not None and snapped_points.size > 0:
         snapped_points = np.asarray(snapped_points, dtype=float).reshape(-1, 2)
-        h_snapped = ax.scatter(
+        ax.scatter(
             snapped_points[:, 0],
             snapped_points[:, 1],
             c="#ff00aa",
@@ -235,18 +227,6 @@ def draw_boundary_section_overlays(
             edgecolors="black",
             linewidths=0.7,
             zorder=9,
-        )
-        legend_handles.append(h_snapped)
-        legend_labels.append("Snapped points")
-
-    if legend_handles:
-        ax.legend(
-            legend_handles,
-            legend_labels,
-            loc="upper right",
-            fontsize=8,
-            frameon=True,
-            facecolor="white",
         )
 
 
@@ -335,13 +315,14 @@ def plot_tissue_outline_on_HE_image(
     overlay_contour: BaseGeometry | None = None,
     approx_points: np.ndarray | None = None,
     snapped_points: np.ndarray | None = None,
+    show_approx_points: bool = False,
 ):
     # Plot H&E image with tissue outline on top.
     # Optionally restrict the plot to bounds = (xmin, ymin, xmax, ymax).
 
     best_scale, dpi, _, figsize = get_image_figure_parameters(sdata, HE_image)
 
-    title = f"{technology}\nH&E with tissue outline"
+    title = f"{technology}\nH&E with tissue boundary section"
 
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
 
@@ -350,7 +331,7 @@ def plot_tissue_outline_on_HE_image(
         color="#1f77b4",
         fill_alpha=fill_alpha,
         outline_width=outline_width,
-        outline_alpha=1,
+        outline_alpha=0,
         outline_color="red",
     ).pl.show(
         coordinate_systems=dataset_id,
@@ -379,6 +360,7 @@ def plot_tissue_outline_on_HE_image(
         overlay_contour=overlay_contour,
         approx_points=approx_points,
         snapped_points=snapped_points,
+        show_approx_points=show_approx_points,
     )
 
     save_or_show_figure(fig, output_path)
