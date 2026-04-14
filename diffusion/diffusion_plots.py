@@ -13,6 +13,7 @@ import xarray as xr
 from matplotlib import font_manager as fm
 from matplotlib.collections import LineCollection
 from matplotlib.colors import LogNorm
+from matplotlib.lines import Line2D
 from matplotlib.path import Path
 from matplotlib.patches import Rectangle
 from matplotlib.patches import PathPatch
@@ -684,32 +685,57 @@ def plot_bins_and_closest_points_on_contour(
 ):
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
 
-    # Plot the bin centers
-    ax.scatter(
+    # Plot bin centers colored by transcript count (same style as linearized-distance plot).
+    counts = np.asarray(data.gene_bins.transcript_counts, dtype=float)
+    positive_counts = counts[counts > 0]
+    norm = None
+    if positive_counts.size > 0:
+        norm = LogNorm(vmin=float(np.min(positive_counts)), vmax=float(np.max(positive_counts)))
+
+    sc = ax.scatter(
         data.gene_bins.bin_centers[:, 0],
         data.gene_bins.bin_centers[:, 1],
-        c="blue",
-        s=1,
-        label="Bin centers",
+        c=counts,
+        cmap="viridis",
+        norm=norm,
+        s=1
     )
+    line_colors = sc.to_rgba(counts)
+    cbar = fig.colorbar(sc, ax=ax, shrink=0.85, pad=0.02)
+    cbar.set_label("Transcript count per bin")
 
-    # Line segments connecting each bin to its closest point on the contour
+    # Line segments connecting each bin to its closest point on the contour.
+    # Negative signed distance: outside tissue (dotted). Positive/zero: inside/on boundary (solid).
     segments = np.stack([data.gene_bins.bin_centers, data.distance_data.closest_xy], axis=1)
-    lc = LineCollection(
-        segments,
-        array=data.distance_data.closest_distances,  # color line by distance
-        linewidths=line_width,
-    )
-    ax.add_collection(lc)
+    distances = np.asarray(data.distance_data.closest_distances, dtype=float)
+    neg_mask = distances < 0
+    pos_mask = distances >= 0
+
+    if np.any(neg_mask):
+        ax.add_collection(
+            LineCollection(
+                segments[neg_mask],
+                colors=line_colors[neg_mask],
+                linestyles=":",
+                capstyle="round",
+                linewidths=line_width,
+            )
+        )
+    if np.any(pos_mask):
+        ax.add_collection(
+            LineCollection(
+                segments[pos_mask],
+                colors=line_colors[pos_mask],
+                linestyles="-",
+                linewidths=line_width,
+            )
+        )
 
     # Plot the contour
     line_xy = np.array(contour.coords)
-    ax.plot(line_xy[:, 0], line_xy[:, 1], "-", c="red", lw=line_width, label="Contour")
+    ax.plot(line_xy[:, 0], line_xy[:, 1], "-", c="red", lw=line_width, label="Boundary")
 
     ax.set_aspect("equal")
-    # Place legend outside to the right to avoid overlapping the plot.
-    ax.legend(loc="center left", bbox_to_anchor=(1.02, 0.5), borderaxespad=0)
-    fig.subplots_adjust(right=0.78)
     ax.set_xlabel("x [px]")
     ax.set_ylabel("y [px]")
     ax.set_title(title)
@@ -728,7 +754,7 @@ def plot_distances_linearized(
 ) -> None:
     # Scatter plot of bins: along-boundary position vs distance to boundary.
     x = data.distance_data.closest_along_boundary
-    y = data.distance_data.closest_distances
+    y = np.asarray(data.distance_data.closest_distances, dtype=float) * pixel_size_um
     counts = np.asarray(data.gene_bins.transcript_counts, dtype=float)
     positive_counts = counts[counts > 0]
     norm = None
@@ -747,25 +773,15 @@ def plot_distances_linearized(
         marker=".",
         edgecolors="none",
         linewidths=0,
+        zorder=2,
     )
     divider = make_axes_locatable(ax)
-    cax = divider.append_axes("right", size="3%", pad=1.2)  # WAS: 0.45
+    cax = divider.append_axes("right", size="3%", pad=0.08)
     cbar = fig.colorbar(sc, cax=cax)
     cbar.set_label("Transcript count per bin")
-    ax.axhline(0, color="red", linewidth=1, linestyle=":", zorder=3)
+    ax.plot([0.0, 1.0], [0.0, 0.0], color="red", linewidth=1, linestyle="-", zorder=0)
     ax.set_xlabel("Normalized position along boundary")
-    ax.set_ylabel("Distance to boundary [px]")
-
-    secax = ax.secondary_yaxis(
-        "right",
-        functions=(
-            lambda y_px: y_px * pixel_size_um,
-            lambda y_um: y_um / pixel_size_um,
-        ),
-    )
-    secax.yaxis.set_label_position("right")
-    secax.yaxis.tick_right()
-    secax.set_ylabel(f"Distance to boundary [{MICROMETER_UNIT}]", labelpad=14)
+    ax.set_ylabel(f"Distance to boundary [{MICROMETER_UNIT}]")
 
     ax.set_title(title)
 
