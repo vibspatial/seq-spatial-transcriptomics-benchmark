@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import csv
 from dataclasses import dataclass
+from time import perf_counter
 from typing import TYPE_CHECKING
 
 import geopandas as gpd
@@ -11,8 +12,7 @@ import numpy as np
 import spatialdata_plot  # noqa: F401
 import xarray as xr
 from matplotlib import font_manager as fm
-from matplotlib.collections import LineCollection
-from matplotlib.colors import LogNorm
+from matplotlib.colors import LogNorm, Normalize
 from matplotlib.lines import Line2D
 from matplotlib.path import Path
 from matplotlib.patches import Rectangle
@@ -683,6 +683,7 @@ def plot_bins_and_closest_points_on_contour(
     figsize: tuple[float, float] = (6, 6),
     dpi: int | None = None,
 ):
+    _plot_start = perf_counter()
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
 
     # Plot bin centers colored by transcript count (same style as linearized-distance plot).
@@ -692,48 +693,63 @@ def plot_bins_and_closest_points_on_contour(
     if positive_counts.size > 0:
         norm = LogNorm(vmin=float(np.min(positive_counts)), vmax=float(np.max(positive_counts)))
 
-    sc = ax.scatter(
-        data.gene_bins.bin_centers[:, 0],
-        data.gene_bins.bin_centers[:, 1],
-        c=counts,
-        cmap="viridis",
-        norm=norm,
-        s=1
-    )
-    line_colors = sc.to_rgba(counts)
-    cbar = fig.colorbar(sc, ax=ax, shrink=0.85, pad=0.02)
+    # Draw low-count bins first and high-count bins last so high counts appear on top.
+    draw_order = np.argsort(counts, kind="stable")
+    centers_sorted = data.gene_bins.bin_centers[draw_order]
+    counts_sorted = counts[draw_order]
+    closest_xy_sorted = data.distance_data.closest_xy[draw_order]
+    distances_sorted = np.asarray(data.distance_data.closest_distances, dtype=float)[draw_order]
+
+    cmap = plt.get_cmap("viridis")
+    if norm is not None:
+        color_norm = norm
+    elif counts.size > 0:
+        vmin = float(np.min(counts))
+        vmax = float(np.max(counts))
+        if np.isclose(vmin, vmax):
+            vmax = vmin + 1.0
+        color_norm = Normalize(vmin=vmin, vmax=vmax)
+    else:
+        color_norm = Normalize(vmin=0.0, vmax=1.0)
+    line_colors = cmap(color_norm(counts_sorted))
+
+    sm = plt.cm.ScalarMappable(norm=color_norm, cmap=cmap)
+    sm.set_array([])
+    cbar = fig.colorbar(sm, ax=ax, shrink=0.85, pad=0.02)
     cbar.set_label("Transcript count per bin")
 
-    # Line segments connecting each bin to its closest point on the contour.
-    # Negative signed distance: outside tissue (dotted). Positive/zero: inside/on boundary (solid).
-    segments = np.stack([data.gene_bins.bin_centers, data.distance_data.closest_xy], axis=1)
-    distances = np.asarray(data.distance_data.closest_distances, dtype=float)
-    neg_mask = distances < 0
-    pos_mask = distances >= 0
+    # Draw each bin pair in order: line first, then the matching dot.
+    # This gives true interleaving depth control for each bin/line pair.
+    for i, (center_xy, closest_xy, distance, color) in enumerate(
+        zip(centers_sorted, closest_xy_sorted, distances_sorted, line_colors)
+    ):
+        line_z = 2 * i
+        dot_z = line_z + 1
+        line_style = ":" if distance < 0 else "-"
+        line_kwargs = {}
+        if distance < 0:
+            line_kwargs["dash_capstyle"] = "round"
 
-    if np.any(neg_mask):
-        ax.add_collection(
-            LineCollection(
-                segments[neg_mask],
-                colors=line_colors[neg_mask],
-                linestyles=":",
-                capstyle="round",
-                linewidths=line_width,
-            )
+        ax.plot(
+            [center_xy[0], closest_xy[0]],
+            [center_xy[1], closest_xy[1]],
+            linestyle=line_style,
+            color=color,
+            linewidth=line_width,
+            zorder=line_z,
+            **line_kwargs,
         )
-    if np.any(pos_mask):
-        ax.add_collection(
-            LineCollection(
-                segments[pos_mask],
-                colors=line_colors[pos_mask],
-                linestyles="-",
-                linewidths=line_width,
-            )
+        ax.scatter(
+            center_xy[0],
+            center_xy[1],
+            c=[color],
+            s=1,
+            zorder=dot_z,
         )
 
     # Plot the contour
     line_xy = np.array(contour.coords)
-    ax.plot(line_xy[:, 0], line_xy[:, 1], "-", c="red", lw=line_width, label="Boundary")
+    ax.plot(line_xy[:, 0], line_xy[:, 1], "-", c="red", lw=line_width, label="Boundary", zorder=1_000_000)
 
     ax.set_aspect("equal")
     ax.set_xlabel("x [px]")
@@ -742,6 +758,7 @@ def plot_bins_and_closest_points_on_contour(
     ax.invert_yaxis()
 
     save_or_show_figure(fig, output_path)
+    print(f"plot_bins_and_closest_points_on_contour took {perf_counter() - _plot_start:.1f}s")
 
 
 def plot_distances_linearized(
