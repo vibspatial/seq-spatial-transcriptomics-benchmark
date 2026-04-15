@@ -844,6 +844,7 @@ def combined_distance_histogram(
     crop_specs: list[tuple[str, str, float, str]],
     output_path: str,
     plots_root: str,
+    gene_name: str,
     title: str | None = None,
     figsize = (12, 6),
     align_peaks: bool = False,
@@ -858,7 +859,7 @@ def combined_distance_histogram(
     """
     data_per_label = _read_crop_distance_data(crop_specs, plots_root)
     bins = _distance_hist_bins(data_per_label, bin_width=5.0)
-    curves = _distance_hist_curves(data_per_label, bins=bins, align_peaks=align_peaks, density=False)
+    curves = _distance_hist_curves(data_per_label, bins=bins, align_peaks=align_peaks, density=True)
 
     fig, ax = plt.subplots(figsize=figsize)
     for label, centers, counts in curves:
@@ -873,8 +874,8 @@ def combined_distance_histogram(
     )
 
     ax.set_xlabel(x_label)
-    ax.set_ylabel("Counts")
-    ax.set_title(title or f"Combined distance histogram\nCounts weighted by # transcripts in bin")
+    ax.set_ylabel(f"Normalized {gene_name} expression")
+    ax.set_title(title)
     ax.legend(fontsize="small")
 
     output_dir = os.path.dirname(output_path)
@@ -1196,6 +1197,7 @@ def ridgeline_distance_histogram(
     crop_specs: list[tuple[str, str, float, str]],
     output_path: str,
     plots_root: str,
+    gene_name: str,
     title: str | None = None,
     figsize=(14, 8),
     align_peaks: bool = False,
@@ -1217,17 +1219,12 @@ def ridgeline_distance_histogram(
     if max_height <= 0:
         raise ValueError("No positive histogram values found.")
 
-    normalized_curves = [
-        (label, centers, counts / max_height)
-        for label, centers, counts in all_curves
-    ]
-
     step = 1.0 - overlap
     assert 0 <= overlap < 1, "overlap must be in [0, 1)."
 
     fig, ax = plt.subplots(figsize=figsize)
-    num_curves = len(normalized_curves)
-    for idx, (label, centers, counts) in enumerate(normalized_curves):
+    num_curves = len(all_curves)
+    for idx, (label, centers, counts) in enumerate(all_curves):
         baseline = (num_curves - 1 - idx) * step
         assert label in COLOR_PALETTE
         color = COLOR_PALETTE[label]
@@ -1237,7 +1234,7 @@ def ridgeline_distance_histogram(
 
     ax.set_yticks([])
     ax.tick_params(axis="y", which="both", length=0)
-    ax.set_ylabel("")
+    ax.set_ylabel(f"Normalized {gene_name} expression")
     ax.legend(fontsize="small", bbox_to_anchor=(1.01, 1), loc="upper left")
 
     ax.set_xlabel(
@@ -1245,7 +1242,7 @@ def ridgeline_distance_histogram(
         if align_peaks
         else f"Distance to boundary [{MICROMETER_UNIT}]"
     )
-    ax.set_title(title or "Distance ridgeline histogram")
+    ax.set_title(title)
     ax.axvline(0, color="black", linewidth=1, linestyle=":", zorder=3)
 
     output_dir = os.path.dirname(output_path)
