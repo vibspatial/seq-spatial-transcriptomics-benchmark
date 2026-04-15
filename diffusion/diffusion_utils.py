@@ -1,6 +1,5 @@
 ﻿import os
 import sys
-import csv
 from dataclasses import dataclass
 from time import perf_counter
 sys.path.append(os.path.abspath('..'))
@@ -464,6 +463,19 @@ class DiffusionBinData:
         )
 
 
+@dataclass
+class DiffusionResults:
+    raw_gene_bins: GeneBinData
+    filtered: DiffusionBinData
+    boundary_section: LineString
+    crop_rect: np.ndarray
+    approx_start_xy: np.ndarray
+    approx_end_xy: np.ndarray
+    snapped_start_xy: np.ndarray
+    snapped_end_xy: np.ndarray
+    max_distance_px: float
+
+
 def get_gene_bin_data(sdata, table_name: str, gene_name: str) -> GeneBinData:
 
     # Get the feature column number for the gene we want to check diffusion for
@@ -486,41 +498,62 @@ def get_gene_bin_data(sdata, table_name: str, gene_name: str) -> GeneBinData:
     )
 
 
-def save_filtered_diffusion_data(
-    filtered: DiffusionBinData,
+def save_diffusion_results(
     output_path: str,
+    raw_gene_bins: GeneBinData,
+    filtered: DiffusionBinData,
+    section: BoundarySectionGeometry,
+    max_distance_px: float,
 ) -> None:
-    """Persist filtered per-bin distances for later recombination across experiments."""
-    row_count = len(filtered.distance_data.closest_distances)
-    with open(output_path, "w", newline="", encoding="utf-8") as csv_file:
-        writer = csv.writer(csv_file)
-        writer.writerow(
-            [
-                "bin_x",
-                "bin_y",
-                "closest_x",
-                "closest_y",
-                "closest_distance_px",
-                "closest_along_boundary",
-                "transcript_count",
-            ]
+    np.savez_compressed(
+        output_path,
+        raw_bin_centers=np.asarray(raw_gene_bins.bin_centers, dtype=float),
+        raw_transcript_counts=np.asarray(raw_gene_bins.transcript_counts, dtype=float),
+        filtered_bin_centers=np.asarray(filtered.gene_bins.bin_centers, dtype=float),
+        filtered_transcript_counts=np.asarray(filtered.gene_bins.transcript_counts, dtype=float),
+        filtered_closest_xy=np.asarray(filtered.distance_data.closest_xy, dtype=float),
+        filtered_closest_distances=np.asarray(filtered.distance_data.closest_distances, dtype=float),
+        filtered_closest_along_boundary=np.asarray(filtered.distance_data.closest_along_boundary, dtype=float),
+        boundary_section_xy=np.asarray(section.boundary_section.coords, dtype=float),
+        crop_rect=np.asarray(section.crop_rect, dtype=float),
+        approx_start_xy=np.asarray(section.approx_start_xy, dtype=float),
+        approx_end_xy=np.asarray(section.approx_end_xy, dtype=float),
+        snapped_start_xy=np.asarray(section.snapped_start_xy, dtype=float),
+        snapped_end_xy=np.asarray(section.snapped_end_xy, dtype=float),
+        max_distance_px=np.asarray([float(max_distance_px)], dtype=float),
+    )
+    print(f"Saved diffusion results to {output_path}")
+
+
+def load_diffusion_results(output_path: str) -> DiffusionResults:
+    with np.load(output_path) as data:
+        return DiffusionResults(
+            raw_gene_bins=GeneBinData(
+                bin_centers=np.asarray(data["raw_bin_centers"], dtype=float),
+                transcript_counts=np.asarray(data["raw_transcript_counts"], dtype=float),
+            ),
+            filtered=DiffusionBinData(
+                gene_bins=GeneBinData(
+                    bin_centers=np.asarray(data["filtered_bin_centers"], dtype=float),
+                    transcript_counts=np.asarray(data["filtered_transcript_counts"], dtype=float),
+                ),
+                distance_data=DistanceData(
+                    closest_xy=np.asarray(data["filtered_closest_xy"], dtype=float),
+                    closest_distances=np.asarray(data["filtered_closest_distances"], dtype=float),
+                    closest_along_boundary=np.asarray(data["filtered_closest_along_boundary"], dtype=float),
+                ),
+            ),
+            boundary_section=LineString(np.asarray(data["boundary_section_xy"], dtype=float)),
+            crop_rect=np.asarray(data["crop_rect"], dtype=float),
+            approx_start_xy=np.asarray(data["approx_start_xy"], dtype=float),
+            approx_end_xy=np.asarray(data["approx_end_xy"], dtype=float),
+            snapped_start_xy=np.asarray(data["snapped_start_xy"], dtype=float),
+            snapped_end_xy=np.asarray(data["snapped_end_xy"], dtype=float),
+            max_distance_px=float(np.asarray(data["max_distance_px"], dtype=float).reshape(-1)[0]),
         )
-        for i in range(row_count):
-            writer.writerow(
-                [
-                    float(filtered.gene_bins.bin_centers[i, 0]),
-                    float(filtered.gene_bins.bin_centers[i, 1]),
-                    float(filtered.distance_data.closest_xy[i, 0]),
-                    float(filtered.distance_data.closest_xy[i, 1]),
-                    float(filtered.distance_data.closest_distances[i]),
-                    float(filtered.distance_data.closest_along_boundary[i]),
-                    float(filtered.gene_bins.transcript_counts[i]),
-                ]
-            )
-    print(f"Saved {row_count} filtered diffusion rows to {output_path}")
 
 
-def analyze_diffusion(
+def compute_diffusion(
     sdata_folder: str,
     experiment: Experiment,
     level: str,
@@ -529,12 +562,8 @@ def analyze_diffusion(
     max_distance_px: float = 400,
     crop_margin_px: float = 0.0,
     use_signed_distances: bool = False,
-    plot_settings: DiffusionPlotSettings | None = None,
 ) -> None:
-    if plot_settings is None:
-        plot_settings = DiffusionPlotSettings()
-
-    print(f"Analyzing diffusion for {experiment.technology} {experiment.dataset_id} at level {level}")
+    print(f"Computing diffusion for {experiment.technology} {experiment.dataset_id} at level {level}")
 
     sdata = sd.read_zarr(os.path.join(sdata_folder, experiment.sdata_path))
 
@@ -579,40 +608,7 @@ def analyze_diffusion(
         )
         os.makedirs(plot_folder, exist_ok=True)
 
-        if plot_settings.tissue_outline and experiment.he_image:
-            plot_tissue_outline_on_HE_image(
-                sdata_crop,
-                experiment.he_image,
-                experiment.tissue_mask,
-                experiment.technology,
-                experiment.dataset_id,
-                experiment.pixel_size_um,
-                os.path.join(plot_folder, "tissue.png"),
-                fill_alpha=0.1,
-                outline_width=1,
-                bounds=tuple(crop_rect),
-                overlay_contour=section.boundary_section,
-                overlay_region=section.thickened_section,
-                approx_points=np.vstack([section.approx_start_xy, section.approx_end_xy]),
-                snapped_points=np.vstack([section.snapped_start_xy, section.snapped_end_xy]),
-            )
-
-        if plot_settings.boundary:
-            plot_boundary_geoseries(
-                section.boundary_section,
-                output_path=os.path.join(plot_folder, "boundary.png"),
-            )
-
         gene_bin_data = get_gene_bin_data(sdata_crop, level, gene_name)
-        if plot_settings.bin_gene_counts:
-            plot_bin_gene_counts_and_contour(
-                gene_bin_data,
-                section.boundary_section,
-                os.path.join(plot_folder, f"counts_{gene_name}.png"),
-                experiment.pixel_size_um,
-                f"{experiment.technology}\n{gene_name} transcript counts per bin\n",
-                dpi=600,
-            )
 
         distance_data = closest_points_and_distances(
             gene_bin_data.bin_centers,
@@ -642,13 +638,107 @@ def analyze_diffusion(
         )
         filtered = filtered.filter(endpoint_mask)
 
-        distance_output_path = os.path.join(plot_folder, "distances.csv")
-        save_filtered_diffusion_data(filtered, distance_output_path)
+        diffusion_results_output_path = os.path.join(plot_folder, "diffusion.npz")
+        save_diffusion_results(
+            diffusion_results_output_path,
+            raw_gene_bins=gene_bin_data,
+            filtered=filtered,
+            section=section,
+            max_distance_px=max_distance_px,
+        )
+
+
+def generate_diffusion_plots(
+    sdata_folder: str,
+    experiment: Experiment,
+    level: str,
+    gene_name: str,
+    plots_folder: str,
+    plot_settings: DiffusionPlotSettings | None = None,
+) -> None:
+    if plot_settings is None:
+        plot_settings = DiffusionPlotSettings()
+
+    print(f"Generating diffusion plots for {experiment.technology} {experiment.dataset_id} at level {level}")
+
+    sdata = None
+    if plot_settings.tissue_outline and experiment.he_image:
+        sdata = sd.read_zarr(os.path.join(sdata_folder, experiment.sdata_path))
+
+    if not experiment.boundary_point_pairs:
+        raise ValueError(
+            f"No boundary_point_pairs provided for experiment {experiment.dataset_id!r}."
+        )
+
+    for crop_idx, _ in enumerate(experiment.boundary_point_pairs):
+        plot_folder = os.path.join(
+            plots_folder,
+            experiment.technology,
+            experiment.dataset_id,
+            "analysis",
+            f"crop{crop_idx + 1}",
+        )
+        os.makedirs(plot_folder, exist_ok=True)
+
+        diffusion_results_path = os.path.join(plot_folder, "diffusion.npz")
+        if not os.path.exists(diffusion_results_path):
+            raise FileNotFoundError(
+                f"Missing diffusion results file: {diffusion_results_path}. "
+                "Run compute_diffusion() first."
+            )
+        results = load_diffusion_results(diffusion_results_path)
+        crop_rect = np.asarray(results.crop_rect, dtype=float)
+
+        if plot_settings.tissue_outline and experiment.he_image:
+            assert sdata is not None
+            sdata_crop = sdata.query.bounding_box(
+                min_coordinate=crop_rect[:2],
+                max_coordinate=crop_rect[2:],
+                axes=("x", "y"),
+                target_coordinate_system=experiment.dataset_id,
+            )
+            thickened_section = results.boundary_section.buffer(
+                float(results.max_distance_px),
+                cap_style="round",
+                join_style="round",
+            )
+            plot_tissue_outline_on_HE_image(
+                sdata_crop,
+                experiment.he_image,
+                experiment.tissue_mask,
+                experiment.technology,
+                experiment.dataset_id,
+                experiment.pixel_size_um,
+                os.path.join(plot_folder, "tissue.png"),
+                fill_alpha=0.1,
+                outline_width=1,
+                bounds=tuple(crop_rect),
+                overlay_contour=results.boundary_section,
+                overlay_region=thickened_section,
+                approx_points=np.vstack([results.approx_start_xy, results.approx_end_xy]),
+                snapped_points=np.vstack([results.snapped_start_xy, results.snapped_end_xy]),
+            )
+
+        if plot_settings.boundary:
+            plot_boundary_geoseries(
+                results.boundary_section,
+                output_path=os.path.join(plot_folder, "boundary.png"),
+            )
+
+        if plot_settings.bin_gene_counts:
+            plot_bin_gene_counts_and_contour(
+                results.raw_gene_bins,
+                results.boundary_section,
+                os.path.join(plot_folder, f"counts_{gene_name}.png"),
+                experiment.pixel_size_um,
+                f"{experiment.technology}\n{gene_name} transcript counts per bin\n",
+                dpi=600,
+            )
 
         if plot_settings.bins_and_closest_points:
             plot_bins_and_closest_points_on_contour(
-                filtered,
-                section.boundary_section,
+                results.filtered,
+                results.boundary_section,
                 os.path.join(plot_folder, "bins_closest_point_on_boundary.png"),
                 f"{experiment.technology}\nBins and closest point on boundary\n",
                 line_width=0.5,
@@ -657,7 +747,7 @@ def analyze_diffusion(
 
         if plot_settings.distances_linearized:
             plot_distances_linearized(
-                filtered,
+                results.filtered,
                 os.path.join(plot_folder, "distances_linearized.png"),
                 f"{experiment.technology}\nBin distance to boundary vs position along boundary\n",
                 experiment.pixel_size_um,
@@ -666,7 +756,7 @@ def analyze_diffusion(
 
         if plot_settings.histogram:
             plot_distance_histogram(
-                filtered,
+                results.filtered,
                 os.path.join(plot_folder, "histogram_um.png"),
                 experiment.pixel_size_um,
                 unit="um",
@@ -674,8 +764,9 @@ def analyze_diffusion(
 
         if plot_settings.boxplot:
             plot_distance_boxplot(
-                filtered,
+                results.filtered,
                 os.path.join(plot_folder, "boxplot_um.png"),
                 experiment.pixel_size_um,
                 unit="um",
             )
+
