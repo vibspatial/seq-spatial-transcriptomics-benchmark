@@ -964,6 +964,18 @@ def _distance_hist_curves(
     return curves
 
 
+def _distance_hist_curves_from_crop_specs(
+    crop_specs: list[tuple[str, str, float, str]],
+    plots_root: str,
+    bin_width_um: float = 5.0,
+    align_peaks: bool = False,
+    density: bool = True,
+) -> list[tuple[str, np.ndarray, np.ndarray]]:
+    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
+    bins = _distance_hist_bins(data_per_label, bin_width=bin_width_um)
+    return _distance_hist_curves(data_per_label, bins=bins, align_peaks=align_peaks, density=density)
+
+
 def _linear_interpolate_x_at_y(
     x0: float,
     y0: float,
@@ -1066,8 +1078,7 @@ def _find_hwhm_from_histogram(
 def calculate_distance_histogram_hwhm(
     crop_specs: list[tuple[str, str, float, str]],
     plots_root: str,
-    bin_width_um: float = 5.0,
-    density: bool = False,
+    align_peaks: bool = False,
 ) -> list[DistanceHistogramHWHM]:
     """
     Calculate left/right HWHM from weighted signed distance histograms for each crop.
@@ -1075,19 +1086,22 @@ def calculate_distance_histogram_hwhm(
     the right HWHM towards the inside of the tissue (positive distances).
 
     Each entry in crop_specs is (technology, dataset_id, pixel_size_um, crop_name).
+    Histograms are computed on shared bins across crops, matching combined/ridgeline
+    histogram plotting.
     """
     if bin_width_um <= 0:
         raise ValueError("bin_width_um must be positive.")
 
-    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
     rows: list[DistanceHistogramHWHM] = []
+    curves = _distance_hist_curves_from_crop_specs(
+        crop_specs=crop_specs,
+        plots_root=plots_root,
+        bin_width_um=5.0,
+        align_peaks=align_peaks,
+        density=True,
+    )
 
-    for label, distances_um, weights in data_per_label:
-        distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
-        bins = _distance_hist_bins([(label, distances_um, weights)], bin_width=bin_width_um)
-        bin_counts, bin_edges = np.histogram(distances_um, bins=bins, weights=weights, density=density)
-        bin_centers = 0.5 * (bin_edges[:-1] + bin_edges[1:])
-
+    for label, bin_centers, bin_counts in curves:
         peak_x, left_hwhm, right_hwhm = _find_hwhm_from_histogram(bin_centers, bin_counts)
         rows.append(
             DistanceHistogramHWHM(
@@ -1175,7 +1189,7 @@ def plot_distance_histogram_hwhm_bars(
         Rectangle((0, 0), 1, 1, facecolor="white", edgecolor="black", hatch="///", linewidth=0.8),
         Rectangle((0, 0), 1, 1, facecolor="white", edgecolor="black", hatch="", linewidth=0.8),
     ]
-    ax.legend(side_legend_handles, ["Outside tissue", "Inside tissue"], loc="lower left")
+    ax.legend(side_legend_handles, ["Outside tissue", "Inside tissue"], loc="lower right")
 
     save_or_show_figure(fig, output_path)
 
@@ -1246,9 +1260,13 @@ def ridgeline_distance_histogram(
     [-max_distance_um, +max_distance_um].
     """
     assert len(crop_specs) > 0, "crop_specs must contain at least one entry."
-    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
-    bins = _distance_hist_bins(data_per_label, bin_width=5.0)
-    all_curves = _distance_hist_curves(data_per_label, bins=bins, align_peaks=align_peaks, density=True)
+    all_curves = _distance_hist_curves_from_crop_specs(
+        crop_specs=crop_specs,
+        plots_root=plots_root,
+        bin_width_um=5.0,
+        align_peaks=align_peaks,
+        density=True,
+    )
 
     max_height = max(float(np.max(counts)) for _, _, counts in all_curves)
     if max_height <= 0:
