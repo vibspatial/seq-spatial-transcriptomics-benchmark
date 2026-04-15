@@ -1136,8 +1136,29 @@ def plot_distance_histogram_hwhm_bars(
 
     y = np.arange(len(labels))
     fig, ax = plt.subplots(figsize=figsize)
-    ax.barh(y, -left_hwhm, color="#4e79a7", alpha=0.9, label="Outside tissue")
-    ax.barh(y, right_hwhm, color="#e15759", alpha=0.9, label="Inside tissue")
+    tech_colors = [COLOR_PALETTE.get(label, "#7f7f7f") for label in labels]
+    missing_color_labels = [label for label, color in zip(labels, tech_colors) if color == "#7f7f7f"]
+    assert len(missing_color_labels) == 0
+
+    # Keep technology identity in color; use hatch style to encode inside/outside tissue.
+    ax.barh(
+        y,
+        -left_hwhm,
+        color=tech_colors,
+        alpha=0.9,
+        hatch="///",
+        edgecolor="black",
+        linewidth=0.5,
+    )
+    ax.barh(
+        y,
+        right_hwhm,
+        color=tech_colors,
+        alpha=0.9,
+        hatch="",
+        edgecolor="black",
+        linewidth=0.5,
+    )
 
     max_abs = float(np.max(np.concatenate([left_hwhm, right_hwhm])))
     margin = max(0.5, 0.1 * max_abs)
@@ -1150,7 +1171,11 @@ def plot_distance_histogram_hwhm_bars(
     ax.invert_yaxis()
     ax.set_xlabel(f"HWHM [{MICROMETER_UNIT}]")
     ax.set_title(title or "Distance histogram half-width at half-maximum")
-    ax.legend(loc="lower left")
+    side_legend_handles = [
+        Rectangle((0, 0), 1, 1, facecolor="white", edgecolor="black", hatch="///", linewidth=0.8),
+        Rectangle((0, 0), 1, 1, facecolor="white", edgecolor="black", hatch="", linewidth=0.8),
+    ]
+    ax.legend(side_legend_handles, ["Outside tissue", "Inside tissue"], loc="lower left")
 
     save_or_show_figure(fig, output_path)
 
