@@ -24,6 +24,7 @@ from shapely.geometry.base import BaseGeometry
 import sys
 sys.path.append(os.path.abspath('..'))
 from utils.plotting import best_datatree_scale
+from colors import COLOR_PALETTE
 
 if TYPE_CHECKING:
     from diffusion_utils import DiffusionBinData, GeneBinData
@@ -841,7 +842,8 @@ def combined_distance_histogram(
 
     fig, ax = plt.subplots(figsize=figsize)
     for label, centers, counts in curves:
-        ax.plot(centers, counts, linewidth=1.5, label=label)
+        color = COLOR_PALETTE.get(label)
+        ax.plot(centers, counts, linewidth=1.5, label=label, color=color)
 
     ax.axvline(0, color="black", linewidth=1, linestyle=":", zorder=3)
     x_label = (
@@ -896,7 +898,8 @@ def _read_crop_distance_data(
 
         distances_um = distances_px * pixel_size_um
         counts = transcript_counts
-        label = f"{technology}, {crop_name}"
+        label = technology
+        assert crop_name == "crop1"
         data_per_label.append((label, distances_um, counts))
 
     if len(data_per_label) == 0:
@@ -1197,7 +1200,6 @@ def ridgeline_distance_histogram(
         for label, centers, counts in all_curves
     ]
 
-    cmap = plt.get_cmap("viridis")
     step = 1.0 - overlap
     assert 0 <= overlap < 1, "overlap must be in [0, 1)."
 
@@ -1205,7 +1207,8 @@ def ridgeline_distance_histogram(
     num_curves = len(normalized_curves)
     for idx, (label, centers, counts) in enumerate(normalized_curves):
         baseline = (num_curves - 1 - idx) * step
-        color = cmap((idx + 1) / max(len(normalized_curves), 1))
+        assert label in COLOR_PALETTE
+        color = COLOR_PALETTE[label]
         filled = baseline + counts
         ax.plot(centers, filled, color=color, linewidth=1.2, label=label)
         ax.fill_between(centers, baseline, filled, color=color, alpha=fill_alpha, linewidth=0)
