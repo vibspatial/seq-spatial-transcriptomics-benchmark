@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import os
-import csv
 from dataclasses import dataclass
 from time import perf_counter
 from typing import TYPE_CHECKING
@@ -878,34 +877,27 @@ def _read_crop_distance_data(
     data_per_label: list[tuple[str, np.ndarray, np.ndarray]] = []
 
     for technology, dataset_id, pixel_size_um, crop_name in crop_specs:
-        csv_path = os.path.join(
+        npz_path = os.path.join(
             plots_root,
             technology,
             dataset_id,
             "analysis",
             crop_name,
-            "distances.csv",
+            "diffusion.npz",
         )
-        assert os.path.exists(csv_path), f"Missing file: {csv_path}"
+        assert os.path.exists(npz_path), f"Missing file: {npz_path}"
 
-        with open(csv_path, "r", encoding="utf-8", newline="") as csv_file:
-            reader = csv.DictReader(csv_file)
-            assert reader.fieldnames is not None and "closest_distance_px" in reader.fieldnames, (
-                f"{csv_path} must contain a 'closest_distance_px' column"
-            )
-            distances_px = []
-            transcript_counts = []
-            for row in reader:
-                distances_px.append(float(row["closest_distance_px"]))
-                transcript_counts.append(float(row["transcript_count"]))
+        with np.load(npz_path) as data:
+            distances_px = np.asarray(data["filtered_closest_distances"], dtype=float)
+            transcript_counts = np.asarray(data["filtered_transcript_counts"], dtype=float)
 
-            if len(distances_px) == 0:
-                continue
+        if distances_px.size == 0:
+            continue
 
-            distances_um = np.asarray(distances_px, dtype=float) * pixel_size_um
-            counts = np.asarray(transcript_counts, dtype=float)
-            label = f"{technology}, {crop_name}"
-            data_per_label.append((label, distances_um, counts))
+        distances_um = distances_px * pixel_size_um
+        counts = transcript_counts
+        label = f"{technology}, {crop_name}"
+        data_per_label.append((label, distances_um, counts))
 
     if len(data_per_label) == 0:
         raise ValueError("No distance rows found in any selected crop.")
