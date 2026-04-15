@@ -777,7 +777,7 @@ def plot_distances_linearized(
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="3%", pad=0.08)
     cbar = fig.colorbar(sc, cax=cax)
-    cbar.set_label("Transcript count per bin")
+    cbar.set_label("Transcript count")
     ax.plot([0.0, 1.0], [0.0, 0.0], color="red", linewidth=1, linestyle="-", zorder=0)
     ax.set_xlabel("Normalized position along boundary")
     ax.set_ylabel(f"Distance to boundary [{MICROMETER_UNIT}]")
@@ -815,8 +815,8 @@ def plot_distance_histogram(
     ax.hist(distances, bins=bins, weights=weights)
     ax.axvline(0, color="black", linewidth=1, linestyle=":", zorder=3)
     ax.set_xlabel(f"Distance to boundary [{unit_label}]")
-    ax.set_ylabel("Count")
-    ax.set_title(title or f"Distance to boundary histogram [{unit_label}]\nCounts weighted by # transcripts in bin")
+    ax.set_ylabel("Transcript count")
+    ax.set_title(title)
     save_or_show_figure(fig, output_path)
 
 
