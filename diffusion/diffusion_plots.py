@@ -1042,7 +1042,9 @@ def calculate_distance_histogram_hwhm(
     density: bool = False,
 ) -> list[DistanceHistogramHWHM]:
     """
-    Calculate left/right HWHM from weighted distance histograms for each crop.
+    Calculate left/right HWHM from weighted signed distance histograms for each crop.
+    The left HWHM corresponds to diffusion towards the outside of the tissue (negative distances),
+    the right HWHM towards the inside of the tissue (positive distances).
 
     Each entry in crop_specs is (technology, dataset_id, pixel_size_um, crop_name).
     """
@@ -1106,8 +1108,8 @@ def plot_distance_histogram_hwhm_bars(
 
     y = np.arange(len(labels))
     fig, ax = plt.subplots(figsize=figsize)
-    ax.barh(y, -left_hwhm, color="#4e79a7", alpha=0.9, label="Inside")
-    ax.barh(y, right_hwhm, color="#e15759", alpha=0.9, label="Outside")
+    ax.barh(y, -left_hwhm, color="#4e79a7", alpha=0.9, label="Outside tissue")
+    ax.barh(y, right_hwhm, color="#e15759", alpha=0.9, label="Inside tissue")
 
     max_abs = float(np.max(np.concatenate([left_hwhm, right_hwhm])))
     margin = max(0.5, 0.1 * max_abs)
@@ -1120,7 +1122,7 @@ def plot_distance_histogram_hwhm_bars(
     ax.invert_yaxis()
     ax.set_xlabel(f"HWHM [{MICROMETER_UNIT}]")
     ax.set_title(title or "Distance histogram half-width at half-maximum")
-    ax.legend(loc="lower right")
+    ax.legend(loc="lower left")
 
     save_or_show_figure(fig, output_path)
 
