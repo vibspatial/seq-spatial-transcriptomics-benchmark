@@ -23,6 +23,12 @@ from shapely.geometry.base import BaseGeometry
 import spatialdata as sd
 import numpy as np
 
+# Note about signed distances and contour orientation:
+# - points outside the closed tissue annotation contour have a negative distance to it;
+# - points inside have a positive distance to it;
+# - in a coordinate system with the origin at the top-left corner, x-axis pointing
+#   to the right, and y-axis pointing down, the tissue annotation contour is oriented counter-clockwise.
+
 
 def _signed_ring_area(coords: np.ndarray | list[tuple[float, float]]) -> float:
     """Compute signed area for a single linear ring."""
