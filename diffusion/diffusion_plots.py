@@ -634,6 +634,7 @@ def plot_bin_gene_counts_and_contour(
     output_path: str,
     pixel_size_um: float,
     title: str,
+    gene_name: str,
     figsize=(10, 10),
     line_width=1,
     marker_size=0.5,
@@ -656,7 +657,7 @@ def plot_bin_gene_counts_and_contour(
 
     if np.any(nonzero_mask):
         cbar = fig.colorbar(sc, ax=ax, shrink=0.4)
-        cbar.set_label("Counts")
+        cbar.set_label(f"{gene_name} transcript counts")
 
     gpd.GeoSeries([contour]).plot(
         ax=ax,
