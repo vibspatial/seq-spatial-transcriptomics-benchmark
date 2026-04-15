@@ -845,6 +845,7 @@ def combined_distance_histogram(
     output_path: str,
     plots_root: str,
     gene_name: str,
+    max_distance_um: float | None = None,
     title: str | None = None,
     figsize = (12, 6),
     align_peaks: bool = False,
@@ -856,6 +857,8 @@ def combined_distance_histogram(
     at x=0.
 
     Each entry in crop_specs is (technology, dataset_id, pixel_size_um, crop_name).
+    If `max_distance_um` is provided, the x-axis is constrained to
+    [-max_distance_um, +max_distance_um].
     """
     data_per_label = _read_crop_distance_data(crop_specs, plots_root)
     bins = _distance_hist_bins(data_per_label, bin_width=5.0)
@@ -877,6 +880,10 @@ def combined_distance_histogram(
     ax.set_ylabel(f"Normalized {gene_name} expression")
     ax.set_title(title)
     ax.legend(fontsize="small")
+    if max_distance_um is not None:
+        if max_distance_um <= 0:
+            raise ValueError("max_distance_um must be positive.")
+        ax.set_xlim(-max_distance_um, max_distance_um)
 
     output_dir = os.path.dirname(output_path)
     if output_dir:
@@ -1198,6 +1205,7 @@ def ridgeline_distance_histogram(
     output_path: str,
     plots_root: str,
     gene_name: str,
+    max_distance_um: float | None = None,
     title: str | None = None,
     figsize=(14, 8),
     align_peaks: bool = False,
@@ -1209,6 +1217,8 @@ def ridgeline_distance_histogram(
 
     If `align_peaks` is True, each curve is shifted so its histogram peak is placed
     at x=0.
+    If `max_distance_um` is provided, the x-axis is constrained to
+    [-max_distance_um, +max_distance_um].
     """
     assert len(crop_specs) > 0, "crop_specs must contain at least one entry."
     data_per_label = _read_crop_distance_data(crop_specs, plots_root)
@@ -1244,6 +1254,10 @@ def ridgeline_distance_histogram(
     )
     ax.set_title(title)
     ax.axvline(0, color="black", linewidth=1, linestyle=":", zorder=3)
+    if max_distance_um is not None:
+        if max_distance_um <= 0:
+            raise ValueError("max_distance_um must be positive.")
+        ax.set_xlim(-max_distance_um, max_distance_um)
 
     output_dir = os.path.dirname(output_path)
     if output_dir:
