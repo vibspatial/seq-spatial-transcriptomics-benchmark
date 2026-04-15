@@ -241,9 +241,22 @@ def plot_bins_colored_by_feature(
     output_path: str,
     rectangles: list[tuple[float, float, float, float]] | None = None,
 ):
-    # color can be for example 'total_counts' or the name of a gene.
+    def _style_colorbar_for_labels(ax: plt.Axes) -> None:
+        # helper function to shrink the vertical size of the colorbar,
+        # and to add a label. In later versions of spatialdata_plot,
+        # this can be accomplished via the colorbar_params argument to render_*()
+        # or show().
+        fig = ax.figure
+        if len(fig.axes) < 2:
+            return
+        cbar_ax = fig.axes[-1]
+        pos = cbar_ax.get_position()
+        new_h = pos.height * 0.5
+        new_y = pos.y0 + (pos.height - new_h) / 2.0
+        cbar_ax.set_position([pos.x0, new_y, pos.width, new_h])
+        cbar_ax.set_ylabel(f"{feature} transcript count")
 
-    title = f"{feature} ({technology} {dataset_id} {level_info.name})"
+    title = f"{technology}"
     if HE_image:
         best_scale, dpi, _, figsize = get_image_figure_parameters(sdata, HE_image)
 
@@ -259,10 +272,13 @@ def plot_bins_colored_by_feature(
             coordinate_systems=dataset_id,
             title=title,
             figsize=figsize,
-            colorbar=False,
+            colorbar=True,
             dpi=dpi,
             ax=ax,
         )
+        _style_colorbar_for_labels(ax)
+        ax.set_xlabel("x [px]")
+        ax.set_ylabel("y [px]")
         x0, x1 = ax.get_xlim()
         visible_width_px = abs(x1 - x0)
         bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
@@ -286,10 +302,13 @@ def plot_bins_colored_by_feature(
             coordinate_systems=dataset_id,
             title=title,
             figsize=figsize,
-            colorbar=False,
+            colorbar=True,
             dpi=dpi,
             ax=ax,
         )
+        _style_colorbar_for_labels(ax)
+        ax.set_xlabel("x [px]")
+        ax.set_ylabel("y [px]")
         x0, x1 = ax.get_xlim()
         visible_width_px = abs(x1 - x0)
         bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
