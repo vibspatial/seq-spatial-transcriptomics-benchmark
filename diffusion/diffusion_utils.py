@@ -755,7 +755,7 @@ def generate_diffusion_plots(
             plot_distances_linearized(
                 results.filtered,
                 os.path.join(plot_folder, "distances_linearized.png"),
-                f"{experiment.technology}\nBin distance to boundary vs position along boundary\n",
+                f"{experiment.technology}",
                 experiment.pixel_size_um,
                 dpi=600,
             )
@@ -766,6 +766,7 @@ def generate_diffusion_plots(
                 os.path.join(plot_folder, "histogram_um.png"),
                 experiment.pixel_size_um,
                 unit="um",
+                title=f"{experiment.technology}"
             )
 
         if plot_settings.boxplot:
