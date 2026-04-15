@@ -737,7 +737,8 @@ def generate_diffusion_plots(
                 results.boundary_section,
                 os.path.join(plot_folder, f"counts_{gene_name}.png"),
                 experiment.pixel_size_um,
-                f"{experiment.technology}\n{gene_name} transcript counts per bin\n",
+                f"{experiment.technology}",
+                gene_name,
                 dpi=600,
             )
 
