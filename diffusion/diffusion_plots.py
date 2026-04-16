@@ -1089,9 +1089,6 @@ def calculate_distance_histogram_hwhm(
     Histograms are computed on shared bins across crops, matching combined/ridgeline
     histogram plotting.
     """
-    if bin_width_um <= 0:
-        raise ValueError("bin_width_um must be positive.")
-
     rows: list[DistanceHistogramHWHM] = []
     curves = _distance_hist_curves_from_crop_specs(
         crop_specs=crop_specs,
