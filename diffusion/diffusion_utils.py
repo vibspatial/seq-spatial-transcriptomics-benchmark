@@ -443,6 +443,7 @@ class DistanceData:
 
 @dataclass
 class GeneBinData:
+    gene_name: str
     bin_centers: np.ndarray  # bin_centers[i] = (x,y) coordinates a the i-th bin; shape = n x 2 (with n the number of bins)
     transcript_counts: np.ndarray  # transcript_counts[i] = number of transcripts of our gene of interest (ptgds) in bin i; shape = n x 1
 
@@ -458,6 +459,7 @@ class DiffusionBinData:
     def filter(self, mask: np.ndarray) -> "DiffusionBinData":
         return DiffusionBinData(
             gene_bins=GeneBinData(
+                gene_name=self.gene_bins.gene_name,
                 bin_centers=self.gene_bins.bin_centers[mask],
                 transcript_counts=self.gene_bins.transcript_counts[mask],
             ),
@@ -499,6 +501,7 @@ def get_gene_bin_data(sdata, table_name: str, gene_name: str) -> GeneBinData:
     assert bin_centers.shape[1] == 2  # (x,y)
 
     return GeneBinData(
+        gene_name=gene_name,
         bin_centers=bin_centers,
         transcript_counts=transcript_counts,
     )
@@ -511,8 +514,12 @@ def save_diffusion_results(
     section: BoundarySectionGeometry,
     max_distance_px: float,
 ) -> None:
+    assert raw_gene_bins.gene_name == filtered.gene_bins.gene_name, (
+        "raw_gene_bins and filtered.gene_bins must have the same gene_name."
+    )
     np.savez_compressed(
         output_path,
+        gene_name=np.asarray(raw_gene_bins.gene_name),
         raw_bin_centers=np.asarray(raw_gene_bins.bin_centers, dtype=float),
         raw_transcript_counts=np.asarray(raw_gene_bins.transcript_counts, dtype=float),
         filtered_bin_centers=np.asarray(filtered.gene_bins.bin_centers, dtype=float),
@@ -533,13 +540,16 @@ def save_diffusion_results(
 
 def load_diffusion_results(output_path: str) -> DiffusionResults:
     with np.load(output_path) as data:
+        gene_name = str(np.asarray(data["gene_name"]).item())
         return DiffusionResults(
             raw_gene_bins=GeneBinData(
+                gene_name=gene_name,
                 bin_centers=np.asarray(data["raw_bin_centers"], dtype=float),
                 transcript_counts=np.asarray(data["raw_transcript_counts"], dtype=float),
             ),
             filtered=DiffusionBinData(
                 gene_bins=GeneBinData(
+                    gene_name=gene_name,
                     bin_centers=np.asarray(data["filtered_bin_centers"], dtype=float),
                     transcript_counts=np.asarray(data["filtered_transcript_counts"], dtype=float),
                 ),
@@ -658,7 +668,6 @@ def generate_diffusion_plots(
     sdata_folder: str,
     experiment: Experiment,
     level: str,
-    gene_name: str,
     plots_folder: str,
     plot_settings: DiffusionPlotSettings | None = None,
 ) -> None:
@@ -735,10 +744,9 @@ def generate_diffusion_plots(
             plot_bin_gene_counts_and_contour(
                 results.raw_gene_bins,
                 results.boundary_section,
-                os.path.join(plot_folder, f"counts_{gene_name}.png"),
+                os.path.join(plot_folder, "transcripts.png"),
                 experiment.pixel_size_um,
                 f"{experiment.technology}",
-                gene_name,
                 dpi=600,
             )
 
@@ -746,7 +754,7 @@ def generate_diffusion_plots(
             plot_bins_and_closest_points_on_contour(
                 results.filtered,
                 results.boundary_section,
-                os.path.join(plot_folder, "bins_closest_point_on_boundary.png"),
+                os.path.join(plot_folder, "closest_points.png"),
                 f"{experiment.technology}\nBins and closest point on boundary\n",
                 line_width=0.5,
                 dpi=600,
@@ -776,4 +784,3 @@ def generate_diffusion_plots(
                 experiment.pixel_size_um,
                 title=f"{experiment.technology}"
             )
-
