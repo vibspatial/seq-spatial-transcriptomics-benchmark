@@ -766,7 +766,6 @@ def generate_diffusion_plots(
                 results.filtered,
                 os.path.join(plot_folder, "histogram_um.png"),
                 experiment.pixel_size_um,
-                unit="um",
                 title=f"{experiment.technology}"
             )
 
@@ -775,6 +774,6 @@ def generate_diffusion_plots(
                 results.filtered,
                 os.path.join(plot_folder, "boxplot_um.png"),
                 experiment.pixel_size_um,
-                unit="um",
+                title=f"{experiment.technology}"
             )
 
