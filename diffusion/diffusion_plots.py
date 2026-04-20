@@ -39,7 +39,7 @@ class DiffusionPlotSettings:
     bins_and_closest_points: bool = True
     distances_linearized: bool = True
     histogram: bool = True
-    boxplot: bool = True
+    boxplot: bool = False
 
 
 @dataclass(frozen=True)
