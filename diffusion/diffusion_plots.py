@@ -3,10 +3,11 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from time import perf_counter
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Sequence
 
 import geopandas as gpd
 import matplotlib.pyplot as plt
+import matplotlib.patheffects as pe
 import numpy as np
 import spatialdata_plot  # noqa: F401
 import xarray as xr
@@ -51,6 +52,15 @@ class DistanceHistogramHWHM:
     peak_position_um: float
 
 
+@dataclass(frozen=True)
+class DistanceDistributionSummary:
+    label: str
+    quantile_signature_um: dict[str, float]
+    cdf_distance_um: dict[str, float]
+    near_boundary_mass: dict[str, float]
+    side_mass_fraction: dict[str, float]
+
+
 def get_image_figure_parameters(sdata, HE_image, dpi=200, max_dim_for_plots=10000):
     assert isinstance(
         sdata[HE_image], xr.DataTree
@@ -84,12 +94,13 @@ def get_labels_figure_parameters(sdata, labels_layer, dpi=200, max_dim_for_plots
     return dpi, figsize_factor, figsize
 
 
-def save_or_show_figure(fig: plt.Figure, output_path: str) -> None:
+def save_or_show_figure(fig: plt.Figure, output_path: str, dpi: int = 300) -> None:
     output_dir = os.path.dirname(output_path)
     if output_dir:
         os.makedirs(output_dir, exist_ok=True)
     fig.savefig(
         output_path,
+        dpi=dpi,
         bbox_inches="tight",
         pad_inches=max(fig.get_size_inches()) / 100,
         facecolor="white",
@@ -807,7 +818,7 @@ def plot_distances_linearized(
     save_or_show_figure(fig, output_path)
 
 
-def plot_distance_histogram(
+def plot_distance_histogram(  # TODO: remove support for pixel units, it's not really useful.
     data: "DiffusionBinData",
     output_path: str,
     pixel_size_um: float,
@@ -851,14 +862,25 @@ def combined_distance_histogram(
     align_peaks: bool = False,
 ) -> None:
     """
-    Plot overlaid distance histograms (as lines) for multiple crops, in micrometers.
+    Plot overlaid normalized signed-distance histograms for multiple crops.
 
     If `align_peaks` is True, each curve is shifted so its histogram peak is placed
     at x=0.
+    Each entry in `crop_specs` is `(technology, dataset_id, pixel_size_um, crop_name)`.
+    Histograms are computed in micrometers with shared bins across crops.
 
-    Each entry in crop_specs is (technology, dataset_id, pixel_size_um, crop_name).
-    If `max_distance_um` is provided, the x-axis is constrained to
-    [-max_distance_um, +max_distance_um].
+    Args:
+        crop_specs: Crop descriptors used to load per-crop signed distance/weight data.
+        output_path: Destination path for the rendered figure.
+        plots_root: Root directory containing per-crop precomputed diffusion outputs.
+        gene_name: Name used in the y-axis label.
+        max_distance_um: Optional symmetric x-limit in micrometers.
+        title: Optional plot title.
+        figsize: Matplotlib figure size.
+        align_peaks: Whether to shift each curve so its mode is at zero.
+
+    Raises:
+        ValueError: If `max_distance_um` is provided but not positive.
     """
     data_per_label = _read_crop_distance_data(crop_specs, plots_root)
     bins = _distance_hist_bins(data_per_label, bin_width=5.0)
@@ -1081,13 +1103,23 @@ def calculate_distance_histogram_hwhm(
     align_peaks: bool = False,
 ) -> list[DistanceHistogramHWHM]:
     """
-    Calculate left/right HWHM from weighted signed distance histograms for each crop.
+    Calculate left/right HWHM values from per-crop signed-distance histograms.
+
     The left HWHM corresponds to diffusion towards the outside of the tissue (negative distances),
     the right HWHM towards the inside of the tissue (positive distances).
+    Each entry in `crop_specs` is `(technology, dataset_id, pixel_size_um, crop_name)`.
+    Histograms are computed on shared 5-um bins, consistent with the combined and
+    ridgeline histogram visualizations.
 
-    Each entry in crop_specs is (technology, dataset_id, pixel_size_um, crop_name).
-    Histograms are computed on shared bins across crops, matching combined/ridgeline
-    histogram plotting.
+    Args:
+        crop_specs: Crop descriptors used to load per-crop signed distance/weight data.
+        plots_root: Root directory containing per-crop precomputed diffusion outputs.
+        align_peaks: Whether to shift each histogram so its mode is at zero before
+            HWHM extraction.
+
+    Returns:
+        List of `DistanceHistogramHWHM` rows (one row per crop label) containing
+        peak position and left/right HWHM in micrometers.
     """
     rows: list[DistanceHistogramHWHM] = []
     curves = _distance_hist_curves_from_crop_specs(
@@ -1122,6 +1154,15 @@ def plot_distance_histogram_hwhm_bars(
     Plot left/right HWHM per crop as bidirectional horizontal bars.
 
     Left HWHM is drawn towards negative x; right HWHM towards positive x.
+
+    Args:
+        hwhm_rows: HWHM summary rows produced by `calculate_distance_histogram_hwhm`.
+        output_path: Destination path for the rendered figure.
+        title: Optional plot title.
+        figsize: Optional figure size. If omitted, a height is chosen from row count.
+
+    Raises:
+        ValueError: If input is empty or no rows contain finite non-negative left/right HWHM.
     """
     if len(hwhm_rows) == 0:
         raise ValueError("hwhm_rows must contain at least one row.")
@@ -1191,6 +1232,484 @@ def plot_distance_histogram_hwhm_bars(
     save_or_show_figure(fig, output_path)
 
 
+def _weighted_quantiles(
+    values: np.ndarray,
+    weights: np.ndarray,
+    probs: Sequence[float],
+) -> np.ndarray:
+    values = np.asarray(values, dtype=float)
+    weights = np.asarray(weights, dtype=float)
+    probs = np.asarray(probs, dtype=float)
+    if values.ndim != 1 or weights.ndim != 1 or values.size != weights.size:
+        raise ValueError("values and weights must be 1D arrays of equal length.")
+    if probs.ndim != 1 or probs.size == 0:
+        raise ValueError("probs must be a non-empty 1D sequence.")
+    if np.any(probs < 0) or np.any(probs > 1):
+        raise ValueError("All probabilities must be in [0, 1].")
+
+    order = np.argsort(values)
+    v = values[order]
+    w = weights[order]
+    wsum = float(np.sum(w))
+    if not np.isfinite(wsum) or wsum <= 0:
+        raise ValueError("weights must sum to a positive finite value.")
+    cdf = np.cumsum(w) / wsum
+    return np.interp(probs, cdf, v, left=v[0], right=v[-1])
+
+
+def _sample_weighted_points(
+    values: np.ndarray,
+    weights: np.ndarray,
+    max_points: int,
+    rng: np.random.Generator,
+) -> np.ndarray:
+    if max_points <= 0:
+        return np.empty((0,), dtype=float)
+    values = np.asarray(values, dtype=float)
+    weights = np.asarray(weights, dtype=float)
+    if values.size == 0:
+        return np.empty((0,), dtype=float)
+    p = weights / np.sum(weights)
+    n = min(max_points, values.size)
+    # Approximation: sample bins with replacement by transcript-count weights,
+    # instead of sampling individual transcripts without replacement.
+    idx = rng.choice(values.size, size=n, replace=True, p=p)
+    return values[idx]
+
+
+def _split_signed_distance_sides(
+    distances_um: np.ndarray,
+    weights: np.ndarray,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    outside_mask = distances_um <= 0
+    inside_mask = distances_um > 0
+    outside_distances_um = -distances_um[outside_mask]
+    outside_weights = weights[outside_mask]
+    inside_distances_um = distances_um[inside_mask]
+    inside_weights = weights[inside_mask]
+    return outside_distances_um, outside_weights, inside_distances_um, inside_weights
+
+
+def summarize_distance_distributions(
+    crop_specs: list[tuple[str, str, float, str]],
+    plots_root: str,
+    quantiles: Sequence[float] = (0.10, 0.25, 0.50, 0.75, 0.90),
+    cdf_levels: Sequence[float] = (0.25, 0.50, 0.75, 0.90),
+    thresholds_um: Sequence[float] = (5.0, 10.0, 20.0),
+) -> list[DistanceDistributionSummary]:
+    """
+    Summarize outside/inside signed-distance distributions for each crop.
+
+    Distances are split by sign into outside (`d <= 0`, reported as absolute distance)
+    and inside (`d > 0`) components, both weighted by transcript counts.
+
+    Args:
+        crop_specs: Crop descriptors as `(technology, dataset_id, pixel_size_um, crop_name)`.
+        plots_root: Root directory containing per-crop precomputed diffusion outputs.
+        quantiles: Probability levels used to report weighted distance quantiles per side.
+        cdf_levels: CDF levels used to report distance-at-CDF summaries per side.
+        thresholds_um: Absolute-distance thresholds used for near-boundary mass fractions.
+
+    Returns:
+        One `DistanceDistributionSummary` per crop label with quantile signatures,
+        distance-at-CDF summaries, near-boundary masses, and side mass fractions.
+    """
+    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
+    quantiles = tuple(float(q) for q in quantiles)
+    cdf_levels = tuple(float(q) for q in cdf_levels)
+    thresholds_um = tuple(float(t) for t in thresholds_um)
+
+    rows: list[DistanceDistributionSummary] = []
+    for label, distances_um, weights in data_per_label:
+        distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
+        outside_distances_um, outside_weights, inside_distances_um, inside_weights = _split_signed_distance_sides(
+            distances_um, weights
+        )
+
+        total = float(np.sum(weights))
+        outside_total = float(np.sum(outside_weights))
+        inside_total = float(np.sum(inside_weights))
+
+        quantile_map: dict[str, float] = {}
+        if outside_distances_um.size > 0:
+            outside_quantile_values = _weighted_quantiles(outside_distances_um, outside_weights, quantiles)
+            quantile_map.update(
+                {
+                    f"outside_q{int(round(q * 100)):02d}_um": float(val)
+                    for q, val in zip(quantiles, outside_quantile_values, strict=True)
+                }
+            )
+        else:
+            quantile_map.update({f"outside_q{int(round(q * 100)):02d}_um": np.nan for q in quantiles})
+        if inside_distances_um.size > 0:
+            inside_quantile_values = _weighted_quantiles(inside_distances_um, inside_weights, quantiles)
+            quantile_map.update(
+                {
+                    f"inside_q{int(round(q * 100)):02d}_um": float(val)
+                    for q, val in zip(quantiles, inside_quantile_values, strict=True)
+                }
+            )
+        else:
+            quantile_map.update({f"inside_q{int(round(q * 100)):02d}_um": np.nan for q in quantiles})
+
+        cdf_map: dict[str, float] = {}
+        if outside_distances_um.size > 0:
+            outside_cdf_values = _weighted_quantiles(outside_distances_um, outside_weights, cdf_levels)
+            cdf_map.update(
+                {
+                    f"outside_d_at_cdf_{int(round(q * 100)):02d}_um": float(val)
+                    for q, val in zip(cdf_levels, outside_cdf_values, strict=True)
+                }
+            )
+        else:
+            cdf_map.update({f"outside_d_at_cdf_{int(round(q * 100)):02d}_um": np.nan for q in cdf_levels})
+        if inside_distances_um.size > 0:
+            inside_cdf_values = _weighted_quantiles(inside_distances_um, inside_weights, cdf_levels)
+            cdf_map.update(
+                {
+                    f"inside_d_at_cdf_{int(round(q * 100)):02d}_um": float(val)
+                    for q, val in zip(cdf_levels, inside_cdf_values, strict=True)
+                }
+            )
+        else:
+            cdf_map.update({f"inside_d_at_cdf_{int(round(q * 100)):02d}_um": np.nan for q in cdf_levels})
+
+        mass_map = {}
+        for threshold in thresholds_um:
+            key_um = int(round(threshold))
+            outside_mass = np.sum(outside_weights[outside_distances_um <= threshold]) if outside_distances_um.size > 0 else 0.0
+            inside_mass = np.sum(inside_weights[inside_distances_um <= threshold]) if inside_distances_um.size > 0 else 0.0
+            mass_map[f"p_outside_le_{key_um}um"] = float(outside_mass / outside_total) if outside_total > 0 else np.nan
+            mass_map[f"p_inside_le_{key_um}um"] = float(inside_mass / inside_total) if inside_total > 0 else np.nan
+
+        side_fraction = {
+            "outside_fraction": float(outside_total / total) if total > 0 else np.nan,
+            "inside_fraction": float(inside_total / total) if total > 0 else np.nan,
+        }
+
+        rows.append(
+            DistanceDistributionSummary(
+                label=label,
+                quantile_signature_um=quantile_map,
+                cdf_distance_um=cdf_map,
+                near_boundary_mass=mass_map,
+                side_mass_fraction=side_fraction,
+            )
+        )
+    return rows
+
+
+def plot_distance_quantile_signature_with_points(
+    crop_specs: list[tuple[str, str, float, str]],
+    output_path: str,
+    plots_root: str,
+    quantiles: Sequence[float] = (0.10, 0.25, 0.50, 0.75, 0.90),
+    max_points_per_label: int = 2500,
+    max_distance_um: float | None = None,
+    random_seed: int = 0,
+    title: str | None = None,
+) -> None:
+    """
+    Plot sampled transcript distances with overlaid weighted quantile markers.
+
+    The figure contains two panels: outside-tissue distances on the left and
+    inside-tissue distances on the right. Points are sampled with probability
+    proportional to transcript counts to keep dense datasets readable.
+
+    Args:
+        crop_specs: Crop descriptors as `(technology, dataset_id, pixel_size_um, crop_name)`.
+        output_path: Destination path for the rendered figure.
+        plots_root: Root directory containing per-crop precomputed diffusion outputs.
+        quantiles: Quantiles to compute; at least one of 0.25, 0.50, or 0.75 must be present
+            because those are the only quantiles rendered as vertical markers.
+        max_points_per_label: Maximum sampled points per label and side.
+        max_distance_um: Optional x-limit (0 to `max_distance_um`) for both panels.
+        random_seed: Seed for reproducible point sampling/jitter.
+        title: Optional figure title.
+
+    Raises:
+        ValueError: If `quantiles` contains none of 0.25/0.50/0.75, or if
+            `max_distance_um` is provided but not positive.
+    """
+    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
+    quantiles = tuple(float(q) for q in quantiles)
+    display_quantiles = tuple(q for q in quantiles if np.isclose(q, 0.25) or np.isclose(q, 0.50) or np.isclose(q, 0.75))
+    if len(display_quantiles) == 0:
+        raise ValueError("quantiles must include at least one of 0.25, 0.50, or 0.75.")
+    point_size = 2 #6
+    point_alpha = 0.6 #0.18
+    quantile_line_half_height = 0.32
+    rng = np.random.default_rng(random_seed)
+
+    labels = [label for label, _, _ in data_per_label]
+    y_positions = np.arange(len(labels), dtype=float)
+    fig, axes = plt.subplots(
+        1,
+        2,
+        figsize=(14, max(4.0, 0.55 * len(labels) + 1.2)),
+        sharey=True,
+        gridspec_kw={"wspace": 0.05},
+    )
+    ax_outside, ax_inside = axes
+
+    for y, (label, distances_um, weights) in zip(y_positions, data_per_label, strict=True):
+        distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
+        color = COLOR_PALETTE.get(label, "#7f7f7f")
+        outside_distances_um, outside_weights, inside_distances_um, inside_weights = _split_signed_distance_sides(
+            distances_um, weights
+        )
+
+        if outside_distances_um.size > 0:
+            sampled_outside = _sample_weighted_points(
+                outside_distances_um, outside_weights, max_points=max_points_per_label, rng=rng
+            )
+            y_jitter = y + rng.uniform(-0.18, 0.18, size=sampled_outside.size)
+            ax_outside.scatter(
+                sampled_outside,
+                y_jitter,
+                s=point_size,
+                alpha=point_alpha,
+                color=color,
+                linewidths=0,
+                rasterized=True,
+            )
+            qvals_outside = _weighted_quantiles(outside_distances_um, outside_weights, quantiles)
+            for q, qx in zip(quantiles, qvals_outside, strict=True):
+                if q not in display_quantiles:
+                    continue
+                line_width = 3.0 if np.isclose(q, 0.50) else 1.5
+                line = ax_outside.vlines(
+                    qx,
+                    y - quantile_line_half_height,
+                    y + quantile_line_half_height,
+                    color=color,
+                    linewidth=line_width,
+                    linestyles="-",
+                )
+                line.set_path_effects([pe.Stroke(linewidth=line_width + 1.6, foreground="white"), pe.Normal()])
+
+        if inside_distances_um.size > 0:
+            sampled_inside = _sample_weighted_points(
+                inside_distances_um, inside_weights, max_points=max_points_per_label, rng=rng
+            )
+            y_jitter = y + rng.uniform(-0.18, 0.18, size=sampled_inside.size)
+            ax_inside.scatter(
+                sampled_inside,
+                y_jitter,
+                s=point_size,
+                alpha=point_alpha,
+                color=color,
+                linewidths=0,
+                rasterized=True,
+            )
+            qvals_inside = _weighted_quantiles(inside_distances_um, inside_weights, quantiles)
+            for q, qx in zip(quantiles, qvals_inside, strict=True):
+                if q not in display_quantiles:
+                    continue
+                line_width = 3.0 if np.isclose(q, 0.50) else 1.5
+                line = ax_inside.vlines(
+                    qx,
+                    y - quantile_line_half_height,
+                    y + quantile_line_half_height,
+                    color=color,
+                    linewidth=line_width,
+                    linestyles="-",
+                )
+                line.set_path_effects([pe.Stroke(linewidth=line_width + 1.6, foreground="white"), pe.Normal()])
+
+    if max_distance_um is not None:
+        if max_distance_um <= 0:
+            raise ValueError("max_distance_um must be positive.")
+        ax_outside.set_xlim(0, max_distance_um)
+        ax_inside.set_xlim(0, max_distance_um)
+    ax_outside.set_yticks(y_positions)
+    ax_outside.set_yticklabels(labels)
+    ax_outside.invert_yaxis()
+    ax_outside.grid(axis="x", alpha=0.2)
+    ax_inside.grid(axis="x", alpha=0.2)
+    ax_outside.set_xlabel(f"Distance to boundary [{MICROMETER_UNIT}]")
+    ax_inside.set_xlabel(f"Distance to boundary [{MICROMETER_UNIT}]")
+    ax_outside.set_title("Outside tissue")
+    ax_inside.set_title("Inside tissue")
+    quantile_handles = [
+        Line2D([0], [0], color="black", linewidth=(3.0 if np.isclose(q, 0.50) else 1.5))
+        for q in display_quantiles
+    ]
+    quantile_labels = [f"q{int(round(q * 100)):02d}" for q in display_quantiles]
+    ax_inside.legend(quantile_handles, quantile_labels, title="Quantiles", loc="upper right", fontsize="small")
+    if title is not None:
+        fig.suptitle(title)
+    save_or_show_figure(fig, output_path)
+
+
+def plot_distance_cdf(
+    crop_specs: list[tuple[str, str, float, str]],
+    output_path: str,
+    plots_root: str,
+    max_distance_um: float | None = None,
+    title: str | None = None,
+) -> None:
+    """
+    Plot weighted transcript-count CDFs of boundary distance for each crop.
+
+    Two side-by-side panels show outside and inside tissue distances separately.
+    Distances are converted to non-negative magnitudes per side before CDF
+    computation.
+
+    Args:
+        crop_specs: Crop descriptors as `(technology, dataset_id, pixel_size_um, crop_name)`.
+        output_path: Destination path for the rendered figure.
+        plots_root: Root directory containing per-crop precomputed diffusion outputs.
+        max_distance_um: Optional x-limit (0 to `max_distance_um`) for both panels.
+        title: Optional figure title.
+
+    Raises:
+        ValueError: If `max_distance_um` is provided but not positive.
+    """
+    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
+    fig, axes = plt.subplots(1, 2, figsize=(14, 6), sharey=True, gridspec_kw={"wspace": 0.05})
+    ax_outside, ax_inside = axes
+
+    for label, distances_um, weights in data_per_label:
+        distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
+        outside_distances_um, outside_weights, inside_distances_um, inside_weights = _split_signed_distance_sides(
+            distances_um, weights
+        )
+        color = COLOR_PALETTE.get(label, "#7f7f7f")
+
+        for ax, side_distances_um, side_weights in [
+            (ax_outside, outside_distances_um, outside_weights),
+            (ax_inside, inside_distances_um, inside_weights),
+        ]:
+            if side_distances_um.size == 0:
+                continue
+            order = np.argsort(side_distances_um)
+            x = side_distances_um[order]
+            sorted_weights = side_weights[order]
+            cdf = np.cumsum(sorted_weights)
+            cdf = cdf / cdf[-1]
+            ax.step(x, cdf, where="post", linewidth=1.6, color=color, label=label)
+
+    if max_distance_um is not None:
+        if max_distance_um <= 0:
+            raise ValueError("max_distance_um must be positive.")
+        ax_outside.set_xlim(0, max_distance_um)
+        ax_inside.set_xlim(0, max_distance_um)
+    ax_outside.set_ylim(0, 1.02)
+    ax_outside.set_yticks([0.0, 0.25, 0.5, 0.75, 1.0])
+    ax_outside.grid(axis="y", alpha=0.25)
+    ax_inside.grid(axis="y", alpha=0.25)
+    ax_outside.set_xlabel(f"Distance to boundary [{MICROMETER_UNIT}]")
+    ax_inside.set_xlabel(f"Distance to boundary [{MICROMETER_UNIT}]")
+    ax_outside.set_ylabel("Transcript count CDF")
+    ax_outside.set_title("Outside tissue")
+    ax_inside.set_title("Inside tissue")
+    handles, labels = ax_inside.get_legend_handles_labels()
+    if len(handles) > 0:
+        ax_inside.legend(handles, labels, fontsize="small", ncol=1, loc="lower right")
+    if title:
+        fig.suptitle(title)
+    save_or_show_figure(fig, output_path)
+
+
+def plot_near_boundary_mass_bars(
+    summary_rows: list[DistanceDistributionSummary],
+    output_path: str,
+    thresholds_um: Sequence[float] = (5.0, 10.0, 20.0),
+    title: str | None = None,
+) -> None:
+    """
+    Plot per-label near-boundary mass fractions for outside and inside tissue.
+
+    For each threshold `t`, the plotted value is the conditional fraction
+    `P(|d| <= t | side)` where side is outside or inside tissue.
+
+    Args:
+        summary_rows: Rows produced by `summarize_distance_distributions`.
+        output_path: Destination path for the rendered figure.
+        thresholds_um: Distance thresholds (in micrometers) to include.
+        title: Optional figure title.
+
+    Raises:
+        ValueError: If `summary_rows` is empty.
+    """
+    if len(summary_rows) == 0:
+        raise ValueError("summary_rows must contain at least one row.")
+    thresholds_um = tuple(float(t) for t in thresholds_um)
+    labels = [row.label for row in summary_rows]
+    outside_values = np.array(
+        [[row.near_boundary_mass[f"p_outside_le_{int(round(t))}um"] for t in thresholds_um] for row in summary_rows],
+        dtype=float,
+    )
+    inside_values = np.array(
+        [[row.near_boundary_mass[f"p_inside_le_{int(round(t))}um"] for t in thresholds_um] for row in summary_rows],
+        dtype=float,
+    )
+
+    y = np.arange(len(labels), dtype=float)
+    bar_total_height = 0.75
+    bar_h = bar_total_height / max(1, len(thresholds_um))
+    offsets = np.linspace(-0.5 * (bar_total_height - bar_h), 0.5 * (bar_total_height - bar_h), len(thresholds_um))
+
+    fig, axes = plt.subplots(1, 2, figsize=(14, max(4.0, 0.55 * len(labels) + 1.2)), sharey=True)
+    ax_outside, ax_inside = axes
+    tech_colors = [COLOR_PALETTE.get(label, "#7f7f7f") for label in labels]
+    hatches = ("", "///", "xxx", "...")
+    for idx, threshold in enumerate(thresholds_um):
+        hatch = hatches[idx % len(hatches)]
+        ax_outside.barh(
+            y + offsets[idx],
+            outside_values[:, idx],
+            height=bar_h,
+            color=tech_colors,
+            edgecolor="black",
+            linewidth=0.5,
+            hatch=hatch,
+            label=f"P(|d| ≤ {int(round(threshold))} {MICROMETER_UNIT} | outside)",
+        )
+        ax_inside.barh(
+            y + offsets[idx],
+            inside_values[:, idx],
+            height=bar_h,
+            color=tech_colors,
+            edgecolor="black",
+            linewidth=0.5,
+            hatch=hatch,
+            label=f"P(|d| ≤ {int(round(threshold))} {MICROMETER_UNIT} | inside)",
+        )
+
+    max_x = float(np.nanmax(np.concatenate([outside_values.ravel(), inside_values.ravel()])))
+    max_x = max(max_x, 0.05)
+    x_lim = min(1.0, max_x * 1.15)
+
+    ax_outside.set_xlim(0.0, x_lim)
+    ax_inside.set_xlim(0.0, x_lim)
+    ax_outside.set_yticks(y)
+    ax_outside.set_yticklabels(labels)
+    ax_outside.invert_yaxis()
+    ax_outside.grid(axis="x", alpha=0.2)
+    ax_inside.grid(axis="x", alpha=0.2)
+    ax_outside.set_xlabel("Fraction of outside transcripts")
+    ax_inside.set_xlabel("Fraction of inside transcripts")
+    ax_outside.set_title("Outside tissue")
+    ax_inside.set_title("Inside tissue")
+    threshold_handles = [
+        Rectangle((0, 0), 1, 1, facecolor="white", edgecolor="black", hatch=hatches[idx % len(hatches)], linewidth=0.8)
+        for idx in range(len(thresholds_um))
+    ]
+    threshold_labels = [f"|d| ≤ {int(round(t))} {MICROMETER_UNIT}" for t in thresholds_um]
+    ax_inside.legend(
+        threshold_handles,
+        threshold_labels,
+        loc="upper right",
+        fontsize="small",
+        title="Distance d to boundary",
+        frameon=True,
+    )
+    fig.suptitle(title)
+    save_or_show_figure(fig, output_path)
+
+
 def plot_distance_boxplot(
     data: "DiffusionBinData",
     output_path: str,
@@ -1249,12 +1768,28 @@ def ridgeline_distance_histogram(
     fill_alpha: float = 0.45,
 ) -> None:
     """
-    Plot distance histograms as a ridgeline (joy) plot for multiple crops.
+    Plot normalized signed-distance histograms as a ridgeline (joy) chart.
 
     If `align_peaks` is True, each curve is shifted so its histogram peak is placed
     at x=0.
-    If `max_distance_um` is provided, the x-axis is constrained to
-    [-max_distance_um, +max_distance_um].
+    Curves are stacked with configurable overlap and optional filled areas.
+
+    Args:
+        crop_specs: Crop descriptors as `(technology, dataset_id, pixel_size_um, crop_name)`.
+        output_path: Destination path for the rendered figure.
+        plots_root: Root directory containing per-crop precomputed diffusion outputs.
+        gene_name: Name used in the y-axis label.
+        max_distance_um: Optional symmetric x-limit in micrometers.
+        title: Optional plot title.
+        figsize: Matplotlib figure size.
+        align_peaks: Whether to shift each curve so its mode is at zero.
+        overlap: Vertical overlap fraction between neighboring ridges in `[0, 1)`.
+        fill_alpha: Fill alpha for ridge areas.
+
+    Raises:
+        ValueError: If no positive histogram values are available or
+            `max_distance_um` is provided but not positive.
+        AssertionError: If `crop_specs` is empty or `overlap` is outside `[0, 1)`.
     """
     assert len(crop_specs) > 0, "crop_specs must contain at least one entry."
     all_curves = _distance_hist_curves_from_crop_specs(
