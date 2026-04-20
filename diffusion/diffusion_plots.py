@@ -7,13 +7,11 @@ from typing import TYPE_CHECKING, Sequence
 
 import geopandas as gpd
 import matplotlib.pyplot as plt
-import matplotlib.patheffects as pe
 import numpy as np
 import spatialdata_plot  # noqa: F401
 import xarray as xr
 from matplotlib import font_manager as fm
 from matplotlib.colors import LogNorm, Normalize
-from matplotlib.lines import Line2D
 from matplotlib.path import Path
 from matplotlib.patches import Rectangle
 from matplotlib.patches import PathPatch
@@ -57,7 +55,6 @@ class DistanceDistributionSummary:
     label: str
     quantile_signature_um: dict[str, float]
     cdf_distance_um: dict[str, float]
-    near_boundary_mass: dict[str, float]
     side_mass_fraction: dict[str, float]
 
 
@@ -1257,26 +1254,6 @@ def _weighted_quantiles(
     return np.interp(probs, cdf, v, left=v[0], right=v[-1])
 
 
-def _sample_weighted_points(
-    values: np.ndarray,
-    weights: np.ndarray,
-    max_points: int,
-    rng: np.random.Generator,
-) -> np.ndarray:
-    if max_points <= 0:
-        return np.empty((0,), dtype=float)
-    values = np.asarray(values, dtype=float)
-    weights = np.asarray(weights, dtype=float)
-    if values.size == 0:
-        return np.empty((0,), dtype=float)
-    p = weights / np.sum(weights)
-    n = min(max_points, values.size)
-    # Approximation: sample bins with replacement by transcript-count weights,
-    # instead of sampling individual transcripts without replacement.
-    idx = rng.choice(values.size, size=n, replace=True, p=p)
-    return values[idx]
-
-
 def _split_signed_distance_sides(
     distances_um: np.ndarray,
     weights: np.ndarray,
@@ -1295,7 +1272,6 @@ def summarize_distance_distributions(
     plots_root: str,
     quantiles: Sequence[float] = (0.10, 0.25, 0.50, 0.75, 0.90),
     cdf_levels: Sequence[float] = (0.25, 0.50, 0.75, 0.90),
-    thresholds_um: Sequence[float] = (5.0, 10.0, 20.0),
 ) -> list[DistanceDistributionSummary]:
     """
     Summarize outside/inside signed-distance distributions for each crop.
@@ -1308,16 +1284,13 @@ def summarize_distance_distributions(
         plots_root: Root directory containing per-crop precomputed diffusion outputs.
         quantiles: Probability levels used to report weighted distance quantiles per side.
         cdf_levels: CDF levels used to report distance-at-CDF summaries per side.
-        thresholds_um: Absolute-distance thresholds used for near-boundary mass fractions.
-
     Returns:
         One `DistanceDistributionSummary` per crop label with quantile signatures,
-        distance-at-CDF summaries, near-boundary masses, and side mass fractions.
+        distance-at-CDF summaries, and side mass fractions.
     """
     data_per_label = _read_crop_distance_data(crop_specs, plots_root)
     quantiles = tuple(float(q) for q in quantiles)
     cdf_levels = tuple(float(q) for q in cdf_levels)
-    thresholds_um = tuple(float(t) for t in thresholds_um)
 
     rows: list[DistanceDistributionSummary] = []
     for label, distances_um, weights in data_per_label:
@@ -1374,14 +1347,6 @@ def summarize_distance_distributions(
         else:
             cdf_map.update({f"inside_d_at_cdf_{int(round(q * 100)):02d}_um": np.nan for q in cdf_levels})
 
-        mass_map = {}
-        for threshold in thresholds_um:
-            key_um = int(round(threshold))
-            outside_mass = np.sum(outside_weights[outside_distances_um <= threshold]) if outside_distances_um.size > 0 else 0.0
-            inside_mass = np.sum(inside_weights[inside_distances_um <= threshold]) if inside_distances_um.size > 0 else 0.0
-            mass_map[f"p_outside_le_{key_um}um"] = float(outside_mass / outside_total) if outside_total > 0 else np.nan
-            mass_map[f"p_inside_le_{key_um}um"] = float(inside_mass / inside_total) if inside_total > 0 else np.nan
-
         side_fraction = {
             "outside_fraction": float(outside_total / total) if total > 0 else np.nan,
             "inside_fraction": float(inside_total / total) if total > 0 else np.nan,
@@ -1392,154 +1357,10 @@ def summarize_distance_distributions(
                 label=label,
                 quantile_signature_um=quantile_map,
                 cdf_distance_um=cdf_map,
-                near_boundary_mass=mass_map,
                 side_mass_fraction=side_fraction,
             )
         )
     return rows
-
-
-def plot_distance_quantile_signature_with_points(
-    crop_specs: list[tuple[str, str, float, str]],
-    output_path: str,
-    plots_root: str,
-    quantiles: Sequence[float] = (0.10, 0.25, 0.50, 0.75, 0.90),
-    max_points_per_label: int = 2500,
-    max_distance_um: float | None = None,
-    random_seed: int = 0,
-    title: str | None = None,
-) -> None:
-    """
-    Plot sampled transcript distances with overlaid weighted quantile markers.
-
-    The figure contains two panels: outside-tissue distances on the left and
-    inside-tissue distances on the right. Points are sampled with probability
-    proportional to transcript counts to keep dense datasets readable.
-
-    Args:
-        crop_specs: Crop descriptors as `(technology, dataset_id, pixel_size_um, crop_name)`.
-        output_path: Destination path for the rendered figure.
-        plots_root: Root directory containing per-crop precomputed diffusion outputs.
-        quantiles: Quantiles to compute; at least one of 0.25, 0.50, or 0.75 must be present
-            because those are the only quantiles rendered as vertical markers.
-        max_points_per_label: Maximum sampled points per label and side.
-        max_distance_um: Optional x-limit (0 to `max_distance_um`) for both panels.
-        random_seed: Seed for reproducible point sampling/jitter.
-        title: Optional figure title.
-
-    Raises:
-        ValueError: If `quantiles` contains none of 0.25/0.50/0.75, or if
-            `max_distance_um` is provided but not positive.
-    """
-    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
-    quantiles = tuple(float(q) for q in quantiles)
-    display_quantiles = tuple(q for q in quantiles if np.isclose(q, 0.25) or np.isclose(q, 0.50) or np.isclose(q, 0.75))
-    if len(display_quantiles) == 0:
-        raise ValueError("quantiles must include at least one of 0.25, 0.50, or 0.75.")
-    point_size = 2 #6
-    point_alpha = 0.6 #0.18
-    quantile_line_half_height = 0.32
-    rng = np.random.default_rng(random_seed)
-
-    labels = [label for label, _, _ in data_per_label]
-    y_positions = np.arange(len(labels), dtype=float)
-    fig, axes = plt.subplots(
-        1,
-        2,
-        figsize=(14, max(4.0, 0.55 * len(labels) + 1.2)),
-        sharey=True,
-        gridspec_kw={"wspace": 0.05},
-    )
-    ax_outside, ax_inside = axes
-
-    for y, (label, distances_um, weights) in zip(y_positions, data_per_label, strict=True):
-        distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
-        color = COLOR_PALETTE.get(label, "#7f7f7f")
-        outside_distances_um, outside_weights, inside_distances_um, inside_weights = _split_signed_distance_sides(
-            distances_um, weights
-        )
-
-        if outside_distances_um.size > 0:
-            sampled_outside = _sample_weighted_points(
-                outside_distances_um, outside_weights, max_points=max_points_per_label, rng=rng
-            )
-            y_jitter = y + rng.uniform(-0.18, 0.18, size=sampled_outside.size)
-            ax_outside.scatter(
-                sampled_outside,
-                y_jitter,
-                s=point_size,
-                alpha=point_alpha,
-                color=color,
-                linewidths=0,
-                rasterized=True,
-            )
-            qvals_outside = _weighted_quantiles(outside_distances_um, outside_weights, quantiles)
-            for q, qx in zip(quantiles, qvals_outside, strict=True):
-                if q not in display_quantiles:
-                    continue
-                line_width = 3.0 if np.isclose(q, 0.50) else 1.5
-                line = ax_outside.vlines(
-                    qx,
-                    y - quantile_line_half_height,
-                    y + quantile_line_half_height,
-                    color=color,
-                    linewidth=line_width,
-                    linestyles="-",
-                )
-                line.set_path_effects([pe.Stroke(linewidth=line_width + 1.6, foreground="white"), pe.Normal()])
-
-        if inside_distances_um.size > 0:
-            sampled_inside = _sample_weighted_points(
-                inside_distances_um, inside_weights, max_points=max_points_per_label, rng=rng
-            )
-            y_jitter = y + rng.uniform(-0.18, 0.18, size=sampled_inside.size)
-            ax_inside.scatter(
-                sampled_inside,
-                y_jitter,
-                s=point_size,
-                alpha=point_alpha,
-                color=color,
-                linewidths=0,
-                rasterized=True,
-            )
-            qvals_inside = _weighted_quantiles(inside_distances_um, inside_weights, quantiles)
-            for q, qx in zip(quantiles, qvals_inside, strict=True):
-                if q not in display_quantiles:
-                    continue
-                line_width = 3.0 if np.isclose(q, 0.50) else 1.5
-                line = ax_inside.vlines(
-                    qx,
-                    y - quantile_line_half_height,
-                    y + quantile_line_half_height,
-                    color=color,
-                    linewidth=line_width,
-                    linestyles="-",
-                )
-                line.set_path_effects([pe.Stroke(linewidth=line_width + 1.6, foreground="white"), pe.Normal()])
-
-    if max_distance_um is not None:
-        if max_distance_um <= 0:
-            raise ValueError("max_distance_um must be positive.")
-        ax_outside.set_xlim(0, max_distance_um)
-        ax_inside.set_xlim(0, max_distance_um)
-    ax_outside.set_yticks(y_positions)
-    ax_outside.set_yticklabels(labels)
-    ax_outside.invert_yaxis()
-    ax_outside.grid(axis="x", alpha=0.2)
-    ax_inside.grid(axis="x", alpha=0.2)
-    ax_outside.set_xlabel(f"Distance to boundary [{MICROMETER_UNIT}]")
-    ax_inside.set_xlabel(f"Distance to boundary [{MICROMETER_UNIT}]")
-    ax_outside.set_title("Outside tissue")
-    ax_inside.set_title("Inside tissue")
-    quantile_handles = [
-        Line2D([0], [0], color="black", linewidth=(3.0 if np.isclose(q, 0.50) else 1.5))
-        for q in display_quantiles
-    ]
-    quantile_labels = [f"q{int(round(q * 100)):02d}" for q in display_quantiles]
-    ax_inside.legend(quantile_handles, quantile_labels, title="Quantiles", loc="upper right", fontsize="small")
-    if title is not None:
-        fig.suptitle(title)
-    save_or_show_figure(fig, output_path)
 
 
 def plot_distance_cdf(
@@ -1609,104 +1430,6 @@ def plot_distance_cdf(
         ax_inside.legend(handles, labels, fontsize="small", ncol=1, loc="lower right")
     if title:
         fig.suptitle(title)
-    save_or_show_figure(fig, output_path)
-
-
-def plot_near_boundary_mass_bars(
-    summary_rows: list[DistanceDistributionSummary],
-    output_path: str,
-    thresholds_um: Sequence[float] = (5.0, 10.0, 20.0),
-    title: str | None = None,
-) -> None:
-    """
-    Plot per-label near-boundary mass fractions for outside and inside tissue.
-
-    For each threshold `t`, the plotted value is the conditional fraction
-    `P(|d| <= t | side)` where side is outside or inside tissue.
-
-    Args:
-        summary_rows: Rows produced by `summarize_distance_distributions`.
-        output_path: Destination path for the rendered figure.
-        thresholds_um: Distance thresholds (in micrometers) to include.
-        title: Optional figure title.
-
-    Raises:
-        ValueError: If `summary_rows` is empty.
-    """
-    if len(summary_rows) == 0:
-        raise ValueError("summary_rows must contain at least one row.")
-    thresholds_um = tuple(float(t) for t in thresholds_um)
-    labels = [row.label for row in summary_rows]
-    outside_values = np.array(
-        [[row.near_boundary_mass[f"p_outside_le_{int(round(t))}um"] for t in thresholds_um] for row in summary_rows],
-        dtype=float,
-    )
-    inside_values = np.array(
-        [[row.near_boundary_mass[f"p_inside_le_{int(round(t))}um"] for t in thresholds_um] for row in summary_rows],
-        dtype=float,
-    )
-
-    y = np.arange(len(labels), dtype=float)
-    bar_total_height = 0.75
-    bar_h = bar_total_height / max(1, len(thresholds_um))
-    offsets = np.linspace(-0.5 * (bar_total_height - bar_h), 0.5 * (bar_total_height - bar_h), len(thresholds_um))
-
-    fig, axes = plt.subplots(1, 2, figsize=(14, max(4.0, 0.55 * len(labels) + 1.2)), sharey=True)
-    ax_outside, ax_inside = axes
-    tech_colors = [COLOR_PALETTE.get(label, "#7f7f7f") for label in labels]
-    hatches = ("", "///", "xxx", "...")
-    for idx, threshold in enumerate(thresholds_um):
-        hatch = hatches[idx % len(hatches)]
-        ax_outside.barh(
-            y + offsets[idx],
-            outside_values[:, idx],
-            height=bar_h,
-            color=tech_colors,
-            edgecolor="black",
-            linewidth=0.5,
-            hatch=hatch,
-            label=f"P(|d| ≤ {int(round(threshold))} {MICROMETER_UNIT} | outside)",
-        )
-        ax_inside.barh(
-            y + offsets[idx],
-            inside_values[:, idx],
-            height=bar_h,
-            color=tech_colors,
-            edgecolor="black",
-            linewidth=0.5,
-            hatch=hatch,
-            label=f"P(|d| ≤ {int(round(threshold))} {MICROMETER_UNIT} | inside)",
-        )
-
-    max_x = float(np.nanmax(np.concatenate([outside_values.ravel(), inside_values.ravel()])))
-    max_x = max(max_x, 0.05)
-    x_lim = min(1.0, max_x * 1.15)
-
-    ax_outside.set_xlim(0.0, x_lim)
-    ax_inside.set_xlim(0.0, x_lim)
-    ax_outside.set_yticks(y)
-    ax_outside.set_yticklabels(labels)
-    ax_outside.invert_yaxis()
-    ax_outside.grid(axis="x", alpha=0.2)
-    ax_inside.grid(axis="x", alpha=0.2)
-    ax_outside.set_xlabel("Fraction of outside transcripts")
-    ax_inside.set_xlabel("Fraction of inside transcripts")
-    ax_outside.set_title("Outside tissue")
-    ax_inside.set_title("Inside tissue")
-    threshold_handles = [
-        Rectangle((0, 0), 1, 1, facecolor="white", edgecolor="black", hatch=hatches[idx % len(hatches)], linewidth=0.8)
-        for idx in range(len(thresholds_um))
-    ]
-    threshold_labels = [f"|d| ≤ {int(round(t))} {MICROMETER_UNIT}" for t in thresholds_um]
-    ax_inside.legend(
-        threshold_handles,
-        threshold_labels,
-        loc="upper right",
-        fontsize="small",
-        title="Distance d to boundary",
-        frameon=True,
-    )
-    fig.suptitle(title)
     save_or_show_figure(fig, output_path)
 
 
