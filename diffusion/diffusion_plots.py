@@ -349,7 +349,7 @@ def plot_tissue_outline_on_HE_image(
 
     best_scale, dpi, _, figsize = get_image_figure_parameters(sdata, HE_image)
 
-    title = f"{technology}\nH&E with tissue boundary section"
+    title = f"{technology}\nH&E with analyzed tissue boundary section"
 
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
 
@@ -642,7 +642,6 @@ def plot_bin_gene_counts_and_contour(
     output_path: str,
     pixel_size_um: float,
     title: str,
-    gene_name: str,
     figsize=(10, 10),
     line_width=1,
     marker_size=0.5,
@@ -665,7 +664,7 @@ def plot_bin_gene_counts_and_contour(
 
     if np.any(nonzero_mask):
         cbar = fig.colorbar(sc, ax=ax, shrink=0.4)
-        cbar.set_label(f"{gene_name} transcript counts")
+        cbar.set_label(f"{gene_bin_data.gene_name} transcript count")
 
     gpd.GeoSeries([contour]).plot(
         ax=ax,
@@ -726,7 +725,7 @@ def plot_bins_and_closest_points_on_contour(
     sm = plt.cm.ScalarMappable(norm=color_norm, cmap=cmap)
     sm.set_array([])
     cbar = fig.colorbar(sm, ax=ax, shrink=0.85, pad=0.02)
-    cbar.set_label("Transcript count per bin")
+    cbar.set_label(f"{data.gene_bins.gene_name} transcript count")
 
     # Draw each bin pair in order: line first, then the matching dot.
     # This gives true interleaving depth control for each bin/line pair.
@@ -805,7 +804,7 @@ def plot_distances_linearized(
     divider = make_axes_locatable(ax)
     cax = divider.append_axes("right", size="3%", pad=0.08)
     cbar = fig.colorbar(sc, cax=cax)
-    cbar.set_label("Transcript count")
+    cbar.set_label(f"{data.gene_bins.gene_name} transcript count")
     ax.plot([0.0, 1.0], [0.0, 0.0], color="red", linewidth=1, linestyle="-", zorder=0)
     ax.set_xlabel("Normalized position along boundary")
     ax.set_ylabel(f"Distance to boundary [{MICROMETER_UNIT}]")
@@ -835,8 +834,35 @@ def plot_distance_histogram(
         bins = 10
     ax.hist(distances, bins=bins, weights=weights)
     ax.axvline(0, color="black", linewidth=1, linestyle=":", zorder=3)
+    # Add inside tissue/outside tissue labels on the histogram plots
+    label_bbox = {
+        "boxstyle": "square,pad=0.25",
+        "facecolor": "white",
+        "edgecolor": "black",
+        "linewidth": 1.0,
+    }
+    ax.text(
+        0.25,
+        0.95,
+        "Outside tissue",
+        transform=ax.transAxes,
+        ha="center",
+        va="top",
+        bbox=label_bbox,
+        zorder=4,
+    )
+    ax.text(
+        0.75,
+        0.95,
+        "Inside tissue",
+        transform=ax.transAxes,
+        ha="center",
+        va="top",
+        bbox=label_bbox,
+        zorder=4,
+    )
     ax.set_xlabel(f"Distance to boundary [{MICROMETER_UNIT}]")
-    ax.set_ylabel("Transcript count")
+    ax.set_ylabel(f"{data.gene_bins.gene_name} transcript count")
     ax.set_title(title)
     save_or_show_figure(fig, output_path)
 
