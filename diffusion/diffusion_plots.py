@@ -815,24 +815,17 @@ def plot_distances_linearized(
     save_or_show_figure(fig, output_path)
 
 
-def plot_distance_histogram(  # TODO: remove support for pixel units, it's not really useful.
+def plot_distance_histogram(
     data: "DiffusionBinData",
     output_path: str,
     pixel_size_um: float,
-    unit: str = "px",
     title: str | None = None,
 ) -> None:
     distances = np.asarray(data.distance_data.closest_distances, dtype=float)
     weights = np.asarray(data.gene_bins.transcript_counts, dtype=float)
     distances, weights = _sanitize_distance_weights(distances, weights, label="distance histogram")
-    assert unit in {"px", "um"}, "unit must be 'px' or 'um'."
-    if unit == "um":
-        distances = distances * pixel_size_um
-        unit_label = MICROMETER_UNIT
-        bin_width = 5.0
-    else:
-        unit_label = "px"
-        bin_width = 5.0 / pixel_size_um
+    distances = distances * pixel_size_um
+    bin_width = 5.0
 
     fig, ax = plt.subplots(figsize=(6, 6))
     dmin = float(np.min(distances))
@@ -842,7 +835,7 @@ def plot_distance_histogram(  # TODO: remove support for pixel units, it's not r
         bins = 10
     ax.hist(distances, bins=bins, weights=weights)
     ax.axvline(0, color="black", linewidth=1, linestyle=":", zorder=3)
-    ax.set_xlabel(f"Distance to boundary [{unit_label}]")
+    ax.set_xlabel(f"Distance to boundary [{MICROMETER_UNIT}]")
     ax.set_ylabel("Transcript count")
     ax.set_title(title)
     save_or_show_figure(fig, output_path)
@@ -1437,18 +1430,12 @@ def plot_distance_boxplot(
     data: "DiffusionBinData",
     output_path: str,
     pixel_size_um: float,
-    unit: str = "px",
     title: str | None = None,
 ) -> None:
     distances = np.asarray(data.distance_data.closest_distances, dtype=float)
     weights = np.asarray(data.gene_bins.transcript_counts, dtype=float)
     distances, weights = _sanitize_distance_weights(distances, weights, label="distance boxplot")
-    assert unit in {"px", "um"}, "unit must be 'px' or 'um'."
-    if unit == "um":
-        distances = distances * pixel_size_um
-        unit_label = MICROMETER_UNIT
-    else:
-        unit_label = "px"
+    distances = distances * pixel_size_um
     if not np.all(np.isclose(weights, np.rint(weights))):
         raise ValueError("Transcript counts must be integer to expand-by-count.")
     repeats = np.rint(weights).astype(int)
@@ -1458,8 +1445,8 @@ def plot_distance_boxplot(
 
     fig, ax = plt.subplots(figsize=(6, 6))
     ax.boxplot(expanded_distances)
-    ax.set_ylabel(f"Distance to boundary [{unit_label}]")
-    ax.set_title(title or f"Distance to boundary boxplot [{unit_label}]")
+    ax.set_ylabel(f"Distance to boundary [{MICROMETER_UNIT}]")
+    ax.set_title(title)
     save_or_show_figure(fig, output_path)
 
 
