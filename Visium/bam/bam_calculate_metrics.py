@@ -10,6 +10,13 @@ import pandas as pd
 from pathlib import Path
 import argparse
 
+# installation:
+# uv venv .venv_bam_env --python=3.12
+# source .venv_bam_env/bin/activate
+# uv pip install dask
+# uv pip install pandas
+# uv pip install pyarrow
+
 
 def calculate_metrics_all(
     input_path: str | Path,
@@ -61,6 +68,9 @@ def calculate_metrics_all(
     print("All sample sizes:", sample_sizes, flush=True)
 
     for _sample_size in sample_sizes:
+        # max sample size set to 1000000000
+        if _sample_size > 1_000_000_000:
+            break
         print(f"Processing sample size {_sample_size}.", flush=True)
         _output_dir_sample_size = os.path.join(
             output_dir, f"sample_size_{_sample_size}"
