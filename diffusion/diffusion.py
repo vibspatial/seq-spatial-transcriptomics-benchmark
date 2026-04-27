@@ -18,4 +18,5 @@ class Experiment:
     pixel_size_um: float # pixel size of H&E image in microns; units of coordinate system used for e.g. spot centroids
     tissue_mask: str | None  # name of tissue mask shapes layer
     levels: list[LevelInfo]  # bin sizes, they MUST be ordered from finest to coarsest
+    hexbins: LevelInfo # hexagonally (re)binned data, coarser but faster visualization
     boundary_point_pairs: list[tuple[tuple[float, float], tuple[float, float]]] = field(default_factory=list)  # list of (approx_start_xy, approx_end_xy) pairs near tissue boundary
