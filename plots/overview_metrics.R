@@ -72,7 +72,7 @@ pretty_names <- c(
   Q30_bases_in_UMI = "Q30 bases in UMI",
   
   Number_of_spots_with_at_least_1_UMI_in_tissue = "Spots in tissue with ≥1 UMI count",
-  Percentage_of_spots_recovered_in_tissue = "Percentage of spots recovered in tissue (%)",
+  Percentage_of_spots_recovered_in_tissue = "Percentage of spots in tissue with ≥1 UMI count (%)",
   
   Total_number_of_reads = "Reads",
   Total_number_of_genes = "Genes",
@@ -84,7 +84,7 @@ pretty_names <- c(
   Percentage_of_genes_in_tissue = "Percentage of genes detected in tissue (%)",
   Percentage_of_targeted_genes_found_in_capture_area = "Percentage of targeted genes detected in capture area (%)",
   Percentage_of_targeted_genes_found_in_tissue = "Percentage of targeted genes detected in tissue (%)",
-  Percentage_of_unique_UMIs_in_tissue = "Percentage of UMI counts detected in tissue (%)",
+  Percentage_of_unique_UMIs_in_tissue = "Percentage of unique UMI counts detected in tissue (%)",
   
   Sequencing_saturation_reported = "Sequencing saturation (%) - reported",
   Sequencing_saturation_calculated_total_reads = "Sequencing saturation (%)",
@@ -95,8 +95,9 @@ pretty_names <- c(
   Percentage_of_reads_that_contains_a_usable_UMI = "Percentage of reads contributing to UMI counts (%)",
   ratio_reads_unique_UMIs = "Reads/unique UMI",
   
+  Percentage_of_tissue_covered_by_spots_100M = "Percentage of tissue covered by spots (%)",
   Number_of_spots_with_at_least_1_UMI_in_tissue_100M = "Spots in tissue with ≥1 UMI count",
-  Percentage_of_spots_recovered_in_tissue_100M = "Percentage of spots recovered in tissue (%)",
+  Percentage_of_spots_recovered_in_tissue_100M = "Percentage of spots in tissue with ≥1 UMI count (%)",
   Total_number_of_reads_100M = "Reads",
   Total_number_of_genes_100M = "Genes",
   Total_number_of_UMIs_100M = "UMI counts",
@@ -106,7 +107,7 @@ pretty_names <- c(
   Percentage_of_genes_in_tissue_100M = "Percentage of genes detected in tissue (%)",
   Percentage_of_targeted_genes_found_in_capture_area_100M = "Percentage of targeted genes detected in capture area (%)",
   Percentage_of_targeted_genes_found_in_tissue_100M = "Percentage of targeted genes detected in tissue (%)",
-  Percentage_of_unique_UMIs_in_tissue_100M = "Percentage of UMI counts detected in tissue (%)",
+  Percentage_of_unique_UMIs_in_tissue_100M = "Percentage of unique UMI counts detected in tissue (%)",
   Sequencing_saturation_reported_100M = "Sequencing saturation (%) - reported",
   Sequencing_saturation_calculated_total_reads_100M = "Sequencing saturation (%)",
   Sequencing_saturation_calculated_total_UMIs_100M = "Sequencing saturation (%)",

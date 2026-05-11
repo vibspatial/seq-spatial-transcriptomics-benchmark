@@ -186,20 +186,42 @@ plot_upset <- function(df_wide, sample_type, outdir) {
   
   png(outfile, width = 2800, height = 1800, res = 300)
   
+  par(
+    mar = c(10, 12, 6, 4),
+    mgp = c(3, 1, 0)
+  )
+  
   p <- upset(
     upset_data,
     sets = pretty_names,
     keep.order = TRUE,
     nsets = length(pretty_names),
-    nintersects = 25,
+    nintersects = 15,
     order.by = "freq",
+    
     mainbar.y.label = "Gene intersections",
     sets.x.label = "Genes per sample",
-    text.scale = c(1.6, 1.2, 1.1, 1.1, 1.2, 0.9),
+    
+    text.scale = c(
+      2.0,  # intersection size title
+      1.8,  # intersection size ticks
+      1.7,  # set size title
+      1.6,  # set size ticks
+      1.5,  # set names
+      1.5   # numbers above bars
+    ),
+    
+    mb.ratio = c(0.65, 0.35),
+    
+    number.angles = 0,
+    
     main.bar.color = "black",
     sets.bar.color = "black",
     matrix.color = "black",
-    shade.color = "grey90"
+    shade.color = "grey90",
+    
+    point.size = 4,
+    line.size = 1.2
   )
   
   print(p)
