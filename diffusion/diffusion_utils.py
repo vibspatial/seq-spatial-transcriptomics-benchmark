@@ -725,7 +725,7 @@ def generate_diffusion_plots(
                 experiment.dataset_id,
                 experiment.pixel_size_um,
                 os.path.join(plot_folder, "tissue.png"),
-                fill_alpha=0.1,
+                fill_alpha=0.0,
                 outline_width=1,
                 bounds=tuple(crop_rect),
                 overlay_contour=results.boundary_section,

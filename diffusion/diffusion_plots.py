@@ -91,6 +91,31 @@ def get_labels_figure_parameters(sdata, labels_layer, dpi=200, max_dim_for_plots
     return dpi, figsize_factor, figsize
 
 
+def is_single_channel_image(sdata, image_element: str, scale: str) -> bool:
+    image = sdata.images[image_element][scale]["image"]
+    if "c" in image.dims:
+        return image.sizes["c"] == 1
+    return image.ndim == 2 or (image.ndim >= 3 and image.shape[0] == 1)
+
+
+def render_background_image_in_grayscale(ax: plt.Axes) -> None:
+    images = ax.get_images()
+    if not images:
+        return
+
+    background_image = images[0]
+    image_array = background_image.get_array()
+    image_ndim = getattr(image_array, "ndim", None)
+    if image_ndim == 2:
+        background_image.set_cmap("gray_r")
+        return
+    if image_ndim == 3 and image_array.shape[-1] in (3, 4):
+        rgb_image = np.asarray(image_array)[..., :3]
+        grayscale_image = np.tensordot(rgb_image, [0.2989, 0.5870, 0.1140], axes=([-1], [0]))
+        background_image.set_data(grayscale_image)
+        background_image.set_cmap("gray")
+
+
 def save_or_show_figure(fig: plt.Figure, output_path: str, dpi: int = 300) -> None:
     output_dir = os.path.dirname(output_path)
     if output_dir:
@@ -103,7 +128,7 @@ def save_or_show_figure(fig: plt.Figure, output_path: str, dpi: int = 300) -> No
         facecolor="white",
         transparent=False,
     )
-    print(f"{output_path} saved")
+    print(f"Saved {output_path}")
     plt.close(fig)
 
 
@@ -251,9 +276,7 @@ def plot_bins_colored_by_feature(
 ):
     def _style_colorbar_for_labels(ax: plt.Axes) -> None:
         # helper function to shrink the vertical size of the colorbar,
-        # and to add a label. In later versions of spatialdata_plot,
-        # this can be accomplished via the colorbar_params argument to render_*()
-        # or show().
+        # and to add a label.
         fig = ax.figure
         if len(fig.axes) < 2:
             return
@@ -269,13 +292,18 @@ def plot_bins_colored_by_feature(
         best_scale, dpi, _, figsize = get_image_figure_parameters(sdata, HE_image)
 
         fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
-        sdata.pl.render_images(element=HE_image, scale=best_scale).pl.render_labels(
+        sdata.pl.render_images(
+            element=HE_image,
+            scale=best_scale,
+            colorbar=False,
+        ).pl.render_labels(
             element=level_info.labels_layer,
             fill_alpha=0.5,
             contour_px=5,
             outline_alpha=0,
             color=feature,
             table_name=level_info.table_name,
+            colorbar_params={"fraction": 0.0375, "pad": 0.015},
         ).pl.show(
             coordinate_systems=dataset_id,
             title=title,
@@ -284,6 +312,7 @@ def plot_bins_colored_by_feature(
             dpi=dpi,
             ax=ax,
         )
+        render_background_image_in_grayscale(ax)
         _style_colorbar_for_labels(ax)
         ax.set_xlabel("x [px]")
         ax.set_ylabel("y [px]")
@@ -349,7 +378,7 @@ def plot_tissue_outline_on_HE_image(
 
     best_scale, dpi, _, figsize = get_image_figure_parameters(sdata, HE_image)
 
-    title = f"{technology}\nH&E with analyzed tissue boundary section"
+    title = technology
 
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
 
@@ -358,7 +387,7 @@ def plot_tissue_outline_on_HE_image(
         color="#1f77b4",
         fill_alpha=fill_alpha,
         outline_width=outline_width,
-        outline_alpha=0,
+        outline_alpha=(1.0, 0.0),
         outline_color="red",
     ).pl.show(
         coordinate_systems=dataset_id,
@@ -368,6 +397,8 @@ def plot_tissue_outline_on_HE_image(
         dpi=dpi,
         ax=ax,
     )
+    if is_single_channel_image(sdata, HE_image, best_scale):
+        render_background_image_in_grayscale(ax)
     ax.set_xlabel("x [px]")
     ax.set_ylabel("y [px]")
     if bounds is not None:
