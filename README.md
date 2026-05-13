@@ -1,0 +1,46 @@
+Datasets correspond to the following IDs:
+- BMKMANU S1000:
+    - Mouse brain: exp74
+- BMKMANU S3000:
+    - Mouse brain: Exp99
+    - Mouse liver: Exp100
+    - Mouse lung: Exp101
+    - Human lung: Exp102
+    - Rice root: psb
+- Curio_seeker:
+    - Mouse brain: SC11
+    - Mouse liver: SC13
+    - Mouse lung: SC12
+    - Human lung: SC14
+- Nova-ST:
+    - Mouse brain: Exp65-sampleSPC014
+    - Mouse liver: Exp100-sampleSPC004
+    - Mouse lung: Exp93-sampleSPC002
+    - Human lung: Exp93-sampleSPC022
+    - Rice root: Exp100-samplePSB
+- Stereo-seq:
+    - Mouse brain: spc014
+    - Mouse liver: spc004
+    - Mouse lung: spc002
+    - Human lung: spc022
+    - Rice root: psb
+- Visium (FFPE)
+    - Mouse brain: SCA016
+    - Mouse liver: SCA014
+    - Mouse lung: SCA013
+    - Human lung: SCA015
+- Visium HD (FFPE)
+    - Mouse brain: SCA003
+    - Mouse liver: SCA002
+    - Mouse lung: SCA001
+    - Human lung: SCA010
+- Visium HD (FF)
+    - Mouse brain: SCA019
+    - Mouse liver: SCA018
+    - Mouse lung: SCA017
+    - Human lung: SCA020
+- Visium HD 3'
+    - Mouse brain: SCA024
+    - Mouse liver (1): SCA01
+    - Mouse liver (2): SCA023
+    - Rice root: FPE010
