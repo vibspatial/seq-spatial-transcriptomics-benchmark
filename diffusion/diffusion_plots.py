@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from time import perf_counter
 from typing import TYPE_CHECKING, Sequence
 
@@ -39,6 +39,7 @@ class DiffusionPlotSettings:
     bins_and_closest_points: bool = True
     distances_linearized: bool = True
     histogram: bool = True
+    histogram_bin_widths_um: list[float] = field(default_factory=lambda: [5.0])
     boxplot: bool = False
 
 
@@ -850,19 +851,18 @@ def plot_distance_histogram(
     output_path: str,
     pixel_size_um: float,
     title: str | None = None,
+    bin_width_um: float = 5.0,
 ) -> None:
     distances = np.asarray(data.distance_data.closest_distances, dtype=float)
     weights = np.asarray(data.gene_bins.transcript_counts, dtype=float)
     distances, weights = _sanitize_distance_weights(distances, weights, label="distance histogram")
     distances = distances * pixel_size_um
-    bin_width = 5.0
 
     fig, ax = plt.subplots(figsize=(6, 6))
-    dmin = float(np.min(distances))
-    dmax = float(np.max(distances))
-    bins = np.arange(dmin, dmax + bin_width, bin_width)
-    if bins.size < 2:
-        bins = 10
+    bins = _distance_hist_bins(
+        [("distance histogram", distances, weights)],
+        bin_width=bin_width_um,
+    )
     ax.hist(distances, bins=bins, weights=weights)
     ax.axvline(0, color="black", linewidth=1, linestyle=":", zorder=3)
     # Add inside tissue/outside tissue labels on the histogram plots
@@ -907,6 +907,7 @@ def combined_distance_histogram(
     title: str | None = None,
     figsize = (12, 6),
     align_peaks: bool = False,
+    bin_width_um: float = 5.0,
 ) -> None:
     """
     Plot overlaid normalized signed-distance histograms for multiple crops.
@@ -925,12 +926,16 @@ def combined_distance_histogram(
         title: Optional plot title.
         figsize: Matplotlib figure size.
         align_peaks: Whether to shift each curve so its mode is at zero.
+        bin_width_um: Histogram bin width in micrometers.
 
     Raises:
         ValueError: If `max_distance_um` is provided but not positive.
     """
     data_per_label = _read_crop_distance_data(crop_specs, plots_root)
-    bins = _distance_hist_bins(data_per_label, bin_width=5.0)
+    bins = _distance_hist_bins(
+        data_per_label,
+        bin_width=bin_width_um,
+    )
     curves = _distance_hist_curves(data_per_label, bins=bins, align_peaks=align_peaks, density=True)
 
     fig, ax = plt.subplots(figsize=figsize)
@@ -1005,7 +1010,10 @@ def _read_crop_distance_data(
     return data_per_label
 
 
-def _distance_hist_bins(data_per_label: list[tuple[str, np.ndarray, np.ndarray]], bin_width: float = 5.0) -> np.ndarray:
+def _distance_hist_bins(
+    data_per_label: list[tuple[str, np.ndarray, np.ndarray]],
+    bin_width: float = 5.0,
+) -> np.ndarray:
     concat = np.concatenate([distances_um for _, distances_um, _ in data_per_label])
     dmin = float(np.min(concat))
     dmax = float(np.max(concat))
@@ -1041,7 +1049,10 @@ def _distance_hist_curves_from_crop_specs(
     density: bool = True,
 ) -> list[tuple[str, np.ndarray, np.ndarray]]:
     data_per_label = _read_crop_distance_data(crop_specs, plots_root)
-    bins = _distance_hist_bins(data_per_label, bin_width=bin_width_um)
+    bins = _distance_hist_bins(
+        data_per_label,
+        bin_width=bin_width_um,
+    )
     return _distance_hist_curves(data_per_label, bins=bins, align_peaks=align_peaks, density=density)
 
 
@@ -1148,6 +1159,7 @@ def calculate_distance_histogram_hwhm(
     crop_specs: list[tuple[str, str, float, str]],
     plots_root: str,
     align_peaks: bool = False,
+    bin_width_um: float = 5.0,
 ) -> list[DistanceHistogramHWHM]:
     """
     Calculate left/right HWHM values from per-crop signed-distance histograms.
@@ -1155,7 +1167,7 @@ def calculate_distance_histogram_hwhm(
     The left HWHM corresponds to diffusion towards the outside of the tissue (negative distances),
     the right HWHM towards the inside of the tissue (positive distances).
     Each entry in `crop_specs` is `(technology, dataset_id, pixel_size_um, crop_name)`.
-    Histograms are computed on shared 5-um bins, consistent with the combined and
+    Histograms are computed on shared bins, consistent with the combined and
     ridgeline histogram visualizations.
 
     Args:
@@ -1163,6 +1175,7 @@ def calculate_distance_histogram_hwhm(
         plots_root: Root directory containing per-crop precomputed diffusion outputs.
         align_peaks: Whether to shift each histogram so its mode is at zero before
             HWHM extraction.
+        bin_width_um: Histogram bin width in micrometers.
 
     Returns:
         List of `DistanceHistogramHWHM` rows (one row per crop label) containing
@@ -1172,7 +1185,7 @@ def calculate_distance_histogram_hwhm(
     curves = _distance_hist_curves_from_crop_specs(
         crop_specs=crop_specs,
         plots_root=plots_root,
-        bin_width_um=5.0,
+        bin_width_um=bin_width_um,
         align_peaks=align_peaks,
         density=True,
     )
@@ -1531,6 +1544,7 @@ def ridgeline_distance_histogram(
     title: str | None = None,
     figsize=(14, 8),
     align_peaks: bool = False,
+    bin_width_um: float = 5.0,
     overlap: float = 0.6,
     fill_alpha: float = 0.45,
 ) -> None:
@@ -1550,6 +1564,7 @@ def ridgeline_distance_histogram(
         title: Optional plot title.
         figsize: Matplotlib figure size.
         align_peaks: Whether to shift each curve so its mode is at zero.
+        bin_width_um: Histogram bin width in micrometers.
         overlap: Vertical overlap fraction between neighboring ridges in `[0, 1)`.
         fill_alpha: Fill alpha for ridge areas.
 
@@ -1562,7 +1577,7 @@ def ridgeline_distance_histogram(
     all_curves = _distance_hist_curves_from_crop_specs(
         crop_specs=crop_specs,
         plots_root=plots_root,
-        bin_width_um=5.0,
+        bin_width_um=bin_width_um,
         align_peaks=align_peaks,
         density=True,
     )

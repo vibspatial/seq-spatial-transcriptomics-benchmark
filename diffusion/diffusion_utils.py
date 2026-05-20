@@ -669,11 +669,8 @@ def generate_diffusion_plots(
     experiment: Experiment,
     level: str,
     plots_folder: str,
-    plot_settings: DiffusionPlotSettings | None = None,
+    plot_settings: DiffusionPlotSettings,
 ) -> None:
-    if plot_settings is None:
-        plot_settings = DiffusionPlotSettings()
-
     print(f"Generating diffusion plots for {experiment.technology} {experiment.dataset_id} at level {level}")
 
     sdata = None
@@ -770,12 +767,24 @@ def generate_diffusion_plots(
             )
 
         if plot_settings.histogram:
-            plot_distance_histogram(
-                results.filtered,
-                os.path.join(plot_folder, "histogram_um.png"),
-                experiment.pixel_size_um,
-                title=f"{experiment.technology}"
-            )
+            bin_widths_um = plot_settings.histogram_bin_widths_um
+            if len(bin_widths_um) == 0:
+                raise ValueError("histogram_bin_widths_um must contain at least one bin width.")
+
+            for bin_width_um in bin_widths_um:
+                bin_width_str = f"{bin_width_um:g}".replace(".", "p")
+                histogram_output_path = os.path.join(
+                    plot_folder,
+                    f"histogram_binwidth_{bin_width_str}um.png",
+                )
+
+                plot_distance_histogram(
+                    results.filtered,
+                    histogram_output_path,
+                    experiment.pixel_size_um,
+                    title=f"{experiment.technology}",
+                    bin_width_um=bin_width_um,
+                )
 
         if plot_settings.boxplot:
             plot_distance_boxplot(
