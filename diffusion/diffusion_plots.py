@@ -56,6 +56,14 @@ class DistanceHistogramHWHM:
 
 
 @dataclass(frozen=True)
+class DistanceKDEPeakMedianDistance:
+    label: str
+    left_median_distance_um: float
+    right_median_distance_um: float
+    peak_position_um: float
+
+
+@dataclass(frozen=True)
 class DistanceKDECurve:
     label: str
     x_um: np.ndarray
@@ -1581,6 +1589,151 @@ def plot_distance_histogram_hwhm_bars(
         Rectangle((0, 0), 1, 1, facecolor="white", edgecolor="black", hatch="", linewidth=0.8),
     ]
     ax.legend(side_legend_handles, ["Outside tissue", "Inside tissue"], loc="lower right")
+
+    save_or_show_figure(fig, output_path)
+
+
+def calculate_distance_to_kde_peak_median(
+    crop_specs: list[tuple[str, str, float, str]],
+    plots_root: str,
+) -> list[DistanceKDEPeakMedianDistance]:
+    """
+    Calculate weighted median distances to the detected KDE peak on both sides.
+
+    Distances are first shifted so the per-crop KDE peak is at zero. The left
+    median summarizes distances on the negative side of that peak and the right
+    median summarizes distances on the positive side.
+
+    Args:
+        crop_specs: Crop descriptors used to load per-crop signed distance/weight data.
+        plots_root: Root directory containing per-crop precomputed diffusion outputs.
+
+    Returns:
+        One row per crop label containing the detected peak position together with
+        the weighted median distance to that peak on the left and right side.
+    """
+    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
+    curves = _distance_kde_curves(data_per_label, align_peaks=False)
+
+    rows: list[DistanceKDEPeakMedianDistance] = []
+    for (label, distances_um, weights), curve in zip(data_per_label, curves, strict=True):
+        if label != curve.label:
+            raise ValueError(f"Label mismatch while computing KDE-peak medians: {label!r} != {curve.label!r}")
+
+        distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
+        left_distances_um, left_weights, right_distances_um, right_weights = _split_peak_aligned_distance_sides(
+            distances_um,
+            weights,
+            peak_position_um=curve.peak_position_um,
+        )
+
+        left_median_distance_um = (
+            float(_weighted_quantiles(left_distances_um, left_weights, probs=(0.50,))[0])
+            if left_distances_um.size > 0
+            else np.nan
+        )
+        right_median_distance_um = (
+            float(_weighted_quantiles(right_distances_um, right_weights, probs=(0.50,))[0])
+            if right_distances_um.size > 0
+            else np.nan
+        )
+
+        rows.append(
+            DistanceKDEPeakMedianDistance(
+                label=label,
+                left_median_distance_um=left_median_distance_um,
+                right_median_distance_um=right_median_distance_um,
+                peak_position_um=curve.peak_position_um,
+            )
+        )
+
+    return rows
+
+
+def plot_distance_to_kde_peak_median_bars(
+    median_rows: list[DistanceKDEPeakMedianDistance],
+    output_path: str,
+    title: str | None = None,
+    figsize: tuple[float, float] | None = None,
+) -> None:
+    """
+    Plot left/right weighted median distance to the detected KDE peak per crop.
+
+    Left-of-peak medians are drawn towards negative x; right-of-peak medians are
+    drawn towards positive x.
+
+    Args:
+        median_rows: Summary rows produced by `calculate_distance_to_kde_peak_median`.
+        output_path: Destination path for the rendered figure.
+        title: Optional plot title.
+        figsize: Optional figure size. If omitted, a height is chosen from row count.
+
+    Raises:
+        ValueError: If input is empty or no rows contain finite non-negative left/right medians.
+    """
+    if len(median_rows) == 0:
+        raise ValueError("median_rows must contain at least one row.")
+
+    labels = [row.label for row in median_rows]
+    left_median = np.asarray([row.left_median_distance_um for row in median_rows], dtype=float)
+    right_median = np.asarray([row.right_median_distance_um for row in median_rows], dtype=float)
+    valid = np.isfinite(left_median) & np.isfinite(right_median) & (left_median >= 0) & (right_median >= 0)
+    if not np.any(valid):
+        raise ValueError("No finite non-negative left/right KDE-peak medians available to plot.")
+
+    dropped = int(np.sum(~valid))
+    if dropped > 0:
+        print(f"Dropping {dropped} rows with invalid KDE-peak median values before plotting.")
+
+    keep_idx = np.flatnonzero(valid)
+    labels = [labels[i] for i in keep_idx]
+    left_median = left_median[keep_idx]
+    right_median = right_median[keep_idx]
+
+    if figsize is None:
+        figsize = (12, max(4.5, 0.45 * len(labels) + 1.5))
+
+    y = np.arange(len(labels))
+    fig, ax = plt.subplots(figsize=figsize)
+    tech_colors = [COLOR_PALETTE.get(label, "#7f7f7f") for label in labels]
+    missing_color_labels = [label for label, color in zip(labels, tech_colors) if color == "#7f7f7f"]
+    assert len(missing_color_labels) == 0
+
+    ax.barh(
+        y,
+        -left_median,
+        color=tech_colors,
+        alpha=0.9,
+        hatch="///",
+        edgecolor="black",
+        linewidth=0.5,
+    )
+    ax.barh(
+        y,
+        right_median,
+        color=tech_colors,
+        alpha=0.9,
+        hatch="",
+        edgecolor="black",
+        linewidth=0.5,
+    )
+
+    max_abs = float(np.max(np.concatenate([left_median, right_median])))
+    margin = max(0.5, 0.1 * max_abs)
+    ax.set_xlim(-(max_abs + margin), max_abs + margin)
+    ax.axvline(0.0, color="black", linewidth=1, linestyle=":", zorder=3)
+    ax.grid(axis="x", alpha=0.25)
+
+    ax.set_yticks(y)
+    ax.set_yticklabels(labels, fontsize=8)
+    ax.invert_yaxis()
+    ax.set_xlabel(f"Median distance to KDE peak [{MICROMETER_UNIT}]")
+    ax.set_title(title or "Median distance to KDE peak")
+    side_legend_handles = [
+        Rectangle((0, 0), 1, 1, facecolor="white", edgecolor="black", hatch="///", linewidth=0.8),
+        Rectangle((0, 0), 1, 1, facecolor="white", edgecolor="black", hatch="", linewidth=0.8),
+    ]
+    ax.legend(side_legend_handles, ["Left of KDE peak", "Right of KDE peak"], loc="lower right")
 
     save_or_show_figure(fig, output_path)
 
