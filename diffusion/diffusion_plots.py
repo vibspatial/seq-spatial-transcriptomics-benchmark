@@ -876,6 +876,7 @@ def plot_distance_histogram(
     title: str | None = None,
     bin_width_um: float = 5.0,
 ) -> None:
+    kde_color = "#1f77b4"
     distances = np.asarray(data.distance_data.closest_distances, dtype=float)
     weights = np.asarray(data.gene_bins.transcript_counts, dtype=float)
     distances, weights = _sanitize_distance_weights(distances, weights, label="distance histogram")
@@ -907,7 +908,7 @@ def plot_distance_histogram(
     )
     ax.axvline(
         density_curve.peak_position_um,
-        color="#d62728",
+        color=kde_color,
         linewidth=1.2,
         linestyle=":",
         zorder=4,
@@ -946,31 +947,30 @@ def plot_distance_histogram(
     kde_line, = density_ax.plot(
         density_curve.x_um,
         density_curve.density,
-        color="#1f77b4",
+        color=kde_color,
         linewidth=1.2,
-        label="Weighted KDE",
+        label="Transcript-weighted KDE",
     )
     peak_marker = density_ax.scatter(
         [density_curve.peak_position_um],
         [density_curve.peak_density],
         s=28,
-        color="#d62728",
+        color=kde_color,
         edgecolors="white",
         linewidths=0.8,
         zorder=5,
-        label=f"Detected peak ({density_curve.peak_position_um:.2f} {MICROMETER_UNIT})",
+        label=f"Detected peak (d={density_curve.peak_position_um:.2f} {MICROMETER_UNIT})",
     )
     if max_distance_um <= 0:
         raise ValueError("max_distance_um must be positive.")
     ax.set_xlim(-max_distance_um, max_distance_um)
-    density_ax.set_ylabel("")
-    density_ax.set_yticks([])
-    density_ax.tick_params(right=False, labelright=False)
-    density_ax.spines["right"].set_visible(False)
+    density_ax.set_ylabel(f"{data.gene_bins.gene_name} weighted KDE density")
+    density_ax.tick_params(right=True, labelright=True)
+    density_ax.spines["right"].set_visible(True)
 
     handles = [bar_container, kde_line, peak_marker]
     labels = [handle.get_label() for handle in handles]
-    ax.legend(handles, labels, fontsize="small", loc="upper left", bbox_to_anchor=(1.02, 1.0), borderaxespad=0.0)
+    ax.legend(handles, labels, fontsize="small", loc="upper left", bbox_to_anchor=(1.16, 1.0), borderaxespad=0.0)
     save_or_show_figure(fig, output_path)
 
 
