@@ -43,6 +43,7 @@ class DiffusionPlotSettings:
     distances_linearized: bool = True
     histogram: bool = True
     histogram_bin_widths_um: list[float] = field(default_factory=lambda: [5.0])
+    max_plot_distance_um: float = 100.0
     boxplot: bool = False
 
 
@@ -863,6 +864,7 @@ def plot_distance_histogram(
     data: "DiffusionBinData",
     output_path: str,
     pixel_size_um: float,
+    max_distance_um: float,
     title: str | None = None,
     bin_width_um: float = 5.0,
 ) -> None:
@@ -950,6 +952,9 @@ def plot_distance_histogram(
         zorder=5,
         label=f"Detected peak ({density_curve.peak_position_um:.2f} {MICROMETER_UNIT})",
     )
+    if max_distance_um <= 0:
+        raise ValueError("max_distance_um must be positive.")
+    ax.set_xlim(-max_distance_um, max_distance_um)
     density_ax.set_ylabel("")
     density_ax.set_yticks([])
     density_ax.tick_params(right=False, labelright=False)

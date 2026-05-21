@@ -784,6 +784,7 @@ def generate_diffusion_plots(
                     experiment.pixel_size_um,
                     title=f"{experiment.technology}",
                     bin_width_um=bin_width_um,
+                    max_distance_um=plot_settings.max_plot_distance_um,
                 )
 
         if plot_settings.boxplot:
