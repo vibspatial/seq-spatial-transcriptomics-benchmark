@@ -29,6 +29,9 @@ if TYPE_CHECKING:
     from diffusion_utils import DiffusionBinData, GeneBinData
 
 MICROMETER_UNIT = "\u00B5m"
+KDE_GRID_STEP_UM = 0.25
+KDE_TAIL_BANDWIDTHS = 3.0
+KDE_BANDWIDTH_FALLBACK_UM = 1.0
 
 
 @dataclass
@@ -49,6 +52,16 @@ class DistanceHistogramHWHM:
     left_hwhm_um: float
     right_hwhm_um: float
     peak_position_um: float
+
+
+@dataclass(frozen=True)
+class DistanceKDECurve:
+    label: str
+    x_um: np.ndarray
+    density: np.ndarray
+    peak_position_um: float
+    peak_density: float
+    alignment_shift_um: float
 
 
 @dataclass(frozen=True)
@@ -77,7 +90,7 @@ def get_image_figure_parameters(sdata, HE_image, dpi=200, max_dim_for_plots=1000
     return best_scale, dpi, figsize_factor, figsize
 
 
-def get_labels_figure_parameters(sdata, labels_layer, dpi=200, max_dim_for_plots=10000):
+def get_labels_figure_parameters(sdata, labels_layer, dpi=200):
     assert isinstance(
         sdata.labels[labels_layer], xr.DataArray
     ), f"Expected xarray.DataArray for sdata.labels[{labels_layer!r}], got {type(sdata.labels[labels_layer])}"
@@ -863,8 +876,32 @@ def plot_distance_histogram(
         [("distance histogram", distances, weights)],
         bin_width=bin_width_um,
     )
-    ax.hist(distances, bins=bins, weights=weights)
-    ax.axvline(0, color="black", linewidth=1, linestyle=":", zorder=3)
+    bin_centers = _distance_hist_bin_centers_from_edges(bins)
+    bin_widths = np.diff(bins)
+    histogram_counts, _ = np.histogram(distances, bins=bins, weights=weights, density=False)
+    density_curve = _distance_kde_curves(
+        [("distance histogram", distances, weights)],
+        align_peaks=False,
+    )[0]
+
+    bar_container = ax.bar(
+        bin_centers,
+        histogram_counts,
+        width=bin_widths,
+        align="center",
+        color="#d9d9d9",
+        edgecolor="#666666",
+        linewidth=0.8,
+        alpha=0.9,
+        label="Transcript-weighted histogram",
+    )
+    ax.axvline(
+        density_curve.peak_position_um,
+        color="#d62728",
+        linewidth=1.2,
+        linestyle=":",
+        zorder=4,
+    )
     # Add inside tissue/outside tissue labels on the histogram plots
     label_bbox = {
         "boxstyle": "square,pad=0.25",
@@ -895,6 +932,32 @@ def plot_distance_histogram(
     ax.set_xlabel(f"Distance to boundary [{MICROMETER_UNIT}]")
     ax.set_ylabel(f"{data.gene_bins.gene_name} transcript count")
     ax.set_title(title)
+    density_ax = ax.twinx()
+    kde_line, = density_ax.plot(
+        density_curve.x_um,
+        density_curve.density,
+        color="#1f77b4",
+        linewidth=1.2,
+        label="Weighted KDE",
+    )
+    peak_marker = density_ax.scatter(
+        [density_curve.peak_position_um],
+        [density_curve.peak_density],
+        s=28,
+        color="#d62728",
+        edgecolors="white",
+        linewidths=0.8,
+        zorder=5,
+        label=f"Detected peak ({density_curve.peak_position_um:.2f} {MICROMETER_UNIT})",
+    )
+    density_ax.set_ylabel("")
+    density_ax.set_yticks([])
+    density_ax.tick_params(right=False, labelright=False)
+    density_ax.spines["right"].set_visible(False)
+
+    handles = [bar_container, kde_line, peak_marker]
+    labels = [handle.get_label() for handle in handles]
+    ax.legend(handles, labels, fontsize="small", loc="upper left", bbox_to_anchor=(1.02, 1.0), borderaxespad=0.0)
     save_or_show_figure(fig, output_path)
 
 
@@ -912,10 +975,12 @@ def combined_distance_histogram(
     """
     Plot overlaid normalized signed-distance histograms for multiple crops.
 
-    If `align_peaks` is True, each curve is shifted so its histogram peak is placed
-    at x=0.
+    If `align_peaks` is True, each KDE curve is shifted so its detected density peak
+    is placed at x=0.
     Each entry in `crop_specs` is `(technology, dataset_id, pixel_size_um, crop_name)`.
-    Histograms are computed in micrometers with shared bins across crops.
+    Histograms are computed in micrometers with shared bins across crops, and
+    the overlaid density curves are true weighted KDEs evaluated on the raw
+    distance values.
 
     Args:
         crop_specs: Crop descriptors used to load per-crop signed distance/weight data.
@@ -925,7 +990,7 @@ def combined_distance_histogram(
         max_distance_um: Optional symmetric x-limit in micrometers.
         title: Optional plot title.
         figsize: Matplotlib figure size.
-        align_peaks: Whether to shift each curve so its mode is at zero.
+        align_peaks: Whether to shift each KDE curve so its mode is at zero.
         bin_width_um: Histogram bin width in micrometers.
 
     Raises:
@@ -936,12 +1001,44 @@ def combined_distance_histogram(
         data_per_label,
         bin_width=bin_width_um,
     )
-    curves = _distance_hist_curves(data_per_label, bins=bins, align_peaks=align_peaks, density=True)
+    curves = _distance_kde_curves(
+        data_per_label,
+        align_peaks=align_peaks,
+    )
 
     fig, ax = plt.subplots(figsize=figsize)
-    for label, centers, counts in curves:
-        color = COLOR_PALETTE.get(label)
-        ax.plot(centers, counts, linewidth=1.5, label=label, color=color)
+    for curve in curves:
+        color = COLOR_PALETTE.get(curve.label)
+        label_distances_um = next(distances_um for label, distances_um, _ in data_per_label if label == curve.label)
+        label_weights = next(weights for label, _, weights in data_per_label if label == curve.label)
+        histogram_density, _ = np.histogram(label_distances_um, bins=bins, weights=label_weights, density=True)
+        histogram_centers_um = _distance_hist_bin_centers_from_edges(bins)
+        if align_peaks:
+            histogram_centers_um = histogram_centers_um - curve.alignment_shift_um
+        ax.step(
+            histogram_centers_um,
+            histogram_density,
+            where="mid",
+            linewidth=0.9,
+            alpha=0.3,
+            color=color,
+        )
+        ax.plot(
+            curve.x_um,
+            curve.density,
+            linewidth=1.8,
+            label=curve.label,
+            color=color,
+        )
+        ax.scatter(
+            [curve.peak_position_um],
+            [curve.peak_density],
+            s=24,
+            color=color,
+            edgecolors="white",
+            linewidths=0.8,
+            zorder=4,
+        )
 
     ax.axvline(0, color="black", linewidth=1, linestyle=":", zorder=3)
     x_label = (
@@ -1014,13 +1111,196 @@ def _distance_hist_bins(
     data_per_label: list[tuple[str, np.ndarray, np.ndarray]],
     bin_width: float = 5.0,
 ) -> np.ndarray:
+    if not np.isfinite(bin_width) or bin_width <= 0:
+        raise ValueError("bin_width must be a positive finite value.")
     concat = np.concatenate([distances_um for _, distances_um, _ in data_per_label])
-    dmin = float(np.min(concat))
-    dmax = float(np.max(concat))
-    bins = np.arange(dmin, dmax + bin_width, bin_width)
-    if bins.size < 2:
-        bins = 10
-    return bins
+    max_abs = float(np.max(np.abs(concat)))
+    if not np.isfinite(max_abs):
+        raise ValueError("Histogram distances must contain finite values.")
+    half_bin = 0.5 * bin_width
+    n_half = int(np.ceil(max_abs / bin_width))
+    centers = np.arange(-n_half, n_half + 1, dtype=float) * bin_width
+    return np.concatenate([centers - half_bin, [centers[-1] + half_bin]])
+
+
+def _distance_hist_bin_centers_from_edges(bins: np.ndarray) -> np.ndarray:
+    bins = np.asarray(bins, dtype=float)
+    if bins.ndim != 1 or bins.size < 2:
+        raise ValueError("bins must be a 1D array with at least two edges.")
+    return 0.5 * (bins[:-1] + bins[1:])
+
+
+def _distance_kde_grid(
+    max_abs_um: float,
+    max_bandwidth_um: float = 0.0,
+    step_um: float = KDE_GRID_STEP_UM,
+    tail_bandwidths: float = KDE_TAIL_BANDWIDTHS,
+) -> np.ndarray:
+    if not np.isfinite(max_abs_um) or max_abs_um < 0:
+        raise ValueError("max_abs_um must be finite and non-negative.")
+    if not np.isfinite(step_um) or step_um <= 0:
+        raise ValueError("step_um must be finite and positive.")
+
+    limit_um = max_abs_um + tail_bandwidths * max(0.0, max_bandwidth_um)
+    n_half = max(1, int(np.ceil(limit_um / step_um)))
+    return np.arange(-n_half, n_half + 1, dtype=float) * step_um
+
+
+def _weighted_mean_and_std(
+    values: np.ndarray,
+    weights: np.ndarray,
+) -> tuple[float, float]:
+    total_weight = float(np.sum(weights))
+    if not np.isfinite(total_weight) or total_weight <= 0:
+        raise ValueError("weights must sum to a positive finite value.")
+    mean = float(np.sum(weights * values) / total_weight)
+    variance = float(np.sum(weights * (values - mean) ** 2) / total_weight)
+    variance = max(variance, 0.0)
+    return mean, float(np.sqrt(variance))
+
+
+def _effective_sample_size(weights: np.ndarray) -> float:
+    total_weight = float(np.sum(weights))
+    sumsq_weight = float(np.sum(weights * weights))
+    if not np.isfinite(total_weight) or not np.isfinite(sumsq_weight) or total_weight <= 0 or sumsq_weight <= 0:
+        raise ValueError("weights must be positive and finite.")
+    return (total_weight * total_weight) / sumsq_weight
+
+
+def _weighted_kde_bandwidth_um(
+    values_um: np.ndarray,
+    weights: np.ndarray,
+    fallback_scale_um: float = KDE_BANDWIDTH_FALLBACK_UM,
+) -> float:
+    _, weighted_std = _weighted_mean_and_std(values_um, weights)
+    q25_um, q75_um = _weighted_quantiles(values_um, weights, probs=(0.25, 0.75))
+    weighted_iqr_um = float(q75_um - q25_um)
+    robust_scale_um = weighted_iqr_um / 1.349 if weighted_iqr_um > 0 else np.nan
+
+    scale_candidates = [weighted_std]
+    if np.isfinite(robust_scale_um) and robust_scale_um > 0:
+        scale_candidates.append(robust_scale_um)
+    positive_scales = [candidate for candidate in scale_candidates if np.isfinite(candidate) and candidate > 0]
+    scale_um = min(positive_scales) if positive_scales else np.nan
+
+    n_eff = _effective_sample_size(weights)
+    if np.isfinite(scale_um) and scale_um > 0 and np.isfinite(n_eff) and n_eff > 1:
+        bandwidth_um = 0.9 * scale_um * (n_eff ** (-1.0 / 5.0))
+        if np.isfinite(bandwidth_um) and bandwidth_um > 0:
+            return float(bandwidth_um)
+
+    data_range_um = float(np.max(values_um) - np.min(values_um))
+    fallback_candidates = [fallback_scale_um, data_range_um / 20.0, 1e-6]
+    return float(max(candidate for candidate in fallback_candidates if np.isfinite(candidate) and candidate > 0))
+
+
+def _shared_kde_bandwidth_um(
+    data_per_label: list[tuple[str, np.ndarray, np.ndarray]],
+) -> float:
+    if len(data_per_label) == 0:
+        raise ValueError("data_per_label must contain at least one dataset.")
+
+    pooled_distances: list[np.ndarray] = []
+    pooled_weights: list[np.ndarray] = []
+    for label, distances_um, weights in data_per_label:
+        distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
+        pooled_distances.append(distances_um)
+        pooled_weights.append(weights)
+
+    return _weighted_kde_bandwidth_um(
+        np.concatenate(pooled_distances),
+        np.concatenate(pooled_weights),
+    )
+
+
+def _evaluate_weighted_gaussian_kde(
+    x_um: np.ndarray,
+    values_um: np.ndarray,
+    weights: np.ndarray,
+    bandwidth_um: float,
+    value_chunk_size: int = 4096,
+) -> np.ndarray:
+    if bandwidth_um <= 0 or not np.isfinite(bandwidth_um):
+        raise ValueError("bandwidth_um must be finite and positive.")
+    total_weight = float(np.sum(weights))
+    if total_weight <= 0 or not np.isfinite(total_weight):
+        raise ValueError("weights must sum to a positive finite value.")
+
+    density = np.zeros_like(x_um, dtype=float)
+    normalization = total_weight * bandwidth_um * np.sqrt(2.0 * np.pi)
+    for start in range(0, values_um.size, value_chunk_size):
+        stop = min(start + value_chunk_size, values_um.size)
+        value_chunk = values_um[start:stop]
+        weight_chunk = weights[start:stop]
+        scaled_delta = (x_um[:, None] - value_chunk[None, :]) / bandwidth_um
+        density += np.exp(-0.5 * scaled_delta * scaled_delta) @ weight_chunk
+    return density / normalization
+
+
+def _detect_peak_from_curve(
+    x_um: np.ndarray,
+    density_values: np.ndarray,
+) -> tuple[float, float]:
+    if x_um.ndim != 1 or density_values.ndim != 1 or x_um.size != density_values.size:
+        raise ValueError("x_um and density_values must be 1D arrays with equal length.")
+    if x_um.size == 0:
+        raise ValueError("Density curve must contain at least one sample.")
+
+    peak_density = float(np.max(density_values))
+    if not np.isfinite(peak_density) or peak_density <= 0:
+        raise ValueError("Density peak must be finite and positive.")
+    peak_indices = np.flatnonzero(np.isclose(density_values, peak_density))
+    if peak_indices.size == 0:
+        raise ValueError("No peak index found in density curve.")
+    peak_position_um = float(np.mean(x_um[peak_indices]))
+    return peak_position_um, peak_density
+
+
+def _distance_kde_curves(
+    data_per_label: list[tuple[str, np.ndarray, np.ndarray]],
+    align_peaks: bool = False,
+    x_um: np.ndarray | None = None,
+) -> list[DistanceKDECurve]:
+    sanitized_data: list[tuple[str, np.ndarray, np.ndarray]] = []
+    max_abs_um = 0.0
+    for label, distances_um, weights in data_per_label:
+        distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
+        sanitized_data.append((label, distances_um, weights))
+        max_abs_um = max(max_abs_um, float(np.max(np.abs(distances_um))))
+
+    shared_bandwidth_um = _shared_kde_bandwidth_um(sanitized_data)
+    if len(sanitized_data) > 1:
+        labels_str = ", ".join(label for label, _, _ in sanitized_data)
+        print(f"Using shared KDE bandwidth: {shared_bandwidth_um:.3f} {MICROMETER_UNIT} for {labels_str}")
+    bandwidths_um = [shared_bandwidth_um] * len(sanitized_data)
+
+    if x_um is None:
+        x_um = _distance_kde_grid(
+            max_abs_um=max_abs_um,
+            max_bandwidth_um=max(bandwidths_um, default=0.0),
+        )
+    x_um = np.asarray(x_um, dtype=float)
+
+    curves: list[DistanceKDECurve] = []
+    for (label, distances_um, weights), bandwidth_um in zip(sanitized_data, bandwidths_um, strict=True):
+        density_values = _evaluate_weighted_gaussian_kde(x_um, distances_um, weights, bandwidth_um=bandwidth_um)
+        peak_position_um, peak_density = _detect_peak_from_curve(x_um, density_values)
+        alignment_shift_um = peak_position_um
+        curve_x_um = x_um
+        if align_peaks:
+            curve_x_um = x_um - peak_position_um
+            peak_position_um = 0.0
+        curves.append(
+            DistanceKDECurve(
+                label=label,
+                x_um=curve_x_um,
+                density=density_values,
+                peak_position_um=peak_position_um,
+                peak_density=peak_density,
+                alignment_shift_um=alignment_shift_um,
+            )
+        )
+    return curves
 
 
 def _distance_hist_curves(
@@ -1033,12 +1313,24 @@ def _distance_hist_curves(
     for label, distances_um, weights in data_per_label:
         distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
         counts, edges = np.histogram(distances_um, bins=bins, weights=weights, density=density)
-        centers = 0.5 * (edges[:-1] + edges[1:])
+        centers = _distance_hist_bin_centers_from_edges(edges)
         if align_peaks:
             peak_idx = int(np.argmax(counts))
             centers = centers - centers[peak_idx]
         curves.append((label, centers, counts))
     return curves
+
+
+def _distance_kde_curves_from_crop_specs(
+    crop_specs: list[tuple[str, str, float, str]],
+    plots_root: str,
+    align_peaks: bool = False,
+) -> list[DistanceKDECurve]:
+    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
+    return _distance_kde_curves(
+        data_per_label,
+        align_peaks=align_peaks,
+    )
 
 
 def _distance_hist_curves_from_crop_specs(
@@ -1069,33 +1361,33 @@ def _linear_interpolate_x_at_y(
     return x0 + t * (x1 - x0)
 
 
-def _find_hwhm_from_histogram(
-    centers: np.ndarray,
-    counts: np.ndarray,
+def _find_hwhm_from_curve(
+    x_um: np.ndarray,
+    y_values: np.ndarray,
 ) -> tuple[float, float, float]:
     """
-    Compute half-width at half-maximum (HWHM) on both sides of a histogram peak.
+    Compute half-width at half-maximum (HWHM) on both sides of a 1D peak curve.
 
-    The peak height is defined as the global maximum of `counts`. Half-maximum is
-    `0.5 * peak_count`. Peak bins are identified as all bins whose value is
+    The peak height is defined as the global maximum of `y_values`. Half-maximum is
+    `0.5 * peak_count`. Peak samples are identified as all x-locations whose value is
     `np.isclose` to the global maximum.
 
-    If multiple bins share the maximum:
-    - `peak_left_idx` is the first (leftmost) max bin index.
-    - `peak_right_idx` is the last (rightmost) max bin index.
-    - `peak_x` is the mean of the corresponding peak-bin centers.
+    If multiple samples share the maximum:
+    - `peak_left_idx` is the first (leftmost) max index.
+    - `peak_right_idx` is the last (rightmost) max index.
+    - `peak_x` is the mean of the corresponding x positions.
 
     Left and right half-maximum crossing positions are found by scanning outward
     from the peak edges and taking the first interval that brackets `half_max`.
-    Crossing x-coordinates are linearly interpolated between neighboring bin centers.
+    Crossing x-coordinates are linearly interpolated between neighboring x positions.
     If no crossing exists on a side, that side's HWHM is returned as `np.nan`.
 
     Parameters
     ----------
-    centers : np.ndarray
-        1D array of histogram bin centers (x positions).
-    counts : np.ndarray
-        1D array of histogram values at `centers` (same length as `centers`).
+    x_um : np.ndarray
+        1D array of x positions.
+    y_values : np.ndarray
+        1D array of curve values at `x_um` (same length as `x_um`).
 
     Returns
     -------
@@ -1105,46 +1397,46 @@ def _find_hwhm_from_histogram(
         - `left_hwhm` is `peak_x - left_halfmax_x` (or `np.nan` if not found),
         - `right_hwhm` is `right_halfmax_x - peak_x` (or `np.nan` if not found).
     """
-    if centers.ndim != 1 or counts.ndim != 1 or centers.size != counts.size:
-        raise ValueError("centers and counts must be 1D arrays with equal length.")
-    if centers.size == 0:
-        raise ValueError("Histogram must contain at least one bin.")
+    if x_um.ndim != 1 or y_values.ndim != 1 or x_um.size != y_values.size:
+        raise ValueError("x_um and y_values must be 1D arrays with equal length.")
+    if x_um.size == 0:
+        raise ValueError("Curve must contain at least one sample.")
 
-    peak_count = float(np.max(counts))
+    peak_count = float(np.max(y_values))
     if not np.isfinite(peak_count) or peak_count <= 0:
-        raise ValueError("Histogram peak must be finite and positive.")
+        raise ValueError("Curve peak must be finite and positive.")
     half_max = 0.5 * peak_count
 
-    peak_indices = np.flatnonzero(np.isclose(counts, peak_count))
+    peak_indices = np.flatnonzero(np.isclose(y_values, peak_count))
     if peak_indices.size == 0:
-        raise ValueError("No peak index found in histogram.")
+        raise ValueError("No peak index found in curve.")
     peak_left_idx = int(peak_indices[0])
     peak_right_idx = int(peak_indices[-1])
-    peak_x = float(np.mean(centers[peak_indices]))
+    peak_x = float(np.mean(x_um[peak_indices]))
 
     left_x = np.nan
     for i in range(peak_left_idx - 1, -1, -1):
-        if counts[i] <= half_max <= counts[i + 1]:
+        if y_values[i] <= half_max <= y_values[i + 1]:
             left_x = float(
                 _linear_interpolate_x_at_y(
-                    float(centers[i]),
-                    float(counts[i]),
-                    float(centers[i + 1]),
-                    float(counts[i + 1]),
+                    float(x_um[i]),
+                    float(y_values[i]),
+                    float(x_um[i + 1]),
+                    float(y_values[i + 1]),
                     half_max,
                 )
             )
             break
 
     right_x = np.nan
-    for i in range(peak_right_idx + 1, counts.size):
-        if counts[i] <= half_max <= counts[i - 1]:
+    for i in range(peak_right_idx + 1, y_values.size):
+        if y_values[i] <= half_max <= y_values[i - 1]:
             right_x = float(
                 _linear_interpolate_x_at_y(
-                    float(centers[i - 1]),
-                    float(counts[i - 1]),
-                    float(centers[i]),
-                    float(counts[i]),
+                    float(x_um[i - 1]),
+                    float(y_values[i - 1]),
+                    float(x_um[i]),
+                    float(y_values[i]),
                     half_max,
                 )
             )
@@ -1159,42 +1451,38 @@ def calculate_distance_histogram_hwhm(
     crop_specs: list[tuple[str, str, float, str]],
     plots_root: str,
     align_peaks: bool = False,
-    bin_width_um: float = 5.0,
 ) -> list[DistanceHistogramHWHM]:
     """
-    Calculate left/right HWHM values from per-crop signed-distance histograms.
+    Calculate left/right HWHM values from per-crop signed-distance KDE curves.
 
     The left HWHM corresponds to diffusion towards the outside of the tissue (negative distances),
     the right HWHM towards the inside of the tissue (positive distances).
     Each entry in `crop_specs` is `(technology, dataset_id, pixel_size_um, crop_name)`.
-    Histograms are computed on shared bins, consistent with the combined and
-    ridgeline histogram visualizations.
+    KDE curves are evaluated on a shared symmetric x-grid anchored at zero,
+    consistent with the combined and ridgeline visualizations.
 
     Args:
         crop_specs: Crop descriptors used to load per-crop signed distance/weight data.
         plots_root: Root directory containing per-crop precomputed diffusion outputs.
-        align_peaks: Whether to shift each histogram so its mode is at zero before
+        align_peaks: Whether to shift each KDE curve so its mode is at zero before
             HWHM extraction.
-        bin_width_um: Histogram bin width in micrometers.
 
     Returns:
         List of `DistanceHistogramHWHM` rows (one row per crop label) containing
         peak position and left/right HWHM in micrometers.
     """
     rows: list[DistanceHistogramHWHM] = []
-    curves = _distance_hist_curves_from_crop_specs(
+    curves = _distance_kde_curves_from_crop_specs(
         crop_specs=crop_specs,
         plots_root=plots_root,
-        bin_width_um=bin_width_um,
         align_peaks=align_peaks,
-        density=True,
     )
 
-    for label, bin_centers, bin_counts in curves:
-        peak_x, left_hwhm, right_hwhm = _find_hwhm_from_histogram(bin_centers, bin_counts)
+    for curve in curves:
+        peak_x, left_hwhm, right_hwhm = _find_hwhm_from_curve(curve.x_um, curve.density)
         rows.append(
             DistanceHistogramHWHM(
-                label=label,
+                label=curve.label,
                 left_hwhm_um=left_hwhm,
                 right_hwhm_um=right_hwhm,
                 peak_position_um=peak_x,
@@ -1330,6 +1618,21 @@ def _split_signed_distance_sides(
     return outside_distances_um, outside_weights, inside_distances_um, inside_weights
 
 
+def _split_peak_aligned_distance_sides(
+    distances_um: np.ndarray,
+    weights: np.ndarray,
+    peak_position_um: float,
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+    shifted_distances_um = np.asarray(distances_um, dtype=float) - float(peak_position_um)
+    left_mask = shifted_distances_um <= 0
+    right_mask = shifted_distances_um > 0
+    left_distances_um = -shifted_distances_um[left_mask]
+    left_weights = weights[left_mask]
+    right_distances_um = shifted_distances_um[right_mask]
+    right_weights = weights[right_mask]
+    return left_distances_um, left_weights, right_distances_um, right_weights
+
+
 def summarize_distance_distributions(
     crop_specs: list[tuple[str, str, float, str]],
     plots_root: str,
@@ -1432,13 +1735,16 @@ def plot_distance_cdf(
     plots_root: str,
     max_distance_um: float | None = None,
     title: str | None = None,
+    origin: str = "boundary",
 ) -> None:
     """
-    Plot weighted transcript-count CDFs of boundary distance for each crop.
+    Plot weighted transcript-count CDFs using either boundary- or peak-based origin.
 
-    Two side-by-side panels show outside and inside tissue distances separately.
-    Distances are converted to non-negative magnitudes per side before CDF
-    computation.
+    Two side-by-side panels show non-negative distances on either side of the
+    chosen origin. With `origin="boundary"`, panels correspond to outside and
+    inside tissue. With `origin="peak"`, distances are first shifted by the
+    detected KDE peak used for peak-aligned histogram/ridgeline plots, and the
+    panels correspond to left and right of that peak.
 
     Args:
         crop_specs: Crop descriptors as `(technology, dataset_id, pixel_size_um, crop_name)`.
@@ -1446,24 +1752,44 @@ def plot_distance_cdf(
         plots_root: Root directory containing per-crop precomputed diffusion outputs.
         max_distance_um: Optional x-limit (0 to `max_distance_um`) for both panels.
         title: Optional figure title.
+        origin: Distance origin used for the CDFs. Must be `"boundary"` or `"peak"`.
 
     Raises:
+        ValueError: If `origin` is not one of the supported values.
         ValueError: If `max_distance_um` is provided but not positive.
     """
     data_per_label = _read_crop_distance_data(crop_specs, plots_root)
+    if origin not in {"boundary", "peak"}:
+        raise ValueError("origin must be 'boundary' or 'peak'.")
+
+    peak_positions_by_label: dict[str, float] = {}
+    if origin == "peak":
+        curves = _distance_kde_curves(data_per_label, align_peaks=False)
+        peak_positions_by_label = {curve.label: curve.alignment_shift_um for curve in curves}
+
     fig, axes = plt.subplots(1, 2, figsize=(14, 6), sharey=True, gridspec_kw={"wspace": 0.05})
-    ax_outside, ax_inside = axes
+    ax_left, ax_right = axes
 
     for label, distances_um, weights in data_per_label:
         distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
-        outside_distances_um, outside_weights, inside_distances_um, inside_weights = _split_signed_distance_sides(
-            distances_um, weights
-        )
+        if origin == "boundary":
+            left_distances_um, left_weights, right_distances_um, right_weights = _split_signed_distance_sides(
+                distances_um,
+                weights,
+            )
+        else:
+            if label not in peak_positions_by_label:
+                raise ValueError(f"Missing KDE peak position for label {label!r}.")
+            left_distances_um, left_weights, right_distances_um, right_weights = _split_peak_aligned_distance_sides(
+                distances_um,
+                weights,
+                peak_position_um=peak_positions_by_label[label],
+            )
         color = COLOR_PALETTE.get(label, "#7f7f7f")
 
         for ax, side_distances_um, side_weights in [
-            (ax_outside, outside_distances_um, outside_weights),
-            (ax_inside, inside_distances_um, inside_weights),
+            (ax_left, left_distances_um, left_weights),
+            (ax_right, right_distances_um, right_weights),
         ]:
             if side_distances_um.size == 0:
                 continue
@@ -1477,20 +1803,28 @@ def plot_distance_cdf(
     if max_distance_um is not None:
         if max_distance_um <= 0:
             raise ValueError("max_distance_um must be positive.")
-        ax_outside.set_xlim(0, max_distance_um)
-        ax_inside.set_xlim(0, max_distance_um)
-    ax_outside.set_ylim(0, 1.02)
-    ax_outside.set_yticks([0.0, 0.25, 0.5, 0.75, 1.0])
-    ax_outside.grid(axis="y", alpha=0.25)
-    ax_inside.grid(axis="y", alpha=0.25)
-    ax_outside.set_xlabel(f"Distance to boundary [{MICROMETER_UNIT}]")
-    ax_inside.set_xlabel(f"Distance to boundary [{MICROMETER_UNIT}]")
-    ax_outside.set_ylabel("Transcript count CDF")
-    ax_outside.set_title("Outside tissue")
-    ax_inside.set_title("Inside tissue")
-    handles, labels = ax_inside.get_legend_handles_labels()
+        ax_left.set_xlim(0, max_distance_um)
+        ax_right.set_xlim(0, max_distance_um)
+    ax_left.set_ylim(0, 1.02)
+    ax_left.set_yticks([0.0, 0.25, 0.5, 0.75, 1.0])
+    ax_left.grid(axis="y", alpha=0.25)
+    ax_right.grid(axis="y", alpha=0.25)
+    if origin == "boundary":
+        x_label = f"Distance to boundary [{MICROMETER_UNIT}]"
+        left_title = "Outside tissue"
+        right_title = "Inside tissue"
+    else:
+        x_label = f"Distance to KDE peak [{MICROMETER_UNIT}]"
+        left_title = "Left of peak"
+        right_title = "Right of peak"
+    ax_left.set_xlabel(x_label)
+    ax_right.set_xlabel(x_label)
+    ax_left.set_ylabel("Transcript count CDF")
+    ax_left.set_title(left_title)
+    ax_right.set_title(right_title)
+    handles, labels = ax_right.get_legend_handles_labels()
     if len(handles) > 0:
-        ax_inside.legend(handles, labels, fontsize="small", ncol=1, loc="lower right")
+        ax_right.legend(handles, labels, fontsize="small", ncol=1, loc="lower right")
     if title:
         fig.suptitle(title)
     save_or_show_figure(fig, output_path)
@@ -1544,14 +1878,13 @@ def ridgeline_distance_histogram(
     title: str | None = None,
     figsize=(14, 8),
     align_peaks: bool = False,
-    bin_width_um: float = 5.0,
     overlap: float = 0.6,
     fill_alpha: float = 0.45,
 ) -> None:
     """
-    Plot normalized signed-distance histograms as a ridgeline (joy) chart.
+    Plot signed-distance KDE curves as a ridgeline (joy) chart.
 
-    If `align_peaks` is True, each curve is shifted so its histogram peak is placed
+    If `align_peaks` is True, each curve is shifted so its KDE peak is placed
     at x=0.
     Curves are stacked with configurable overlap and optional filled areas.
 
@@ -1564,40 +1897,46 @@ def ridgeline_distance_histogram(
         title: Optional plot title.
         figsize: Matplotlib figure size.
         align_peaks: Whether to shift each curve so its mode is at zero.
-        bin_width_um: Histogram bin width in micrometers.
         overlap: Vertical overlap fraction between neighboring ridges in `[0, 1)`.
         fill_alpha: Fill alpha for ridge areas.
 
     Raises:
-        ValueError: If no positive histogram values are available or
+        ValueError: If no positive KDE values are available or
             `max_distance_um` is provided but not positive.
         AssertionError: If `crop_specs` is empty or `overlap` is outside `[0, 1)`.
     """
     assert len(crop_specs) > 0, "crop_specs must contain at least one entry."
-    all_curves = _distance_hist_curves_from_crop_specs(
+    all_curves = _distance_kde_curves_from_crop_specs(
         crop_specs=crop_specs,
         plots_root=plots_root,
-        bin_width_um=bin_width_um,
         align_peaks=align_peaks,
-        density=True,
     )
 
-    max_height = max(float(np.max(counts)) for _, _, counts in all_curves)
+    max_height = max(float(np.max(curve.density)) for curve in all_curves)
     if max_height <= 0:
-        raise ValueError("No positive histogram values found.")
+        raise ValueError("No positive KDE values found.")
 
     step = 1.0 - overlap
     assert 0 <= overlap < 1, "overlap must be in [0, 1)."
 
     fig, ax = plt.subplots(figsize=figsize)
     num_curves = len(all_curves)
-    for idx, (label, centers, counts) in enumerate(all_curves):
+    for idx, curve in enumerate(all_curves):
         baseline = (num_curves - 1 - idx) * step
-        assert label in COLOR_PALETTE
-        color = COLOR_PALETTE[label]
-        filled = baseline + counts
-        ax.plot(centers, filled, color=color, linewidth=1.2, label=label)
-        ax.fill_between(centers, baseline, filled, color=color, alpha=fill_alpha, linewidth=0)
+        assert curve.label in COLOR_PALETTE
+        color = COLOR_PALETTE[curve.label]
+        filled = baseline + curve.density
+        ax.plot(curve.x_um, filled, color=color, linewidth=1.4, label=curve.label)
+        ax.fill_between(curve.x_um, baseline, filled, color=color, alpha=fill_alpha, linewidth=0)
+        ax.scatter(
+            [curve.peak_position_um],
+            [baseline + curve.peak_density],
+            s=18,
+            color=color,
+            edgecolors="white",
+            linewidths=0.6,
+            zorder=4,
+        )
 
     ax.set_yticks([])
     ax.tick_params(axis="y", which="both", length=0)
