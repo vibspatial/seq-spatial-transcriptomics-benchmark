@@ -32,6 +32,9 @@ MICROMETER_UNIT = "\u00B5m"
 KDE_GRID_STEP_UM = 0.25
 KDE_TAIL_BANDWIDTHS = 3.0
 KDE_BANDWIDTH_FALLBACK_UM = 1.0
+BOOTSTRAP_RESAMPLES_DEFAULT = 200
+BOOTSTRAP_CONFIDENCE_LEVEL_DEFAULT = 0.95
+BOOTSTRAP_RANDOM_SEED_DEFAULT = 0
 
 
 @dataclass
@@ -53,6 +56,12 @@ class DistanceHistogramHWHM:
     left_hwhm_um: float
     right_hwhm_um: float
     peak_position_um: float
+    left_hwhm_ci_low_um: float = np.nan
+    left_hwhm_ci_high_um: float = np.nan
+    right_hwhm_ci_low_um: float = np.nan
+    right_hwhm_ci_high_um: float = np.nan
+    peak_position_ci_low_um: float = np.nan
+    peak_position_ci_high_um: float = np.nan
 
 
 @dataclass(frozen=True)
@@ -61,6 +70,12 @@ class DistanceKDEPeakMedianDistance:
     left_median_distance_um: float
     right_median_distance_um: float
     peak_position_um: float
+    left_median_distance_ci_low_um: float = np.nan
+    left_median_distance_ci_high_um: float = np.nan
+    right_median_distance_ci_low_um: float = np.nan
+    right_median_distance_ci_high_um: float = np.nan
+    peak_position_ci_low_um: float = np.nan
+    peak_position_ci_high_um: float = np.nan
 
 
 @dataclass(frozen=True)
@@ -71,6 +86,19 @@ class DistanceKDECurve:
     peak_position_um: float
     peak_density: float
     alignment_shift_um: float
+    peak_position_ci_low_um: float = np.nan
+    peak_position_ci_high_um: float = np.nan
+    alignment_shift_ci_low_um: float = np.nan
+    alignment_shift_ci_high_um: float = np.nan
+
+
+@dataclass(frozen=True)
+class DistanceMetricBootstrapSamples:
+    peak_position_um: np.ndarray
+    left_hwhm_um: np.ndarray
+    right_hwhm_um: np.ndarray
+    left_median_distance_um: np.ndarray
+    right_median_distance_um: np.ndarray
 
 
 @dataclass(frozen=True)
@@ -1269,10 +1297,108 @@ def _detect_peak_from_curve(
     return peak_position_um, peak_density
 
 
+def _validate_confidence_level(confidence_level: float) -> float:
+    confidence_level = float(confidence_level)
+    if not np.isfinite(confidence_level) or not (0.0 < confidence_level < 1.0):
+        raise ValueError("confidence_level must be a finite value strictly between 0 and 1.")
+    return confidence_level
+
+
+def _bootstrap_resampled_weights(
+    weights: np.ndarray,
+    rng: np.random.Generator,
+) -> np.ndarray:
+    weights = np.asarray(weights, dtype=float)
+    total_weight = float(np.sum(weights))
+    if not np.isfinite(total_weight) or total_weight <= 0:
+        raise ValueError("weights must sum to a positive finite value.")
+
+    probabilities = weights / total_weight
+    if np.all(np.isclose(weights, np.rint(weights))):
+        bootstrap_total = int(np.rint(total_weight))
+    else:
+        bootstrap_total = max(1, int(np.rint(_effective_sample_size(weights))))
+
+    if bootstrap_total <= 0:
+        raise ValueError("bootstrap_total must be positive.")
+
+    return rng.multinomial(bootstrap_total, probabilities).astype(float)
+
+
+def _bootstrap_distance_metric_samples(
+    distances_um: np.ndarray,
+    weights: np.ndarray,
+    x_um: np.ndarray,
+    bandwidth_um: float,
+    n_resamples: int = BOOTSTRAP_RESAMPLES_DEFAULT,
+    rng: np.random.Generator | None = None,
+) -> DistanceMetricBootstrapSamples:
+    if n_resamples < 0:
+        raise ValueError("n_resamples must be non-negative.")
+    if rng is None:
+        rng = np.random.default_rng(BOOTSTRAP_RANDOM_SEED_DEFAULT)
+
+    peak_position_samples_um = np.full(n_resamples, np.nan, dtype=float)
+    left_hwhm_samples_um = np.full(n_resamples, np.nan, dtype=float)
+    right_hwhm_samples_um = np.full(n_resamples, np.nan, dtype=float)
+    left_median_distance_samples_um = np.full(n_resamples, np.nan, dtype=float)
+    right_median_distance_samples_um = np.full(n_resamples, np.nan, dtype=float)
+
+    for idx in range(n_resamples):
+        resampled_weights = _bootstrap_resampled_weights(weights, rng)
+        density_values = _evaluate_weighted_gaussian_kde(x_um, distances_um, resampled_weights, bandwidth_um=bandwidth_um)
+        peak_position_um, _ = _detect_peak_from_curve(x_um, density_values)
+        peak_position_samples_um[idx] = peak_position_um
+
+        _, left_hwhm_um, right_hwhm_um = _find_hwhm_from_curve(x_um, density_values)
+        left_hwhm_samples_um[idx] = left_hwhm_um
+        right_hwhm_samples_um[idx] = right_hwhm_um
+
+        left_distances_um, left_weights, right_distances_um, right_weights = _split_peak_aligned_distance_sides(
+            distances_um,
+            resampled_weights,
+            peak_position_um=peak_position_um,
+        )
+        if left_distances_um.size > 0:
+            left_median_distance_samples_um[idx] = float(
+                _weighted_quantiles(left_distances_um, left_weights, probs=(0.50,))[0]
+            )
+        if right_distances_um.size > 0:
+            right_median_distance_samples_um[idx] = float(
+                _weighted_quantiles(right_distances_um, right_weights, probs=(0.50,))[0]
+            )
+
+    return DistanceMetricBootstrapSamples(
+        peak_position_um=peak_position_samples_um,
+        left_hwhm_um=left_hwhm_samples_um,
+        right_hwhm_um=right_hwhm_samples_um,
+        left_median_distance_um=left_median_distance_samples_um,
+        right_median_distance_um=right_median_distance_samples_um,
+    )
+
+
+def _bootstrap_confidence_interval(
+    samples: np.ndarray,
+    confidence_level: float = BOOTSTRAP_CONFIDENCE_LEVEL_DEFAULT,
+) -> tuple[float, float]:
+    confidence_level = _validate_confidence_level(confidence_level)
+    samples = np.asarray(samples, dtype=float)
+    finite_samples = samples[np.isfinite(samples)]
+    if finite_samples.size == 0:
+        return np.nan, np.nan
+
+    alpha = 0.5 * (1.0 - confidence_level)
+    ci_low, ci_high = np.quantile(finite_samples, [alpha, 1.0 - alpha])
+    return float(ci_low), float(ci_high)
+
+
 def _distance_kde_curves(
     data_per_label: list[tuple[str, np.ndarray, np.ndarray]],
     align_peaks: bool = False,
     x_um: np.ndarray | None = None,
+    bootstrap_resamples: int = BOOTSTRAP_RESAMPLES_DEFAULT,
+    confidence_level: float = BOOTSTRAP_CONFIDENCE_LEVEL_DEFAULT,
+    random_seed: int = BOOTSTRAP_RANDOM_SEED_DEFAULT,
 ) -> list[DistanceKDECurve]:
     sanitized_data: list[tuple[str, np.ndarray, np.ndarray]] = []
     max_abs_um = 0.0
@@ -1293,24 +1419,57 @@ def _distance_kde_curves(
             max_bandwidth_um=max(bandwidths_um, default=0.0),
         )
     x_um = np.asarray(x_um, dtype=float)
+    confidence_level = _validate_confidence_level(confidence_level)
+    bootstrap_rng = np.random.default_rng(random_seed)
 
     curves: list[DistanceKDECurve] = []
     for (label, distances_um, weights), bandwidth_um in zip(sanitized_data, bandwidths_um, strict=True):
         density_values = _evaluate_weighted_gaussian_kde(x_um, distances_um, weights, bandwidth_um=bandwidth_um)
-        peak_position_um, peak_density = _detect_peak_from_curve(x_um, density_values)
-        alignment_shift_um = peak_position_um
+        raw_peak_position_um, peak_density = _detect_peak_from_curve(x_um, density_values)
+        alignment_shift_ci_low_um = np.nan
+        alignment_shift_ci_high_um = np.nan
+        peak_position_ci_low_um = np.nan
+        peak_position_ci_high_um = np.nan
+        if bootstrap_resamples > 0:
+            peak_samples = _bootstrap_distance_metric_samples(
+                distances_um=distances_um,
+                weights=weights,
+                x_um=x_um,
+                bandwidth_um=bandwidth_um,
+                n_resamples=bootstrap_resamples,
+                rng=bootstrap_rng,
+            ).peak_position_um
+            alignment_shift_ci_low_um, alignment_shift_ci_high_um = _bootstrap_confidence_interval(
+                peak_samples,
+                confidence_level=confidence_level,
+            )
+
+        alignment_shift_um = raw_peak_position_um
+        peak_position_um = raw_peak_position_um
+        peak_position_ci_low_um = alignment_shift_ci_low_um
+        peak_position_ci_high_um = alignment_shift_ci_high_um
         curve_x_um = x_um
         if align_peaks:
-            curve_x_um = x_um - peak_position_um
+            curve_x_um = x_um - raw_peak_position_um
             peak_position_um = 0.0
+            if bootstrap_resamples > 0:
+                aligned_peak_samples = peak_samples - raw_peak_position_um
+                peak_position_ci_low_um, peak_position_ci_high_um = _bootstrap_confidence_interval(
+                    aligned_peak_samples,
+                    confidence_level=confidence_level,
+                )
         curves.append(
             DistanceKDECurve(
                 label=label,
                 x_um=curve_x_um,
                 density=density_values,
                 peak_position_um=peak_position_um,
+                peak_position_ci_low_um=peak_position_ci_low_um,
+                peak_position_ci_high_um=peak_position_ci_high_um,
                 peak_density=peak_density,
                 alignment_shift_um=alignment_shift_um,
+                alignment_shift_ci_low_um=alignment_shift_ci_low_um,
+                alignment_shift_ci_high_um=alignment_shift_ci_high_um,
             )
         )
     return curves
@@ -1338,11 +1497,17 @@ def _distance_kde_curves_from_crop_specs(
     crop_specs: list[tuple[str, str, float, str]],
     plots_root: str,
     align_peaks: bool = False,
+    bootstrap_resamples: int = BOOTSTRAP_RESAMPLES_DEFAULT,
+    confidence_level: float = BOOTSTRAP_CONFIDENCE_LEVEL_DEFAULT,
+    random_seed: int = BOOTSTRAP_RANDOM_SEED_DEFAULT,
 ) -> list[DistanceKDECurve]:
     data_per_label = _read_crop_distance_data(crop_specs, plots_root)
     return _distance_kde_curves(
         data_per_label,
         align_peaks=align_peaks,
+        bootstrap_resamples=bootstrap_resamples,
+        confidence_level=confidence_level,
+        random_seed=random_seed,
     )
 
 
@@ -1464,6 +1629,9 @@ def calculate_distance_histogram_hwhm(
     crop_specs: list[tuple[str, str, float, str]],
     plots_root: str,
     align_peaks: bool = False,
+    bootstrap_resamples: int = BOOTSTRAP_RESAMPLES_DEFAULT,
+    confidence_level: float = BOOTSTRAP_CONFIDENCE_LEVEL_DEFAULT,
+    random_seed: int = BOOTSTRAP_RANDOM_SEED_DEFAULT,
 ) -> list[DistanceHistogramHWHM]:
     """
     Calculate left/right HWHM values from per-crop signed-distance KDE curves.
@@ -1482,27 +1650,85 @@ def calculate_distance_histogram_hwhm(
 
     Returns:
         List of `DistanceHistogramHWHM` rows (one row per crop label) containing
-        peak position and left/right HWHM in micrometers.
+        peak position, left/right HWHM in micrometers, and bootstrap confidence intervals.
     """
+    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
+    sanitized_data: list[tuple[str, np.ndarray, np.ndarray]] = []
+    max_abs_um = 0.0
+    for label, distances_um, weights in data_per_label:
+        distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
+        sanitized_data.append((label, distances_um, weights))
+        max_abs_um = max(max_abs_um, float(np.max(np.abs(distances_um))))
+
+    shared_bandwidth_um = _shared_kde_bandwidth_um(sanitized_data)
+    x_um = _distance_kde_grid(max_abs_um=max_abs_um, max_bandwidth_um=shared_bandwidth_um)
+    confidence_level = _validate_confidence_level(confidence_level)
+    bootstrap_rng = np.random.default_rng(random_seed)
+
     rows: list[DistanceHistogramHWHM] = []
-    curves = _distance_kde_curves_from_crop_specs(
-        crop_specs=crop_specs,
-        plots_root=plots_root,
+    curves = _distance_kde_curves(
+        sanitized_data,
         align_peaks=align_peaks,
+        x_um=x_um,
+        bootstrap_resamples=0,
+        confidence_level=confidence_level,
+        random_seed=random_seed,
     )
 
-    for curve in curves:
+    for (label, distances_um, weights), curve in zip(sanitized_data, curves, strict=True):
         peak_x, left_hwhm, right_hwhm = _find_hwhm_from_curve(curve.x_um, curve.density)
+        bootstrap_samples = _bootstrap_distance_metric_samples(
+            distances_um=distances_um,
+            weights=weights,
+            x_um=x_um,
+            bandwidth_um=shared_bandwidth_um,
+            n_resamples=bootstrap_resamples,
+            rng=bootstrap_rng,
+        )
+        left_hwhm_ci_low_um, left_hwhm_ci_high_um = _bootstrap_confidence_interval(
+            bootstrap_samples.left_hwhm_um,
+            confidence_level=confidence_level,
+        )
+        right_hwhm_ci_low_um, right_hwhm_ci_high_um = _bootstrap_confidence_interval(
+            bootstrap_samples.right_hwhm_um,
+            confidence_level=confidence_level,
+        )
+        peak_samples_um = bootstrap_samples.peak_position_um
+        if align_peaks:
+            peak_samples_um = peak_samples_um - curve.alignment_shift_um
+        peak_position_ci_low_um, peak_position_ci_high_um = _bootstrap_confidence_interval(
+            peak_samples_um,
+            confidence_level=confidence_level,
+        )
         rows.append(
             DistanceHistogramHWHM(
-                label=curve.label,
+                label=label,
                 left_hwhm_um=left_hwhm,
+                left_hwhm_ci_low_um=left_hwhm_ci_low_um,
+                left_hwhm_ci_high_um=left_hwhm_ci_high_um,
                 right_hwhm_um=right_hwhm,
+                right_hwhm_ci_low_um=right_hwhm_ci_low_um,
+                right_hwhm_ci_high_um=right_hwhm_ci_high_um,
                 peak_position_um=peak_x,
+                peak_position_ci_low_um=peak_position_ci_low_um,
+                peak_position_ci_high_um=peak_position_ci_high_um,
             )
         )
 
     return rows
+
+
+def _errorbar_lengths_from_ci(
+    estimate: np.ndarray,
+    ci_low: np.ndarray,
+    ci_high: np.ndarray,
+) -> np.ndarray:
+    estimate = np.asarray(estimate, dtype=float)
+    ci_low = np.asarray(ci_low, dtype=float)
+    ci_high = np.asarray(ci_high, dtype=float)
+    lower = np.where(np.isfinite(ci_low), np.clip(estimate - ci_low, a_min=0.0, a_max=None), 0.0)
+    upper = np.where(np.isfinite(ci_high), np.clip(ci_high - estimate, a_min=0.0, a_max=None), 0.0)
+    return np.vstack([lower, upper])
 
 
 def plot_distance_histogram_hwhm_bars(
@@ -1530,7 +1756,11 @@ def plot_distance_histogram_hwhm_bars(
 
     labels = [row.label for row in hwhm_rows]
     left_hwhm = np.asarray([row.left_hwhm_um for row in hwhm_rows], dtype=float)
+    left_hwhm_ci_low = np.asarray([row.left_hwhm_ci_low_um for row in hwhm_rows], dtype=float)
+    left_hwhm_ci_high = np.asarray([row.left_hwhm_ci_high_um for row in hwhm_rows], dtype=float)
     right_hwhm = np.asarray([row.right_hwhm_um for row in hwhm_rows], dtype=float)
+    right_hwhm_ci_low = np.asarray([row.right_hwhm_ci_low_um for row in hwhm_rows], dtype=float)
+    right_hwhm_ci_high = np.asarray([row.right_hwhm_ci_high_um for row in hwhm_rows], dtype=float)
     valid = np.isfinite(left_hwhm) & np.isfinite(right_hwhm) & (left_hwhm >= 0) & (right_hwhm >= 0)
     if not np.any(valid):
         raise ValueError("No finite non-negative left/right HWHM pairs available to plot.")
@@ -1542,7 +1772,11 @@ def plot_distance_histogram_hwhm_bars(
     keep_idx = np.flatnonzero(valid)
     labels = [labels[i] for i in keep_idx]
     left_hwhm = left_hwhm[keep_idx]
+    left_hwhm_ci_low = left_hwhm_ci_low[keep_idx]
+    left_hwhm_ci_high = left_hwhm_ci_high[keep_idx]
     right_hwhm = right_hwhm[keep_idx]
+    right_hwhm_ci_low = right_hwhm_ci_low[keep_idx]
+    right_hwhm_ci_high = right_hwhm_ci_high[keep_idx]
 
     if figsize is None:
         figsize = (12, max(4.5, 0.45 * len(labels) + 1.5))
@@ -1572,8 +1806,40 @@ def plot_distance_histogram_hwhm_bars(
         edgecolor="black",
         linewidth=0.5,
     )
+    left_hwhm_error = _errorbar_lengths_from_ci(left_hwhm, left_hwhm_ci_low, left_hwhm_ci_high)
+    ax.errorbar(
+        -left_hwhm,
+        y,
+        xerr=np.vstack([left_hwhm_error[1], left_hwhm_error[0]]),
+        fmt="none",
+        ecolor="black",
+        elinewidth=0.9,
+        capsize=2.5,
+        zorder=4,
+    )
+    ax.errorbar(
+        right_hwhm,
+        y,
+        xerr=_errorbar_lengths_from_ci(right_hwhm, right_hwhm_ci_low, right_hwhm_ci_high),
+        fmt="none",
+        ecolor="black",
+        elinewidth=0.9,
+        capsize=2.5,
+        zorder=4,
+    )
 
-    max_abs = float(np.max(np.concatenate([left_hwhm, right_hwhm])))
+    max_abs = float(
+        np.nanmax(
+            np.concatenate(
+                [
+                    left_hwhm,
+                    right_hwhm,
+                    left_hwhm_ci_high,
+                    right_hwhm_ci_high,
+                ]
+            )
+        )
+    )
     margin = max(0.5, 0.1 * max_abs)
     ax.set_xlim(-(max_abs + margin), max_abs + margin)
     ax.axvline(0.0, color="black", linewidth=1, linestyle=":", zorder=3)
@@ -1602,6 +1868,9 @@ def plot_distance_histogram_hwhm_bars(
 def calculate_distance_to_kde_peak_median(
     crop_specs: list[tuple[str, str, float, str]],
     plots_root: str,
+    bootstrap_resamples: int = BOOTSTRAP_RESAMPLES_DEFAULT,
+    confidence_level: float = BOOTSTRAP_CONFIDENCE_LEVEL_DEFAULT,
+    random_seed: int = BOOTSTRAP_RANDOM_SEED_DEFAULT,
 ) -> list[DistanceKDEPeakMedianDistance]:
     """
     Calculate weighted median distances to the detected KDE peak on both sides.
@@ -1616,17 +1885,35 @@ def calculate_distance_to_kde_peak_median(
 
     Returns:
         One row per crop label containing the detected peak position together with
-        the weighted median distance to that peak on the left and right side.
+        the weighted median distance to that peak on the left and right side,
+        plus bootstrap confidence intervals.
     """
     data_per_label = _read_crop_distance_data(crop_specs, plots_root)
-    curves = _distance_kde_curves(data_per_label, align_peaks=False)
+    sanitized_data: list[tuple[str, np.ndarray, np.ndarray]] = []
+    max_abs_um = 0.0
+    for label, distances_um, weights in data_per_label:
+        distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
+        sanitized_data.append((label, distances_um, weights))
+        max_abs_um = max(max_abs_um, float(np.max(np.abs(distances_um))))
+
+    shared_bandwidth_um = _shared_kde_bandwidth_um(sanitized_data)
+    x_um = _distance_kde_grid(max_abs_um=max_abs_um, max_bandwidth_um=shared_bandwidth_um)
+    confidence_level = _validate_confidence_level(confidence_level)
+    bootstrap_rng = np.random.default_rng(random_seed)
+    curves = _distance_kde_curves(
+        sanitized_data,
+        align_peaks=False,
+        x_um=x_um,
+        bootstrap_resamples=0,
+        confidence_level=confidence_level,
+        random_seed=random_seed,
+    )
 
     rows: list[DistanceKDEPeakMedianDistance] = []
-    for (label, distances_um, weights), curve in zip(data_per_label, curves, strict=True):
+    for (label, distances_um, weights), curve in zip(sanitized_data, curves, strict=True):
         if label != curve.label:
             raise ValueError(f"Label mismatch while computing KDE-peak medians: {label!r} != {curve.label!r}")
 
-        distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
         left_distances_um, left_weights, right_distances_um, right_weights = _split_peak_aligned_distance_sides(
             distances_um,
             weights,
@@ -1643,13 +1930,39 @@ def calculate_distance_to_kde_peak_median(
             if right_distances_um.size > 0
             else np.nan
         )
+        bootstrap_samples = _bootstrap_distance_metric_samples(
+            distances_um=distances_um,
+            weights=weights,
+            x_um=x_um,
+            bandwidth_um=shared_bandwidth_um,
+            n_resamples=bootstrap_resamples,
+            rng=bootstrap_rng,
+        )
+        left_median_ci_low_um, left_median_ci_high_um = _bootstrap_confidence_interval(
+            bootstrap_samples.left_median_distance_um,
+            confidence_level=confidence_level,
+        )
+        right_median_ci_low_um, right_median_ci_high_um = _bootstrap_confidence_interval(
+            bootstrap_samples.right_median_distance_um,
+            confidence_level=confidence_level,
+        )
+        peak_position_ci_low_um, peak_position_ci_high_um = _bootstrap_confidence_interval(
+            bootstrap_samples.peak_position_um,
+            confidence_level=confidence_level,
+        )
 
         rows.append(
             DistanceKDEPeakMedianDistance(
                 label=label,
                 left_median_distance_um=left_median_distance_um,
+                left_median_distance_ci_low_um=left_median_ci_low_um,
+                left_median_distance_ci_high_um=left_median_ci_high_um,
                 right_median_distance_um=right_median_distance_um,
+                right_median_distance_ci_low_um=right_median_ci_low_um,
+                right_median_distance_ci_high_um=right_median_ci_high_um,
                 peak_position_um=curve.peak_position_um,
+                peak_position_ci_low_um=peak_position_ci_low_um,
+                peak_position_ci_high_um=peak_position_ci_high_um,
             )
         )
 
@@ -1682,7 +1995,11 @@ def plot_distance_to_kde_peak_median_bars(
 
     labels = [row.label for row in median_rows]
     left_median = np.asarray([row.left_median_distance_um for row in median_rows], dtype=float)
+    left_median_ci_low = np.asarray([row.left_median_distance_ci_low_um for row in median_rows], dtype=float)
+    left_median_ci_high = np.asarray([row.left_median_distance_ci_high_um for row in median_rows], dtype=float)
     right_median = np.asarray([row.right_median_distance_um for row in median_rows], dtype=float)
+    right_median_ci_low = np.asarray([row.right_median_distance_ci_low_um for row in median_rows], dtype=float)
+    right_median_ci_high = np.asarray([row.right_median_distance_ci_high_um for row in median_rows], dtype=float)
     valid = np.isfinite(left_median) & np.isfinite(right_median) & (left_median >= 0) & (right_median >= 0)
     if not np.any(valid):
         raise ValueError("No finite non-negative left/right KDE-peak medians available to plot.")
@@ -1694,7 +2011,11 @@ def plot_distance_to_kde_peak_median_bars(
     keep_idx = np.flatnonzero(valid)
     labels = [labels[i] for i in keep_idx]
     left_median = left_median[keep_idx]
+    left_median_ci_low = left_median_ci_low[keep_idx]
+    left_median_ci_high = left_median_ci_high[keep_idx]
     right_median = right_median[keep_idx]
+    right_median_ci_low = right_median_ci_low[keep_idx]
+    right_median_ci_high = right_median_ci_high[keep_idx]
 
     if figsize is None:
         figsize = (12, max(4.5, 0.45 * len(labels) + 1.5))
@@ -1723,8 +2044,41 @@ def plot_distance_to_kde_peak_median_bars(
         edgecolor="black",
         linewidth=0.5,
     )
+    left_median_error = _errorbar_lengths_from_ci(left_median, left_median_ci_low, left_median_ci_high)
+    right_median_error = _errorbar_lengths_from_ci(right_median, right_median_ci_low, right_median_ci_high)
+    ax.errorbar(
+        -left_median,
+        y,
+        xerr=np.vstack([left_median_error[1], left_median_error[0]]),
+        fmt="none",
+        ecolor="black",
+        elinewidth=0.9,
+        capsize=2.5,
+        zorder=4,
+    )
+    ax.errorbar(
+        right_median,
+        y,
+        xerr=right_median_error,
+        fmt="none",
+        ecolor="black",
+        elinewidth=0.9,
+        capsize=2.5,
+        zorder=4,
+    )
 
-    max_abs = float(np.max(np.concatenate([left_median, right_median])))
+    max_abs = float(
+        np.nanmax(
+            np.concatenate(
+                [
+                    left_median,
+                    right_median,
+                    left_median_ci_high,
+                    right_median_ci_high,
+                ]
+            )
+        )
+    )
     margin = max(0.5, 0.1 * max_abs)
     ax.set_xlim(-(max_abs + margin), max_abs + margin)
     ax.axvline(0.0, color="black", linewidth=1, linestyle=":", zorder=3)
