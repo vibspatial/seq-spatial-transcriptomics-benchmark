@@ -1588,7 +1588,13 @@ def plot_distance_histogram_hwhm_bars(
         Rectangle((0, 0), 1, 1, facecolor="white", edgecolor="black", hatch="///", linewidth=0.8),
         Rectangle((0, 0), 1, 1, facecolor="white", edgecolor="black", hatch="", linewidth=0.8),
     ]
-    ax.legend(side_legend_handles, ["Outside tissue", "Inside tissue"], loc="lower right")
+    ax.legend(
+        side_legend_handles,
+        ["Outside tissue", "Inside tissue"],
+        loc="upper left",
+        bbox_to_anchor=(1.02, 1.0),
+        borderaxespad=0.0,
+    )
 
     save_or_show_figure(fig, output_path)
 
@@ -1659,8 +1665,8 @@ def plot_distance_to_kde_peak_median_bars(
     """
     Plot left/right weighted median distance to the detected KDE peak per crop.
 
-    Left-of-peak medians are drawn towards negative x; right-of-peak medians are
-    drawn towards positive x.
+    Left-of-peak medians (~outside tissue) are drawn towards negative x;
+    right-of-peak medians (~inside tissue) are drawn towards positive x.
 
     Args:
         median_rows: Summary rows produced by `calculate_distance_to_kde_peak_median`.
@@ -1727,13 +1733,19 @@ def plot_distance_to_kde_peak_median_bars(
     ax.set_yticks(y)
     ax.set_yticklabels(labels, fontsize=8)
     ax.invert_yaxis()
-    ax.set_xlabel(f"Median distance to KDE peak [{MICROMETER_UNIT}]")
+    ax.set_xlabel(f"Median distance [{MICROMETER_UNIT}]")
     ax.set_title(title or "Median distance to KDE peak")
     side_legend_handles = [
         Rectangle((0, 0), 1, 1, facecolor="white", edgecolor="black", hatch="///", linewidth=0.8),
         Rectangle((0, 0), 1, 1, facecolor="white", edgecolor="black", hatch="", linewidth=0.8),
     ]
-    ax.legend(side_legend_handles, ["Left of KDE peak", "Right of KDE peak"], loc="lower right")
+    ax.legend(
+        side_legend_handles,
+        ["Outside tissue", "Inside tissue"], # Left of KDE peak, Right of KDE peak
+        loc="upper left",
+        bbox_to_anchor=(1.02, 1.0),
+        borderaxespad=0.0,
+    )
 
     save_or_show_figure(fig, output_path)
 
