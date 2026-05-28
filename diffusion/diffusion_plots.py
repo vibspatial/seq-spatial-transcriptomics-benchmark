@@ -974,7 +974,7 @@ def plot_distance_histogram(
     save_or_show_figure(fig, output_path)
 
 
-def combined_distance_histogram(
+def plot_distance_kde_combined(
     crop_specs: list[tuple[str, str, float, str]],
     output_path: str,
     plots_root: str,
@@ -986,7 +986,7 @@ def combined_distance_histogram(
     bin_width_um: float = 5.0,
 ) -> None:
     """
-    Plot overlaid normalized signed-distance histograms for multiple crops.
+    Plot overlaid normalized signed-distance KDEs for multiple crops.
 
     If `align_peaks` is True, each KDE curve is shifted so its detected density peak
     is placed at x=0.
@@ -1985,8 +1985,8 @@ def plot_distance_cdf(
         right_title = "Inside tissue"
     else:
         x_label = f"Distance to KDE peak [{MICROMETER_UNIT}]"
-        left_title = "Left of peak"
-        right_title = "Right of peak"
+        left_title = "Outside tissue" # "Left of peak"
+        right_title = "Inside tissue" # "Right of peak"
     ax_left.set_xlabel(x_label)
     ax_right.set_xlabel(x_label)
     ax_left.set_ylabel("Transcript count CDF")
@@ -2039,7 +2039,7 @@ def _sanitize_distance_weights(
     return distances[valid], weights[valid]
 
 
-def ridgeline_distance_histogram(
+def plot_distance_kde_ridgeline(
     crop_specs: list[tuple[str, str, float, str]],
     output_path: str,
     plots_root: str,
