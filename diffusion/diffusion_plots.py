@@ -39,6 +39,7 @@ class DiffusionPlotSettings:
     tissue_outline: bool = True
     boundary: bool = True
     bin_gene_counts: bool = True
+    full_tissue_bin_gene_counts: bool = True
     bins_and_closest_points: bool = True
     distances_linearized: bool = True
     histogram: bool = True
@@ -725,6 +726,61 @@ def plot_bin_gene_counts_and_contour(
         color="red",
         linewidth=line_width,
     )
+    ax.set_xlabel("x [px]")
+    ax.set_ylabel("y [px]")
+    ax.invert_yaxis()
+    x0, x1 = ax.get_xlim()
+    visible_width_px = abs(x1 - x0)
+    bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
+    bar_px = bar_um / pixel_size_um
+    add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
+
+    save_or_show_figure(fig, output_path)
+
+
+def plot_full_tissue_bin_gene_counts_with_highlighted_section(
+    gene_bin_data: "GeneBinData",
+    full_tissue_contour,
+    highlighted_section,
+    output_path: str,
+    pixel_size_um: float,
+    title: str,
+    figsize=(10, 10),
+    contour_line_width=1,
+    highlighted_section_line_width=2,
+    marker_size=0.5,
+    dpi: int | None = None,
+) -> None:
+    """Scatter plot full-tissue non-zero gene bins, with the crop boundary section highlighted."""
+    fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
+    ax.set_title(title)
+    counts = np.asarray(gene_bin_data.transcript_counts)
+    nonzero_mask = counts > 0
+    sc = ax.scatter(
+        gene_bin_data.bin_centers[nonzero_mask, 0],
+        gene_bin_data.bin_centers[nonzero_mask, 1],
+        c=counts[nonzero_mask],
+        s=marker_size,
+        marker="o",
+        linewidths=0,
+        edgecolors="none",
+    )
+
+    if np.any(nonzero_mask):
+        cbar = fig.colorbar(sc, ax=ax, shrink=0.4)
+        cbar.set_label(f"{gene_bin_data.gene_name} transcript count")
+
+    gpd.GeoSeries([full_tissue_contour]).plot(
+        ax=ax,
+        color="red",
+        linewidth=contour_line_width,
+    )
+    gpd.GeoSeries([highlighted_section]).plot(
+        ax=ax,
+        color="#E69F00",
+        linewidth=highlighted_section_line_width,
+    )
+
     ax.set_xlabel("x [px]")
     ax.set_ylabel("y [px]")
     ax.invert_yaxis()

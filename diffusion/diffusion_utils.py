@@ -12,6 +12,7 @@ from diffusion_plots import (
     plot_distance_boxplot,
     plot_distance_histogram,
     plot_distances_linearized,
+    plot_full_tissue_bin_gene_counts_with_highlighted_section,
     plot_tissue_outline_on_HE_image,
 )
 
@@ -674,13 +675,28 @@ def generate_diffusion_plots(
     print(f"Generating diffusion plots for {experiment.technology} {experiment.dataset_id} at level {level}")
 
     sdata = None
-    if plot_settings.tissue_outline and experiment.he_image:
+    if (
+        (plot_settings.tissue_outline and experiment.he_image)
+        or plot_settings.full_tissue_bin_gene_counts
+    ):
         sdata = sd.read_zarr(os.path.join(sdata_folder, experiment.sdata_path))
 
     if not experiment.boundary_point_pairs:
         raise ValueError(
             f"No boundary_point_pairs provided for experiment {experiment.dataset_id!r}."
         )
+
+    full_tissue_contour = None
+    full_tissue_gene_bin_data = None
+    if plot_settings.full_tissue_bin_gene_counts:
+        assert sdata is not None
+        if experiment.tissue_mask is None:
+            raise ValueError("tissue_mask must be set to generate full-tissue diffusion plots.")
+        full_tissue_contour = longest_shape_contour(sdata, experiment.tissue_mask)
+        if full_tissue_contour is None or full_tissue_contour.is_empty:
+            raise ValueError(
+                f"No tissue contour found in shapes layer {experiment.tissue_mask!r}."
+            )
 
     for crop_idx, _ in enumerate(experiment.boundary_point_pairs):
         plot_folder = os.path.join(
@@ -700,6 +716,13 @@ def generate_diffusion_plots(
             )
         results = load_diffusion_results(diffusion_results_path)
         crop_rect = np.asarray(results.crop_rect, dtype=float)
+        if plot_settings.full_tissue_bin_gene_counts and full_tissue_gene_bin_data is None:
+            assert sdata is not None
+            full_tissue_gene_bin_data = get_gene_bin_data(
+                sdata,
+                level,
+                results.raw_gene_bins.gene_name,
+            )
 
         if plot_settings.tissue_outline and experiment.he_image:
             assert sdata is not None
@@ -742,6 +765,19 @@ def generate_diffusion_plots(
                 results.raw_gene_bins,
                 results.boundary_section,
                 os.path.join(plot_folder, "transcripts_closeup.png"),
+                experiment.pixel_size_um,
+                f"{experiment.technology}",
+                dpi=600,
+            )
+
+        if plot_settings.full_tissue_bin_gene_counts:
+            assert full_tissue_contour is not None
+            assert full_tissue_gene_bin_data is not None
+            plot_full_tissue_bin_gene_counts_with_highlighted_section(
+                full_tissue_gene_bin_data,
+                full_tissue_contour,
+                results.boundary_section,
+                os.path.join(plot_folder, "transcripts.png"),
                 experiment.pixel_size_um,
                 f"{experiment.technology}",
                 dpi=600,
