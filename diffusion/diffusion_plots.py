@@ -700,6 +700,7 @@ def plot_bin_gene_counts_and_contour(
     figsize=(10, 10),
     line_width=1,
     marker_size=0.5,
+    show_axes: bool = False,
     dpi: int | None = None,
 ) -> None:
     """Scatter plot non-zero gene bin counts, overlaid with the given contour."""
@@ -726,8 +727,22 @@ def plot_bin_gene_counts_and_contour(
         color="red",
         linewidth=line_width,
     )
-    ax.set_xlabel("x [px]")
-    ax.set_ylabel("y [px]")
+    if show_axes:
+        ax.set_xlabel("x [px]")
+        ax.set_ylabel("y [px]")
+    else:
+        ax.set_xlabel("")
+        ax.set_ylabel("")
+        ax.tick_params(
+            axis="both",
+            which="both",
+            bottom=False,
+            top=False,
+            left=False,
+            right=False,
+            labelbottom=False,
+            labelleft=False,
+        )
     ax.invert_yaxis()
     x0, x1 = ax.get_xlim()
     visible_width_px = abs(x1 - x0)
@@ -749,6 +764,7 @@ def plot_full_tissue_bin_gene_counts_with_highlighted_section(
     contour_line_width=1,
     highlighted_section_line_width=2,
     marker_size=0.5,
+    show_axes: bool = False,
     dpi: int | None = None,
 ) -> None:
     """Scatter plot full-tissue non-zero gene bins, with the crop boundary section highlighted."""
@@ -781,8 +797,22 @@ def plot_full_tissue_bin_gene_counts_with_highlighted_section(
         linewidth=highlighted_section_line_width,
     )
 
-    ax.set_xlabel("x [px]")
-    ax.set_ylabel("y [px]")
+    if show_axes:
+        ax.set_xlabel("x [px]")
+        ax.set_ylabel("y [px]")
+    else:
+        ax.set_xlabel("")
+        ax.set_ylabel("")
+        ax.tick_params(
+            axis="both",
+            which="both",
+            bottom=False,
+            top=False,
+            left=False,
+            right=False,
+            labelbottom=False,
+            labelleft=False,
+        )
     ax.invert_yaxis()
     x0, x1 = ax.get_xlim()
     visible_width_px = abs(x1 - x0)
