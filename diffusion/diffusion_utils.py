@@ -741,7 +741,7 @@ def generate_diffusion_plots(
             plot_bin_gene_counts_and_contour(
                 results.raw_gene_bins,
                 results.boundary_section,
-                os.path.join(plot_folder, "transcripts.png"),
+                os.path.join(plot_folder, "transcripts_closeup.png"),
                 experiment.pixel_size_um,
                 f"{experiment.technology}",
                 dpi=600,
