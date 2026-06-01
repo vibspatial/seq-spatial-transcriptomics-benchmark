@@ -184,8 +184,12 @@ def add_scalebar(
     loc: str = "lower right",
     color: str = "black",
     font_size: int = 8,
+    frameon: bool = True,
+    size_vertical_scale: float = 1.0,
 ) -> None:
     assert length_px > 0, "length_px must be positive."
+    assert size_vertical_scale > 0, "size_vertical_scale must be positive."
+    size_vertical = max(1.0, length_px * 0.01) * size_vertical_scale
     scalebar = AnchoredSizeBar(
         transform=ax.transData,
         size=length_px,
@@ -195,13 +199,14 @@ def add_scalebar(
         borderpad=1.0,
         sep=4,
         color=color,
-        frameon=True,
-        size_vertical=max(1.0, length_px * 0.01),
+        frameon=frameon,
+        size_vertical=size_vertical,
         fontproperties=fm.FontProperties(size=font_size),
     )
-    scalebar.patch.set_facecolor("white")
-    scalebar.patch.set_edgecolor("black")
-    scalebar.patch.set_alpha(0.8)
+    if frameon:
+        scalebar.patch.set_facecolor("white")
+        scalebar.patch.set_edgecolor("black")
+        scalebar.patch.set_alpha(0.8)
     ax.add_artist(scalebar)
 
 
@@ -748,7 +753,14 @@ def plot_bin_gene_counts_and_contour(
     visible_width_px = abs(x1 - x0)
     bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
     bar_px = bar_um / pixel_size_um
-    add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
+    add_scalebar(
+        ax=ax,
+        length_px=bar_px,
+        label=f"{int(bar_um)} {MICROMETER_UNIT}",
+        loc="lower left",
+        frameon=False,
+        size_vertical_scale=18.0,
+    )
 
     save_or_show_figure(fig, output_path)
 
@@ -814,11 +826,16 @@ def plot_full_tissue_bin_gene_counts_with_highlighted_section(
             labelleft=False,
         )
     ax.invert_yaxis()
-    x0, x1 = ax.get_xlim()
-    visible_width_px = abs(x1 - x0)
-    bar_um = pick_scalebar_length_um(visible_width_px=visible_width_px, pixel_size_um=pixel_size_um)
+    bar_um = 1000.0
     bar_px = bar_um / pixel_size_um
-    add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
+    add_scalebar(
+        ax=ax,
+        length_px=bar_px,
+        label="",
+        loc="lower left",
+        frameon=False,
+        size_vertical_scale=18.0,
+    )
 
     save_or_show_figure(fig, output_path)
 
