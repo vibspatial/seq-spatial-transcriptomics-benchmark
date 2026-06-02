@@ -769,12 +769,12 @@ def plot_full_tissue_bin_gene_counts_with_highlighted_section(
     gene_bin_data: "GeneBinData",
     full_tissue_contour,
     highlighted_section,
+    thickened_section: BaseGeometry | None,
     output_path: str,
     pixel_size_um: float,
     title: str,
     figsize=(10, 10),
-    contour_line_width=1,
-    highlighted_section_line_width=2,
+    contour_line_width=1.5,
     marker_size=0.5,
     show_axes: bool = False,
     dpi: int | None = None,
@@ -782,6 +782,24 @@ def plot_full_tissue_bin_gene_counts_with_highlighted_section(
     """Scatter plot full-tissue non-zero gene bins, with the crop boundary section highlighted."""
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
     ax.set_title(title)
+    shared_line_width = contour_line_width
+    full_tissue_zorder = 1
+    highlighted_section_zorder = 2
+    transcripts_zorder = 3
+    thickened_section_zorder = 4
+    gpd.GeoSeries([full_tissue_contour]).plot(
+        ax=ax,
+        color="red",
+        linewidth=shared_line_width,
+        zorder=full_tissue_zorder,
+    )
+    gpd.GeoSeries([highlighted_section]).plot(
+        ax=ax,
+        color="#E69F00",
+        linewidth=shared_line_width,
+        zorder=highlighted_section_zorder,
+    )
+
     counts = np.asarray(gene_bin_data.transcript_counts)
     nonzero_mask = counts > 0
     sc = ax.scatter(
@@ -792,22 +810,21 @@ def plot_full_tissue_bin_gene_counts_with_highlighted_section(
         marker="o",
         linewidths=0,
         edgecolors="none",
+        zorder=transcripts_zorder,
     )
 
     if np.any(nonzero_mask):
         cbar = fig.colorbar(sc, ax=ax, shrink=0.4)
         cbar.set_label(f"{gene_bin_data.gene_name} transcript count")
 
-    gpd.GeoSeries([full_tissue_contour]).plot(
-        ax=ax,
-        color="red",
-        linewidth=contour_line_width,
-    )
-    gpd.GeoSeries([highlighted_section]).plot(
-        ax=ax,
-        color="#E69F00",
-        linewidth=highlighted_section_line_width,
-    )
+    if thickened_section is not None and not thickened_section.is_empty:
+        gpd.GeoSeries([thickened_section]).plot(
+            ax=ax,
+            facecolor="none",
+            edgecolor="#f39c12",
+            linewidth=shared_line_width,
+            zorder=thickened_section_zorder,
+        )
 
     if show_axes:
         ax.set_xlabel("x [px]")

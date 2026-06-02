@@ -732,6 +732,11 @@ def generate_diffusion_plots(
             )
         results = load_diffusion_results(diffusion_results_path)
         crop_rect = np.asarray(results.crop_rect, dtype=float)
+        thickened_section = results.boundary_section.buffer(
+            float(results.max_distance_px),
+            cap_style="round",
+            join_style="round",
+        )
         if plot_settings.full_tissue_bin_gene_counts and full_tissue_gene_bin_data is None:
             assert sdata is not None
             full_tissue_gene_bin_data = get_gene_bin_data(
@@ -747,11 +752,6 @@ def generate_diffusion_plots(
                 max_coordinate=crop_rect[2:],
                 axes=("x", "y"),
                 target_coordinate_system=experiment.dataset_id,
-            )
-            thickened_section = results.boundary_section.buffer(
-                float(results.max_distance_px),
-                cap_style="round",
-                join_style="round",
             )
             plot_tissue_outline_on_HE_image(
                 sdata_crop,
@@ -793,6 +793,7 @@ def generate_diffusion_plots(
                 full_tissue_gene_bin_data,
                 full_tissue_boundary,
                 results.boundary_section,
+                thickened_section,
                 os.path.join(plot_folder, "transcripts.png"),
                 experiment.pixel_size_um,
                 f"{experiment.technology}",
