@@ -773,9 +773,9 @@ def plot_full_tissue_bin_gene_counts_with_highlighted_section(
     output_path: str,
     pixel_size_um: float,
     title: str,
-    figsize=(10, 10),
-    contour_line_width=1.5,
-    marker_size=0.5,
+    figsize=(20, 20),
+    contour_line_width=3,
+    marker_size=1,
     show_axes: bool = False,
     dpi: int | None = None,
 ) -> None:
@@ -795,7 +795,7 @@ def plot_full_tissue_bin_gene_counts_with_highlighted_section(
     )
     gpd.GeoSeries([highlighted_section]).plot(
         ax=ax,
-        color="#E69F00",
+        color="#00BFFF",
         linewidth=shared_line_width,
         zorder=highlighted_section_zorder,
     )
@@ -821,7 +821,7 @@ def plot_full_tissue_bin_gene_counts_with_highlighted_section(
         gpd.GeoSeries([thickened_section]).plot(
             ax=ax,
             facecolor="none",
-            edgecolor="#f39c12",
+            edgecolor="#00BFFF",
             linewidth=shared_line_width,
             zorder=thickened_section_zorder,
         )
