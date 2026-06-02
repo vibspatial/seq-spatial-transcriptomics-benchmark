@@ -17,7 +17,7 @@ from diffusion_plots import (
 )
 
 import shapely
-from shapely.geometry import LineString, Point, Polygon
+from shapely.geometry import LineString, MultiLineString, Point, Polygon
 from shapely.geometry.polygon import orient
 from shapely.ops import substring
 from shapely.geometry.base import BaseGeometry
@@ -90,6 +90,22 @@ def longest_shape_contour(
     if not lines:
         return None
     return max(lines, key=lambda line: line.length)
+
+
+def full_shape_boundary_geometry(
+    sdata,
+    shapes_layer: str,
+) -> BaseGeometry | None:
+    """Return the complete boundary geometry from a shapes layer."""
+    gdf = sdata.shapes[shapes_layer]
+    if gdf.empty:
+        return None
+    lines = [line for geom in gdf.geometry for line in _shape_boundary_lines(geom)]
+    if not lines:
+        return None
+    if len(lines) == 1:
+        return lines[0]
+    return MultiLineString([line.coords for line in lines])
 
 
 def _is_closed_linestring(line: LineString, atol: float = 1e-8) -> bool:
@@ -686,16 +702,16 @@ def generate_diffusion_plots(
             f"No boundary_point_pairs provided for experiment {experiment.dataset_id!r}."
         )
 
-    full_tissue_contour = None
+    full_tissue_boundary = None
     full_tissue_gene_bin_data = None
     if plot_settings.full_tissue_bin_gene_counts:
         assert sdata is not None
         if experiment.tissue_mask is None:
             raise ValueError("tissue_mask must be set to generate full-tissue diffusion plots.")
-        full_tissue_contour = longest_shape_contour(sdata, experiment.tissue_mask)
-        if full_tissue_contour is None or full_tissue_contour.is_empty:
+        full_tissue_boundary = full_shape_boundary_geometry(sdata, experiment.tissue_mask)
+        if full_tissue_boundary is None or full_tissue_boundary.is_empty:
             raise ValueError(
-                f"No tissue contour found in shapes layer {experiment.tissue_mask!r}."
+                f"No tissue boundary found in shapes layer {experiment.tissue_mask!r}."
             )
 
     for crop_idx, _ in enumerate(experiment.boundary_point_pairs):
@@ -771,11 +787,11 @@ def generate_diffusion_plots(
             )
 
         if plot_settings.full_tissue_bin_gene_counts:
-            assert full_tissue_contour is not None
+            assert full_tissue_boundary is not None
             assert full_tissue_gene_bin_data is not None
             plot_full_tissue_bin_gene_counts_with_highlighted_section(
                 full_tissue_gene_bin_data,
-                full_tissue_contour,
+                full_tissue_boundary,
                 results.boundary_section,
                 os.path.join(plot_folder, "transcripts.png"),
                 experiment.pixel_size_um,
