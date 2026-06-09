@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Sequence
 import geopandas as gpd
 import matplotlib.pyplot as plt
 import numpy as np
+import shapely
 import spatialdata_plot  # noqa: F401
 import xarray as xr
 from matplotlib import font_manager as fm
@@ -17,7 +18,7 @@ from matplotlib.patches import Rectangle
 from matplotlib.patches import PathPatch
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 from mpl_toolkits.axes_grid1.anchored_artists import AnchoredSizeBar
-from shapely.geometry import MultiPolygon, Polygon
+from shapely.geometry import MultiPoint, MultiPolygon, Polygon
 from shapely.geometry.base import BaseGeometry
 
 import sys
@@ -32,6 +33,90 @@ MICROMETER_UNIT = "\u00B5m"
 KDE_GRID_STEP_UM = 0.25
 KDE_TAIL_BANDWIDTHS = 3.0
 KDE_BANDWIDTH_FALLBACK_UM = 1.0
+
+
+def _estimate_bin_outline_radius(points_xy: np.ndarray) -> float | None:
+    points_xy = np.asarray(points_xy, dtype=float).reshape(-1, 2)
+    if points_xy.shape[0] < 2:
+        return None
+
+    candidate_steps: list[float] = []
+    for axis in (0, 1):
+        ordered = points_xy[np.argsort(points_xy[:, axis], kind="mergesort")]
+        diffs = np.linalg.norm(np.diff(ordered, axis=0), axis=1)
+        diffs = diffs[np.isfinite(diffs) & (diffs > 1e-8)]
+        if diffs.size > 0:
+            candidate_steps.append(float(np.percentile(diffs, 5.0)))
+
+    if len(candidate_steps) == 0:
+        return None
+
+    step = min(candidate_steps)
+    if not np.isfinite(step) or step <= 0.0:
+        return None
+    return 0.55 * step
+
+
+def _bin_region_geometry(bin_centers: np.ndarray) -> BaseGeometry:
+    bin_centers = np.asarray(bin_centers, dtype=float).reshape(-1, 2)
+    if bin_centers.shape[0] == 0:
+        raise ValueError("bin_centers must contain at least one point.")
+
+    point_cloud = MultiPoint(bin_centers)
+    if point_cloud.is_empty:
+        raise ValueError("Failed to build a point cloud from bin centers.")
+
+    if hasattr(shapely, "concave_hull") and bin_centers.shape[0] >= 4:
+        region = shapely.concave_hull(point_cloud, ratio=0.02, allow_holes=False)
+    else:
+        region = point_cloud.convex_hull
+
+    if region is None or region.is_empty:
+        raise ValueError("Failed to build analysis-region geometry from bin centers.")
+
+    radius = _estimate_bin_outline_radius(bin_centers)
+    if radius is not None:
+        region = region.buffer(radius, join_style="round")
+        if region is None or region.is_empty:
+            raise ValueError("Failed to pad analysis-region geometry.")
+    return region
+
+
+def _plot_bin_region_boundary(
+    ax: plt.Axes,
+    bin_centers: np.ndarray,
+    edgecolor: str,
+    linewidth: float,
+    zorder: float,
+) -> None:
+    region = _bin_region_geometry(bin_centers)
+    region_boundary = region.boundary
+    if region_boundary is None or region_boundary.is_empty:
+        raise ValueError("Failed to build analysis-region boundary from bin centers.")
+
+    gpd.GeoSeries([region_boundary]).plot(
+        ax=ax,
+        color=edgecolor,
+        linewidth=linewidth,
+        zorder=zorder,
+    )
+
+
+def _plot_geometry_boundary(
+    ax: plt.Axes,
+    geometry: BaseGeometry,
+    edgecolor: str,
+    linewidth: float,
+    zorder: float,
+) -> None:
+    geometry_boundary = geometry.boundary
+    if geometry_boundary is not None and not geometry_boundary.is_empty:
+        gpd.GeoSeries([geometry_boundary]).plot(
+            ax=ax,
+            color=edgecolor,
+            linewidth=linewidth,
+            zorder=zorder,
+        )
 
 
 @dataclass
@@ -243,17 +328,26 @@ def draw_labeled_rectangles(
 def draw_boundary_section_overlays(
     ax: plt.Axes,
     overlay_region: BaseGeometry | None = None,
+    overlay_bin_centers: np.ndarray | None = None,
     overlay_contour: BaseGeometry | None = None,
     approx_points: np.ndarray | None = None,
     snapped_points: np.ndarray | None = None,
     show_approx_points: bool = False,
 ) -> None:
     if overlay_region is not None and not overlay_region.is_empty:
-        gpd.GeoSeries([overlay_region]).plot(
+        _plot_geometry_boundary(
             ax=ax,
-            facecolor="#ffd966",
+            geometry=overlay_region,
             edgecolor="#f39c12",
-            alpha=0.25,
+            linewidth=1.5,
+            zorder=6,
+        )
+
+    if overlay_bin_centers is not None and np.size(overlay_bin_centers) > 0:
+        _plot_bin_region_boundary(
+            ax=ax,
+            bin_centers=overlay_bin_centers,
+            edgecolor="#f39c12",
             linewidth=1.5,
             zorder=6,
         )
@@ -397,6 +491,7 @@ def plot_tissue_outline_on_HE_image(
     bounds: tuple[float, float, float, float] | None = None,
     rectangles: list[tuple[float, float, float, float]] | None = None,
     overlay_region: BaseGeometry | None = None,
+    overlay_bin_centers: np.ndarray | None = None,
     overlay_contour: BaseGeometry | None = None,
     approx_points: np.ndarray | None = None,
     snapped_points: np.ndarray | None = None,
@@ -444,6 +539,7 @@ def plot_tissue_outline_on_HE_image(
     draw_boundary_section_overlays(
         ax=ax,
         overlay_region=overlay_region,
+        overlay_bin_centers=overlay_bin_centers,
         overlay_contour=overlay_contour,
         approx_points=approx_points,
         snapped_points=snapped_points,
@@ -769,7 +865,7 @@ def plot_full_tissue_bin_gene_counts_with_highlighted_section(
     gene_bin_data: "GeneBinData",
     full_tissue_contour,
     highlighted_section,
-    thickened_section: BaseGeometry | None,
+    highlighted_analysis_bin_centers: np.ndarray | None,
     output_path: str,
     pixel_size_um: float,
     title: str,
@@ -784,9 +880,9 @@ def plot_full_tissue_bin_gene_counts_with_highlighted_section(
     ax.set_title(title)
     shared_line_width = contour_line_width
     full_tissue_zorder = 1
-    highlighted_section_zorder = 2
-    transcripts_zorder = 3
-    thickened_section_zorder = 4
+    highlighted_analysis_region_zorder = 2
+    highlighted_section_zorder = 3
+    transcripts_zorder = 4
     gpd.GeoSeries([full_tissue_contour]).plot(
         ax=ax,
         color="red",
@@ -817,13 +913,16 @@ def plot_full_tissue_bin_gene_counts_with_highlighted_section(
         cbar = fig.colorbar(sc, ax=ax, shrink=0.4)
         cbar.set_label(f"{gene_bin_data.gene_name} transcript count")
 
-    if thickened_section is not None and not thickened_section.is_empty:
-        gpd.GeoSeries([thickened_section]).plot(
+    if (
+        highlighted_analysis_bin_centers is not None
+        and np.size(highlighted_analysis_bin_centers) > 0
+    ):
+        _plot_bin_region_boundary(
             ax=ax,
-            facecolor="none",
+            bin_centers=highlighted_analysis_bin_centers,
             edgecolor="#00BFFF",
             linewidth=shared_line_width,
-            zorder=thickened_section_zorder,
+            zorder=highlighted_analysis_region_zorder,
         )
 
     if show_axes:

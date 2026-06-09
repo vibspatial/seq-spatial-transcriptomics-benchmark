@@ -492,6 +492,7 @@ class DiffusionBinData:
 class DiffusionResults:
     raw_gene_bins: GeneBinData
     filtered: DiffusionBinData
+    analysis_region_bin_centers: np.ndarray
     boundary_section: LineString
     crop_rect: np.ndarray
     approx_start_xy: np.ndarray
@@ -527,6 +528,7 @@ def get_gene_bin_data(sdata, table_name: str, gene_name: str) -> GeneBinData:
 def save_diffusion_results(
     output_path: str,
     raw_gene_bins: GeneBinData,
+    analysis_region: DiffusionBinData,
     filtered: DiffusionBinData,
     section: BoundarySectionGeometry,
     max_distance_px: float,
@@ -534,11 +536,15 @@ def save_diffusion_results(
     assert raw_gene_bins.gene_name == filtered.gene_bins.gene_name, (
         "raw_gene_bins and filtered.gene_bins must have the same gene_name."
     )
+    assert raw_gene_bins.gene_name == analysis_region.gene_bins.gene_name, (
+        "raw_gene_bins and analysis_region.gene_bins must have the same gene_name."
+    )
     np.savez_compressed(
         output_path,
         gene_name=np.asarray(raw_gene_bins.gene_name),
         raw_bin_centers=np.asarray(raw_gene_bins.bin_centers, dtype=float),
         raw_transcript_counts=np.asarray(raw_gene_bins.transcript_counts, dtype=float),
+        analysis_region_bin_centers=np.asarray(analysis_region.gene_bins.bin_centers, dtype=float),
         filtered_bin_centers=np.asarray(filtered.gene_bins.bin_centers, dtype=float),
         filtered_transcript_counts=np.asarray(filtered.gene_bins.transcript_counts, dtype=float),
         filtered_closest_xy=np.asarray(filtered.distance_data.closest_xy, dtype=float),
@@ -558,6 +564,11 @@ def save_diffusion_results(
 def load_diffusion_results(output_path: str) -> DiffusionResults:
     with np.load(output_path) as data:
         gene_name = str(np.asarray(data["gene_name"]).item())
+        if "analysis_region_bin_centers" not in data.files:
+            raise ValueError(
+                f"Missing analysis_region_bin_centers in {output_path}. "
+                "Regenerate this file with compute_diffusion()."
+            )
         return DiffusionResults(
             raw_gene_bins=GeneBinData(
                 gene_name=gene_name,
@@ -576,6 +587,7 @@ def load_diffusion_results(output_path: str) -> DiffusionResults:
                     closest_along_boundary=np.asarray(data["filtered_closest_along_boundary"], dtype=float),
                 ),
             ),
+            analysis_region_bin_centers=np.asarray(data["analysis_region_bin_centers"], dtype=float),
             boundary_section=LineString(np.asarray(data["boundary_section_xy"], dtype=float)),
             crop_rect=np.asarray(data["crop_rect"], dtype=float),
             approx_start_xy=np.asarray(data["approx_start_xy"], dtype=float),
@@ -584,6 +596,41 @@ def load_diffusion_results(output_path: str) -> DiffusionResults:
             snapped_end_xy=np.asarray(data["snapped_end_xy"], dtype=float),
             max_distance_px=float(np.asarray(data["max_distance_px"], dtype=float).reshape(-1)[0]),
         )
+
+
+def filter_bins_for_diffusion_analysis(
+    diffusion_data: DiffusionBinData,
+    boundary_section: LineString,
+    max_distance_px: float,
+) -> DiffusionBinData:
+    """
+    Keep bins eligible for diffusion analysis before transcript-count filtering.
+
+    This mirrors compute_diffusion(): stay within the round max-distance neighborhood and
+    remove bins whose closest boundary point is exactly one of the section endpoints.
+    """
+    points_geom = shapely.points(diffusion_data.gene_bins.bin_centers)
+    thickened_section = boundary_section.buffer(
+        float(max_distance_px),
+        cap_style="round",
+        join_style="round",
+    )
+    inside_thickened_mask = np.asarray(
+        shapely.covers(thickened_section, points_geom),
+        dtype=bool,
+    )
+    filtered = diffusion_data.filter(inside_thickened_mask)
+
+    # Numerical guard: keep expected max-distance neighborhood only.
+    filtered = filtered.filter(
+        np.abs(filtered.distance_data.closest_distances) <= (max_distance_px + 1e-6)
+    )
+
+    endpoint_mask = mask_excluding_contour_endpoint_closest_points(
+        filtered.distance_data.closest_xy,
+        boundary_section,
+    )
+    return filtered.filter(endpoint_mask)
 
 
 def compute_diffusion(
@@ -648,33 +695,22 @@ def compute_diffusion(
             section.boundary_section,
             use_signed_distances=use_signed_distances,
         )
-        filtered = DiffusionBinData(
+        diffusion_data = DiffusionBinData(
             distance_data=distance_data,
             gene_bins=gene_bin_data,
         )
-
-        points_geom = shapely.points(filtered.gene_bins.bin_centers)
-        inside_thickened_mask = np.asarray(
-            shapely.covers(section.thickened_section, points_geom),
-            dtype=bool,
-        )
-        filtered = filtered.filter(inside_thickened_mask)
-
-        # Numerical guard: keep expected max-distance neighborhood only.
-        filtered = filtered.filter(np.abs(filtered.distance_data.closest_distances) <= (max_distance_px + 1e-6))
-
-        filtered = filtered.filter(filtered.gene_bins.transcript_counts > 0)
-
-        endpoint_mask = mask_excluding_contour_endpoint_closest_points(
-            filtered.distance_data.closest_xy,
+        analysis_region = filter_bins_for_diffusion_analysis(
+            diffusion_data,
             section.boundary_section,
+            max_distance_px,
         )
-        filtered = filtered.filter(endpoint_mask)
+        filtered = analysis_region.filter(analysis_region.gene_bins.transcript_counts > 0)
 
         diffusion_results_output_path = os.path.join(plot_folder, "diffusion.npz")
         save_diffusion_results(
             diffusion_results_output_path,
             raw_gene_bins=gene_bin_data,
+            analysis_region=analysis_region,
             filtered=filtered,
             section=section,
             max_distance_px=max_distance_px,
@@ -732,11 +768,7 @@ def generate_diffusion_plots(
             )
         results = load_diffusion_results(diffusion_results_path)
         crop_rect = np.asarray(results.crop_rect, dtype=float)
-        thickened_section = results.boundary_section.buffer(
-            float(results.max_distance_px),
-            cap_style="round",
-            join_style="round",
-        )
+        analysis_region_bin_centers = results.analysis_region_bin_centers
         if plot_settings.full_tissue_bin_gene_counts and full_tissue_gene_bin_data is None:
             assert sdata is not None
             full_tissue_gene_bin_data = get_gene_bin_data(
@@ -765,7 +797,7 @@ def generate_diffusion_plots(
                 outline_width=1,
                 bounds=tuple(crop_rect),
                 overlay_contour=results.boundary_section,
-                overlay_region=thickened_section,
+                overlay_bin_centers=analysis_region_bin_centers,
                 approx_points=np.vstack([results.approx_start_xy, results.approx_end_xy]),
                 snapped_points=np.vstack([results.snapped_start_xy, results.snapped_end_xy]),
             )
@@ -793,7 +825,7 @@ def generate_diffusion_plots(
                 full_tissue_gene_bin_data,
                 full_tissue_boundary,
                 results.boundary_section,
-                thickened_section,
+                analysis_region_bin_centers,
                 os.path.join(plot_folder, "transcripts.png"),
                 experiment.pixel_size_um,
                 f"{experiment.technology}",
