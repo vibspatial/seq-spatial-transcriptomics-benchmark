@@ -6,6 +6,7 @@ sys.path.append(os.path.abspath('..'))
 from diffusion import Experiment
 from diffusion_plots import (
     DiffusionPlotSettings,
+    read_experiment_distance_data,
     plot_bin_gene_counts_and_contour,
     plot_bins_and_closest_points_on_contour,
     plot_boundary_geoseries,
@@ -851,31 +852,42 @@ def generate_diffusion_plots(
                 dpi=600,
             )
 
-        if plot_settings.histogram:
-            bin_widths_um = plot_settings.histogram_bin_widths_um
-            if len(bin_widths_um) == 0:
-                raise ValueError("histogram_bin_widths_um must contain at least one bin width.")
+    # Spatial inspection plots remain per section; distribution plots pool all sections.
+    if plot_settings.histogram or plot_settings.boxplot:
+        crop_specs = [
+            (experiment.technology, experiment.dataset_id, experiment.pixel_size_um, f"crop{i + 1}")
+            for i in range(len(experiment.boundary_point_pairs))
+        ]
+        pooled = read_experiment_distance_data(crop_specs, plots_folder)[0]
+        pooled_folder = os.path.join(
+            plots_folder, experiment.technology, experiment.dataset_id, "analysis", "pooled",
+        )
+        os.makedirs(pooled_folder, exist_ok=True)
 
-            for bin_width_um in bin_widths_um:
-                bin_width_str = f"{bin_width_um:g}".replace(".", "p")
-                histogram_output_path = os.path.join(
-                    plot_folder,
-                    f"histogram_binwidth_{bin_width_str}um.png",
-                )
+    if plot_settings.histogram:
+        bin_widths_um = plot_settings.histogram_bin_widths_um
+        if len(bin_widths_um) == 0:
+            raise ValueError("histogram_bin_widths_um must contain at least one bin width.")
 
-                plot_distance_histogram(
-                    results.filtered,
-                    histogram_output_path,
-                    experiment.pixel_size_um,
-                    title=f"{experiment.technology}",
-                    bin_width_um=bin_width_um,
-                    max_distance_um=plot_settings.max_plot_distance_um,
-                )
-
-        if plot_settings.boxplot:
-            plot_distance_boxplot(
-                results.filtered,
-                os.path.join(plot_folder, "boxplot_um.png"),
-                experiment.pixel_size_um,
-                title=f"{experiment.technology}"
+        for bin_width_um in bin_widths_um:
+            bin_width_str = f"{bin_width_um:g}".replace(".", "p")
+            histogram_output_path = os.path.join(
+                pooled_folder,
+                f"histogram_binwidth_{bin_width_str}um.png",
             )
+
+            plot_distance_histogram(
+                pooled,
+                histogram_output_path,
+                gene_name=results.raw_gene_bins.gene_name,
+                title=f"{experiment.technology}",
+                bin_width_um=bin_width_um,
+                max_distance_um=plot_settings.max_plot_distance_um,
+            )
+
+    if plot_settings.boxplot:
+        plot_distance_boxplot(
+            pooled,
+            os.path.join(pooled_folder, "boxplot_um.png"),
+            title=f"{experiment.technology}"
+        )

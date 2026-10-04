@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from time import perf_counter
 from typing import TYPE_CHECKING, Sequence
 
@@ -134,11 +134,21 @@ class DiffusionPlotSettings:
 
 
 @dataclass(frozen=True)
+class DistanceDistribution:
+    label: str
+    distances_um: np.ndarray
+    weights: np.ndarray
+    technology: str | None = None
+    dataset_id: str | None = None
+
+
+@dataclass(frozen=True)
 class DistanceHistogramHWHM:
     label: str
     left_hwhm_um: float
     right_hwhm_um: float
     peak_position_um: float
+    technology: str | None = None
 
 
 @dataclass(frozen=True)
@@ -147,6 +157,7 @@ class DistanceKDEPeakMedianDistance:
     left_median_distance_um: float
     right_median_distance_um: float
     peak_position_um: float
+    technology: str | None = None
 
 
 @dataclass(frozen=True)
@@ -157,6 +168,7 @@ class DistanceKDECurve:
     peak_position_um: float
     peak_density: float
     alignment_shift_um: float
+    technology: str | None = None
 
 
 @dataclass(frozen=True)
@@ -745,6 +757,7 @@ def plot_shapely_geometries(
     dpi: int | None = 600,
     title: str | None = None,
 ):
+    """Plot the full mask and each geometry with matching full-mask axis limits."""
     # Code for debugging / testing purpose only.
 
     if tissue_mask is None or tissue_mask not in sdata.shapes:
@@ -767,8 +780,7 @@ def plot_shapely_geometries(
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
     cmap = plt.get_cmap("tab20", len(geometries))
 
-    for i, geom in enumerate(geometries):
-        color = cmap(i)
+    def draw_geometry(ax, geom, color):
         polygons = geom.geoms if isinstance(geom, MultiPolygon) else [geom]
         for poly in polygons:
             patch = PathPatch(
@@ -781,6 +793,9 @@ def plot_shapely_geometries(
             ax.add_patch(patch)
             _add_polygon_orientation_arrows(ax, poly, color=color)
 
+    for i, geom in enumerate(geometries):
+        draw_geometry(ax, geom, cmap(i))
+
     ax.autoscale()
     ax.set_aspect("equal", adjustable="box")
     ax.set_xlabel("x [px]")
@@ -789,7 +804,22 @@ def plot_shapely_geometries(
     if title is not None:
         ax.set_title(title)
 
+    # Capture the combined plot's limits, including padding and inverted y-axis.
+    xlim, ylim = ax.get_xlim(), ax.get_ylim()
     save_or_show_figure(fig, output_path)
+
+    output_stem, output_ext = os.path.splitext(output_path)
+    for i, geom in enumerate(geometries):
+        fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
+        draw_geometry(ax, geom, cmap(i))
+        ax.set_xlim(xlim)
+        ax.set_ylim(ylim)
+        ax.set_aspect("equal", adjustable="box")
+        ax.set_xlabel("x [px]")
+        ax.set_ylabel("y [px]")
+        if title is not None:
+            ax.set_title(title)
+        save_or_show_figure(fig, f"{output_stem}_geo{i}{output_ext}")
 
 
 def plot_bin_gene_counts_and_contour(
@@ -1088,29 +1118,28 @@ def plot_distances_linearized(
 
 
 def plot_distance_histogram(
-    data: "DiffusionBinData",
+    data: DistanceDistribution,
     output_path: str,
-    pixel_size_um: float,
+    gene_name: str,
     max_distance_um: float,
     title: str | None = None,
     bin_width_um: float = 5.0,
 ) -> None:
     kde_color = "#1f77b4"
-    distances = np.asarray(data.distance_data.closest_distances, dtype=float)
-    weights = np.asarray(data.gene_bins.transcript_counts, dtype=float)
+    distances = np.asarray(data.distances_um, dtype=float)
+    weights = np.asarray(data.weights, dtype=float)
     distances, weights = _sanitize_distance_weights(distances, weights, label="distance histogram")
-    distances = distances * pixel_size_um
 
     fig, ax = plt.subplots(figsize=(6, 6))
     bins = _distance_hist_bins(
-        [("distance histogram", distances, weights)],
+        [DistanceDistribution("distance histogram", distances, weights)],
         bin_width=bin_width_um,
     )
     bin_centers = _distance_hist_bin_centers_from_edges(bins)
     bin_widths = np.diff(bins)
     histogram_counts, _ = np.histogram(distances, bins=bins, weights=weights, density=False)
     density_curve = _distance_kde_curves(
-        [("distance histogram", distances, weights)],
+        [DistanceDistribution("distance histogram", distances, weights)],
         align_peaks=False,
     )[0]
 
@@ -1160,7 +1189,7 @@ def plot_distance_histogram(
         zorder=4,
     )
     ax.set_xlabel(f"Distance to boundary [{MICROMETER_UNIT}]")
-    ax.set_ylabel(f"{data.gene_bins.gene_name} transcript count")
+    ax.set_ylabel(f"{gene_name} transcript count")
     ax.set_title(title)
     density_ax = ax.twinx()
     kde_line, = density_ax.plot(
@@ -1183,7 +1212,7 @@ def plot_distance_histogram(
     if max_distance_um <= 0:
         raise ValueError("max_distance_um must be positive.")
     ax.set_xlim(-max_distance_um, max_distance_um)
-    density_ax.set_ylabel(f"{data.gene_bins.gene_name} weighted KDE density")
+    density_ax.set_ylabel(f"{gene_name} weighted KDE density")
     density_ax.tick_params(right=True, labelright=True)
     density_ax.spines["right"].set_visible(True)
 
@@ -1205,17 +1234,17 @@ def plot_distance_kde_combined(
     bin_width_um: float = 5.0,
 ) -> None:
     """
-    Plot overlaid normalized signed-distance KDEs for multiple crops.
+    Plot one normalized signed-distance KDE per experiment, pooling its crops.
 
     If `align_peaks` is True, each KDE curve is shifted so its detected density peak
     is placed at x=0.
     Each entry in `crop_specs` is `(technology, dataset_id, pixel_size_um, crop_name)`.
-    Histograms are computed in micrometers with shared bins across crops, and
+    Histograms are computed in micrometers with shared bins across experiments, and
     the overlaid density curves are true weighted KDEs evaluated on the raw
     distance values.
 
     Args:
-        crop_specs: Crop descriptors used to load per-crop signed distance/weight data.
+        crop_specs: Crop descriptors whose signed distances/counts are pooled per experiment.
         output_path: Destination path for the rendered figure.
         plots_root: Root directory containing per-crop precomputed diffusion outputs.
         gene_name: Name used in the y-axis label.
@@ -1228,7 +1257,7 @@ def plot_distance_kde_combined(
     Raises:
         ValueError: If `max_distance_um` is provided but not positive.
     """
-    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
+    data_per_label = read_experiment_distance_data(crop_specs, plots_root)
     bins = _distance_hist_bins(
         data_per_label,
         bin_width=bin_width_um,
@@ -1239,10 +1268,10 @@ def plot_distance_kde_combined(
     )
 
     fig, ax = plt.subplots(figsize=figsize)
-    for curve in curves:
-        color = COLOR_PALETTE.get(curve.label)
-        label_distances_um = next(distances_um for label, distances_um, _ in data_per_label if label == curve.label)
-        label_weights = next(weights for label, _, weights in data_per_label if label == curve.label)
+    for distribution, curve in zip(data_per_label, curves, strict=True):
+        color = COLOR_PALETTE.get(distribution.technology)
+        label_distances_um = distribution.distances_um
+        label_weights = distribution.weights
         histogram_density, _ = np.histogram(label_distances_um, bins=bins, weights=label_weights, density=True)
         histogram_centers_um = _distance_hist_bin_centers_from_edges(bins)
         if align_peaks:
@@ -1301,51 +1330,65 @@ def plot_distance_kde_combined(
     plt.close(fig)
 
 
-def _read_crop_distance_data(
+def read_experiment_distance_data(
     crop_specs: list[tuple[str, str, float, str]],
     plots_root: str,
-) -> list[tuple[str, np.ndarray, np.ndarray]]:
-    assert len(crop_specs) > 0, "crop_specs must contain at least one entry."
+) -> list[DistanceDistribution]:
+    """Pool configured crops by (technology, dataset_id), in first-seen order.
 
-    data_per_label: list[tuple[str, np.ndarray, np.ndarray]] = []
+    Sections are assumed to select disjoint bins: choose boundary sections far
+    enough apart for the analysis distance limit. No overlap detection or
+    deduplication is performed. Concatenate signed distances and transcript counts
+    before normalization, KDE peak detection/alignment, or summary statistics.
+    Only explicitly listed crops are read; leftover crop folders are ignored.
+    """
+    if not crop_specs:
+        raise ValueError("crop_specs must contain at least one entry.")
 
+    grouped: dict[tuple[str, str], list[tuple[np.ndarray, np.ndarray]]] = {}
     for technology, dataset_id, pixel_size_um, crop_name in crop_specs:
+        chunks = grouped.setdefault((technology, dataset_id), [])
         npz_path = os.path.join(
-            plots_root,
-            technology,
-            dataset_id,
-            "analysis",
-            crop_name,
-            "diffusion.npz",
+            plots_root, technology, dataset_id, "analysis", crop_name, "diffusion.npz",
         )
-        assert os.path.exists(npz_path), f"Missing file: {npz_path}"
-
+        if not os.path.exists(npz_path):
+            raise FileNotFoundError(
+                f"Missing diffusion results file: {npz_path}. Run compute_diffusion() first."
+            )
         with np.load(npz_path) as data:
             distances_px = np.asarray(data["filtered_closest_distances"], dtype=float)
-            transcript_counts = np.asarray(data["filtered_transcript_counts"], dtype=float)
+            counts = np.asarray(data["filtered_transcript_counts"], dtype=float)
+        if distances_px.ndim != 1 or counts.shape != distances_px.shape:
+            raise ValueError(f"Distance and transcript-count arrays must be matching 1D arrays: {npz_path}")
+        if distances_px.size:
+            chunks.append((distances_px * pixel_size_um, counts))
 
-        if distances_px.size == 0:
-            continue
+    technology_counts: dict[str, int] = {}
+    for technology, _ in grouped:
+        technology_counts[technology] = technology_counts.get(technology, 0) + 1
 
-        distances_um = distances_px * pixel_size_um
-        counts = transcript_counts
-        label = technology
-        assert crop_name == "crop1"
-        data_per_label.append((label, distances_um, counts))
-
-    if len(data_per_label) == 0:
-        raise ValueError("No distance rows found in any selected crop.")
-
-    return data_per_label
+    distributions: list[DistanceDistribution] = []
+    for (technology, dataset_id), chunks in grouped.items():
+        if not chunks:
+            raise ValueError(f"No distance rows found for experiment {technology!r}, {dataset_id!r}.")
+        label = technology if technology_counts[technology] == 1 else f"{technology} ({dataset_id})"
+        distributions.append(DistanceDistribution(
+            label=label,
+            distances_um=np.concatenate([distances for distances, _ in chunks]),
+            weights=np.concatenate([counts for _, counts in chunks]),
+            technology=technology,
+            dataset_id=dataset_id,
+        ))
+    return distributions
 
 
 def _distance_hist_bins(
-    data_per_label: list[tuple[str, np.ndarray, np.ndarray]],
+    data_per_label: list[DistanceDistribution],
     bin_width: float = 5.0,
 ) -> np.ndarray:
     if not np.isfinite(bin_width) or bin_width <= 0:
         raise ValueError("bin_width must be a positive finite value.")
-    concat = np.concatenate([distances_um for _, distances_um, _ in data_per_label])
+    concat = np.concatenate([distribution.distances_um for distribution in data_per_label])
     max_abs = float(np.max(np.abs(concat)))
     if not np.isfinite(max_abs):
         raise ValueError("Histogram distances must contain finite values.")
@@ -1427,14 +1470,16 @@ def _weighted_kde_bandwidth_um(
 
 
 def _shared_kde_bandwidth_um(
-    data_per_label: list[tuple[str, np.ndarray, np.ndarray]],
+    data_per_label: list[DistanceDistribution],
 ) -> float:
     if len(data_per_label) == 0:
         raise ValueError("data_per_label must contain at least one dataset.")
 
     pooled_distances: list[np.ndarray] = []
     pooled_weights: list[np.ndarray] = []
-    for label, distances_um, weights in data_per_label:
+    for distribution in data_per_label:
+        label = distribution.label
+        distances_um, weights = distribution.distances_um, distribution.weights
         distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
         pooled_distances.append(distances_um)
         pooled_weights.append(weights)
@@ -1489,20 +1534,22 @@ def _detect_peak_from_curve(
 
 
 def _distance_kde_curves(
-    data_per_label: list[tuple[str, np.ndarray, np.ndarray]],
+    data_per_label: list[DistanceDistribution],
     align_peaks: bool = False,
     x_um: np.ndarray | None = None,
 ) -> list[DistanceKDECurve]:
-    sanitized_data: list[tuple[str, np.ndarray, np.ndarray]] = []
+    sanitized_data: list[DistanceDistribution] = []
     max_abs_um = 0.0
-    for label, distances_um, weights in data_per_label:
+    for distribution in data_per_label:
+        label = distribution.label
+        distances_um, weights = distribution.distances_um, distribution.weights
         distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
-        sanitized_data.append((label, distances_um, weights))
+        sanitized_data.append(replace(distribution, distances_um=distances_um, weights=weights))
         max_abs_um = max(max_abs_um, float(np.max(np.abs(distances_um))))
 
     shared_bandwidth_um = _shared_kde_bandwidth_um(sanitized_data)
     if len(sanitized_data) > 1:
-        labels_str = ", ".join(label for label, _, _ in sanitized_data)
+        labels_str = ", ".join(distribution.label for distribution in sanitized_data)
         print(f"Using shared KDE bandwidth: {shared_bandwidth_um:.3f} {MICROMETER_UNIT} for {labels_str}")
     bandwidths_um = [shared_bandwidth_um] * len(sanitized_data)
 
@@ -1514,7 +1561,9 @@ def _distance_kde_curves(
     x_um = np.asarray(x_um, dtype=float)
 
     curves: list[DistanceKDECurve] = []
-    for (label, distances_um, weights), bandwidth_um in zip(sanitized_data, bandwidths_um, strict=True):
+    for distribution, bandwidth_um in zip(sanitized_data, bandwidths_um, strict=True):
+        label = distribution.label
+        distances_um, weights = distribution.distances_um, distribution.weights
         density_values = _evaluate_weighted_gaussian_kde(x_um, distances_um, weights, bandwidth_um=bandwidth_um)
         peak_position_um, peak_density = _detect_peak_from_curve(x_um, density_values)
         alignment_shift_um = peak_position_um
@@ -1530,19 +1579,22 @@ def _distance_kde_curves(
                 peak_position_um=peak_position_um,
                 peak_density=peak_density,
                 alignment_shift_um=alignment_shift_um,
+                technology=distribution.technology,
             )
         )
     return curves
 
 
 def _distance_hist_curves(
-    data_per_label: list[tuple[str, np.ndarray, np.ndarray]],
+    data_per_label: list[DistanceDistribution],
     bins: np.ndarray,
     align_peaks: bool = False,
     density: bool = False,
 ) -> list[tuple[str, np.ndarray, np.ndarray]]:
     curves: list[tuple[str, np.ndarray, np.ndarray]] = []
-    for label, distances_um, weights in data_per_label:
+    for distribution in data_per_label:
+        label = distribution.label
+        distances_um, weights = distribution.distances_um, distribution.weights
         distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
         counts, edges = np.histogram(distances_um, bins=bins, weights=weights, density=density)
         centers = _distance_hist_bin_centers_from_edges(edges)
@@ -1558,7 +1610,7 @@ def _distance_kde_curves_from_crop_specs(
     plots_root: str,
     align_peaks: bool = False,
 ) -> list[DistanceKDECurve]:
-    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
+    data_per_label = read_experiment_distance_data(crop_specs, plots_root)
     return _distance_kde_curves(
         data_per_label,
         align_peaks=align_peaks,
@@ -1572,7 +1624,7 @@ def _distance_hist_curves_from_crop_specs(
     align_peaks: bool = False,
     density: bool = True,
 ) -> list[tuple[str, np.ndarray, np.ndarray]]:
-    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
+    data_per_label = read_experiment_distance_data(crop_specs, plots_root)
     bins = _distance_hist_bins(
         data_per_label,
         bin_width=bin_width_um,
@@ -1685,7 +1737,7 @@ def calculate_distance_histogram_hwhm(
     align_peaks: bool = False,
 ) -> list[DistanceHistogramHWHM]:
     """
-    Calculate left/right HWHM values from per-crop signed-distance KDE curves.
+    Calculate left/right HWHM values from pooled experiment signed-distance KDE curves.
 
     The left HWHM corresponds to diffusion towards the outside of the tissue (negative distances),
     the right HWHM towards the inside of the tissue (positive distances).
@@ -1694,13 +1746,13 @@ def calculate_distance_histogram_hwhm(
     consistent with the combined and ridgeline visualizations.
 
     Args:
-        crop_specs: Crop descriptors used to load per-crop signed distance/weight data.
+        crop_specs: Crop descriptors whose signed distances/counts are pooled per experiment.
         plots_root: Root directory containing per-crop precomputed diffusion outputs.
         align_peaks: Whether to shift each KDE curve so its mode is at zero before
             HWHM extraction.
 
     Returns:
-        List of `DistanceHistogramHWHM` rows (one row per crop label) containing
+        List of `DistanceHistogramHWHM` rows (one row per experiment) containing
         peak position and left/right HWHM in micrometers.
     """
     rows: list[DistanceHistogramHWHM] = []
@@ -1718,6 +1770,7 @@ def calculate_distance_histogram_hwhm(
                 left_hwhm_um=left_hwhm,
                 right_hwhm_um=right_hwhm,
                 peak_position_um=peak_x,
+                technology=curve.technology,
             )
         )
 
@@ -1731,7 +1784,7 @@ def plot_distance_histogram_hwhm_bars(
     figsize: tuple[float, float] | None = None,
 ) -> None:
     """
-    Plot left/right HWHM per crop as bidirectional horizontal bars.
+    Plot left/right HWHM per experiment as bidirectional horizontal bars.
 
     Left HWHM is drawn towards negative x; right HWHM towards positive x.
 
@@ -1768,7 +1821,10 @@ def plot_distance_histogram_hwhm_bars(
 
     y = np.arange(len(labels))
     fig, ax = plt.subplots(figsize=figsize)
-    tech_colors = [COLOR_PALETTE.get(label, "#7f7f7f") for label in labels]
+    tech_colors = [
+        COLOR_PALETTE.get(hwhm_rows[i].technology or hwhm_rows[i].label, "#7f7f7f")
+        for i in keep_idx
+    ]
     missing_color_labels = [label for label, color in zip(labels, tech_colors) if color == "#7f7f7f"]
     assert len(missing_color_labels) == 0
 
@@ -1825,23 +1881,25 @@ def calculate_distance_to_kde_peak_median(
     """
     Calculate weighted median distances to the detected KDE peak on both sides.
 
-    Distances are first shifted so the per-crop KDE peak is at zero. The left
+    Distances are first shifted so the pooled experiment KDE peak is at zero. The left
     median summarizes distances on the negative side of that peak and the right
     median summarizes distances on the positive side.
 
     Args:
-        crop_specs: Crop descriptors used to load per-crop signed distance/weight data.
+        crop_specs: Crop descriptors whose signed distances/counts are pooled per experiment.
         plots_root: Root directory containing per-crop precomputed diffusion outputs.
 
     Returns:
-        One row per crop label containing the detected peak position together with
+        One row per experiment containing the detected peak position together with
         the weighted median distance to that peak on the left and right side.
     """
-    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
+    data_per_label = read_experiment_distance_data(crop_specs, plots_root)
     curves = _distance_kde_curves(data_per_label, align_peaks=False)
 
     rows: list[DistanceKDEPeakMedianDistance] = []
-    for (label, distances_um, weights), curve in zip(data_per_label, curves, strict=True):
+    for distribution, curve in zip(data_per_label, curves, strict=True):
+        label = distribution.label
+        distances_um, weights = distribution.distances_um, distribution.weights
         if label != curve.label:
             raise ValueError(f"Label mismatch while computing KDE-peak medians: {label!r} != {curve.label!r}")
 
@@ -1869,6 +1927,7 @@ def calculate_distance_to_kde_peak_median(
                 left_median_distance_um=left_median_distance_um,
                 right_median_distance_um=right_median_distance_um,
                 peak_position_um=curve.peak_position_um,
+                technology=distribution.technology,
             )
         )
 
@@ -1882,7 +1941,7 @@ def plot_distance_to_kde_peak_median_bars(
     figsize: tuple[float, float] | None = None,
 ) -> None:
     """
-    Plot left/right weighted median distance to the detected KDE peak per crop.
+    Plot left/right weighted median distance to the detected KDE peak per experiment.
 
     Left-of-peak medians (~outside tissue) are drawn towards negative x;
     right-of-peak medians (~inside tissue) are drawn towards positive x.
@@ -1920,7 +1979,10 @@ def plot_distance_to_kde_peak_median_bars(
 
     y = np.arange(len(labels))
     fig, ax = plt.subplots(figsize=figsize)
-    tech_colors = [COLOR_PALETTE.get(label, "#7f7f7f") for label in labels]
+    tech_colors = [
+        COLOR_PALETTE.get(median_rows[i].technology or median_rows[i].label, "#7f7f7f")
+        for i in keep_idx
+    ]
     missing_color_labels = [label for label, color in zip(labels, tech_colors) if color == "#7f7f7f"]
     assert len(missing_color_labels) == 0
 
@@ -2029,7 +2091,7 @@ def summarize_distance_distributions(
     cdf_levels: Sequence[float] = (0.25, 0.50, 0.75, 0.90),
 ) -> list[DistanceDistributionSummary]:
     """
-    Summarize outside/inside signed-distance distributions for each crop.
+    Summarize outside/inside signed-distance distributions for each experiment, pooling its crops.
 
     Distances are split by sign into outside (`d <= 0`, reported as absolute distance)
     and inside (`d > 0`) components, both weighted by transcript counts.
@@ -2040,15 +2102,17 @@ def summarize_distance_distributions(
         quantiles: Probability levels used to report weighted distance quantiles per side.
         cdf_levels: CDF levels used to report distance-at-CDF summaries per side.
     Returns:
-        One `DistanceDistributionSummary` per crop label with quantile signatures,
+        One `DistanceDistributionSummary` per experiment with quantile signatures,
         distance-at-CDF summaries, and side mass fractions.
     """
-    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
+    data_per_label = read_experiment_distance_data(crop_specs, plots_root)
     quantiles = tuple(float(q) for q in quantiles)
     cdf_levels = tuple(float(q) for q in cdf_levels)
 
     rows: list[DistanceDistributionSummary] = []
-    for label, distances_um, weights in data_per_label:
+    for distribution in data_per_label:
+        label = distribution.label
+        distances_um, weights = distribution.distances_um, distribution.weights
         distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
         outside_distances_um, outside_weights, inside_distances_um, inside_weights = _split_signed_distance_sides(
             distances_um, weights
@@ -2127,7 +2191,7 @@ def plot_distance_cdf(
     origin: str = "boundary",
 ) -> None:
     """
-    Plot weighted transcript-count CDFs using either boundary- or peak-based origin.
+    Plot pooled experiment transcript-count CDFs using boundary- or peak-based origin.
 
     Two side-by-side panels show non-negative distances on either side of the
     chosen origin. With `origin="boundary"`, panels correspond to outside and
@@ -2147,7 +2211,7 @@ def plot_distance_cdf(
         ValueError: If `origin` is not one of the supported values.
         ValueError: If `max_distance_um` is provided but not positive.
     """
-    data_per_label = _read_crop_distance_data(crop_specs, plots_root)
+    data_per_label = read_experiment_distance_data(crop_specs, plots_root)
     if origin not in {"boundary", "peak"}:
         raise ValueError("origin must be 'boundary' or 'peak'.")
 
@@ -2159,7 +2223,9 @@ def plot_distance_cdf(
     fig, axes = plt.subplots(1, 2, figsize=(14, 6), sharey=True, gridspec_kw={"wspace": 0.05})
     ax_left, ax_right = axes
 
-    for label, distances_um, weights in data_per_label:
+    for distribution in data_per_label:
+        label = distribution.label
+        distances_um, weights = distribution.distances_um, distribution.weights
         distances_um, weights = _sanitize_distance_weights(distances_um, weights, label=label)
         if origin == "boundary":
             left_distances_um, left_weights, right_distances_um, right_weights = _split_signed_distance_sides(
@@ -2174,7 +2240,7 @@ def plot_distance_cdf(
                 weights,
                 peak_position_um=peak_positions_by_label[label],
             )
-        color = COLOR_PALETTE.get(label, "#7f7f7f")
+        color = COLOR_PALETTE.get(distribution.technology, "#7f7f7f")
 
         for ax, side_distances_um, side_weights in [
             (ax_left, left_distances_um, left_weights),
@@ -2220,15 +2286,13 @@ def plot_distance_cdf(
 
 
 def plot_distance_boxplot(
-    data: "DiffusionBinData",
+    data: DistanceDistribution,
     output_path: str,
-    pixel_size_um: float,
     title: str | None = None,
 ) -> None:
-    distances = np.asarray(data.distance_data.closest_distances, dtype=float)
-    weights = np.asarray(data.gene_bins.transcript_counts, dtype=float)
+    distances = np.asarray(data.distances_um, dtype=float)
+    weights = np.asarray(data.weights, dtype=float)
     distances, weights = _sanitize_distance_weights(distances, weights, label="distance boxplot")
-    distances = distances * pixel_size_um
     if not np.all(np.isclose(weights, np.rint(weights))):
         raise ValueError("Transcript counts must be integer to expand-by-count.")
     repeats = np.rint(weights).astype(int)
@@ -2271,7 +2335,7 @@ def plot_distance_kde_ridgeline(
     fill_alpha: float = 0.45,
 ) -> None:
     """
-    Plot signed-distance KDE curves as a ridgeline (joy) chart.
+    Plot one pooled signed-distance KDE per experiment as a ridgeline (joy) chart.
 
     If `align_peaks` is True, each curve is shifted so its KDE peak is placed
     at x=0.
@@ -2312,8 +2376,8 @@ def plot_distance_kde_ridgeline(
     num_curves = len(all_curves)
     for idx, curve in enumerate(all_curves):
         baseline = (num_curves - 1 - idx) * step
-        assert curve.label in COLOR_PALETTE
-        color = COLOR_PALETTE[curve.label]
+        assert curve.technology in COLOR_PALETTE
+        color = COLOR_PALETTE[curve.technology]
         filled = baseline + curve.density
         ax.plot(curve.x_um, filled, color=color, linewidth=1.4, label=curve.label)
         ax.fill_between(curve.x_um, baseline, filled, color=color, alpha=fill_alpha, linewidth=0)

@@ -19,4 +19,6 @@ class Experiment:
     tissue_mask: str | None  # name of tissue mask shapes layer
     levels: list[LevelInfo]  # bin sizes, they MUST be ordered from finest to coarsest
     hexbins: LevelInfo # hexagonally (re)binned data, coarser but faster visualization
+    # Sections must be far enough apart that their eligible analysis bins are disjoint.
+    # Distances/counts are pooled per experiment without overlap detection or deduplication.
     boundary_point_pairs: list[tuple[tuple[float, float], tuple[float, float]]] = field(default_factory=list)  # list of (approx_start_xy, approx_end_xy) pairs near tissue boundary
