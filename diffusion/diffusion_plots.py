@@ -851,19 +851,6 @@ def plot_shapely_geometries(
     xlim, ylim = ax.get_xlim(), ax.get_ylim()
     save_or_show_figure(fig, output_path)
 
-    output_stem, output_ext = os.path.splitext(output_path)
-    for i, geom in enumerate(geometries):
-        fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
-        draw_geometry(ax, geom, cmap(i))
-        ax.set_xlim(xlim)
-        ax.set_ylim(ylim)
-        ax.set_aspect("equal", adjustable="box")
-        ax.set_xlabel("x [px]")
-        ax.set_ylabel("y [px]")
-        if title is not None:
-            ax.set_title(title)
-        save_or_show_figure(fig, f"{output_stem}_geo{i}{output_ext}")
-
 
 def plot_bin_gene_counts_and_contour(
     gene_bin_data: "GeneBinData",
