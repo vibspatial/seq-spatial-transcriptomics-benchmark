@@ -37,26 +37,6 @@ class AnalysisRegionPreviewTests(unittest.TestCase):
         assert_array_equal(utils.diffusion_analysis_mask(points, section, 3), expected)
         assert_array_equal(self.reference_mask(points, section, 3), expected)
 
-    def test_sampled_preview_matches_original_rule_and_actual_bin_filter(self):
-        sections = [
-            LineString([(0, 0), (0, 10)]),
-            LineString([(0, 0), (10, 0), (10, 10), (-2, 10), (-2, -2)]),
-            LineString([(0, 0), (0, 10), (10, 10), (10, 0), (0, 0)]),
-        ]
-        for section in sections:
-            with self.subTest(closed=section.is_closed, coords=list(section.coords)):
-                region = utils.build_analysis_region_preview(section, 3, max_grid_size=96)
-                xx, yy = np.meshgrid(region.x_px, region.y_px)
-                points = np.column_stack((xx.ravel(), yy.ravel()))
-                expected = self.reference_mask(points, section, 3)
-                assert_array_equal(region.eligible.ravel(), expected)
-                self.assertFalse(region.eligible[0].any())
-                self.assertFalse(region.eligible[-1].any())
-                distances = utils.closest_points_and_distances(points, section, use_signed_distances=True)
-                data = utils.DiffusionBinData(utils.GeneBinData("Ptgds", points, np.ones(len(points))), distances)
-                selected = utils.filter_bins_for_diffusion_analysis(data, section, 3)
-                assert_array_equal(selected.gene_bins.bin_centers, points[expected])
-
     def test_endpoint_neighborhood_optimization_preserves_coordinate_tolerance(self):
         section = LineString([(10000, 10000), (10000, 10010)])
         points = np.array([[10001, 10000.05], [10001, 10005], [9999, 10009.95]])

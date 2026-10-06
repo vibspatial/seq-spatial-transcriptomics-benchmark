@@ -27,7 +27,7 @@ from utils.plotting import best_datatree_scale
 from colors import COLOR_PALETTE
 
 if TYPE_CHECKING:
-    from diffusion_utils import AnalysisRegionPreview, DiffusionBinData, GeneBinData
+    from diffusion_utils import DiffusionBinData, GeneBinData
 
 MICROMETER_UNIT = "\u00B5m"
 KDE_GRID_STEP_UM = 0.25
@@ -931,62 +931,6 @@ def plot_bin_gene_counts_and_contour(
         size_vertical_scale=18.0,
     )
 
-    save_or_show_figure(fig, output_path)
-
-
-def plot_tissue_contour_with_analysis_regions(
-    full_tissue_contour: BaseGeometry,
-    analysis_regions: Sequence[AnalysisRegionPreview],
-    output_path: str,
-    pixel_size_um: float,
-    title: str,
-    figsize: tuple[float, float] = (10, 10),
-    contour_line_width: float = 1.5,
-    boundary_points: np.ndarray | None = None,
-) -> None:
-    """Preview the red tissue contour and blue distance zones without bin data.
-
-    Regions sample the same spatial selection rule used for analysis bins,
-    including open-section endpoint exclusions. Their edges are drawn at the
-    preview grid's resolution; bin selection is evaluated at actual bin centers.
-    Show supplied boundary-pair coordinates as black dots, before snapping.
-    """
-    fig, ax = plt.subplots(figsize=figsize)
-    ax.set_title(title)
-    for region in analysis_regions:
-        if not np.any(region.eligible):
-            continue
-        ax.contourf(
-            region.x_px, region.y_px, region.eligible,
-            levels=[0.5, 1.5], colors=["#00BFFF"], alpha=0.12, zorder=1,
-        )
-        ax.contour(
-            region.x_px, region.y_px, region.eligible,
-            levels=[0.5], colors=["#00BFFF"], linewidths=contour_line_width, zorder=2,
-        )
-    gpd.GeoSeries([full_tissue_contour]).plot(
-        ax=ax, color="red", linewidth=contour_line_width, zorder=3,
-    )
-    if boundary_points is not None and np.size(boundary_points) > 0:
-        points = np.asarray(boundary_points, dtype=float).reshape(-1, 2)
-        ax.scatter(points[:, 0], points[:, 1], color="black", marker="o", s=25, zorder=4)
-    # Keep the full contour, zones, and supplied endpoints in view, with pixel axes
-    # styled like the tissue_mask_geo{i}.png figures.
-    ax.use_sticky_edges = False
-    ax.autoscale()
-    ax.set_aspect("equal", adjustable="box")
-    ax.set_xlabel("x [px]")
-    ax.set_ylabel("y [px]")
-    ax.invert_yaxis()
-    x0, x1 = ax.get_xlim()
-    bar_um = pick_scalebar_length_um(abs(x1 - x0), pixel_size_um)
-    add_scalebar(
-        ax=ax,
-        length_px=bar_um / pixel_size_um,
-        label=f"{bar_um:g} {MICROMETER_UNIT}",
-        loc="lower left",
-        frameon=False,
-    )
     save_or_show_figure(fig, output_path)
 
 

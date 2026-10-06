@@ -733,35 +733,6 @@ def diffusion_analysis_mask(
     return eligible
 
 
-@dataclass(frozen=True)
-class AnalysisRegionPreview:
-    x_px: np.ndarray
-    y_px: np.ndarray
-    eligible: np.ndarray
-
-
-def build_analysis_region_preview(
-    boundary_section: LineString,
-    max_distance_px: float,
-    max_grid_size: int = 1024,
-) -> AnalysisRegionPreview:
-    """Sample the actual eligibility rule on a plotting grid, including endpoint cuts.
-
-    Grid resolution only affects the drawn boundary, never bin selection. Padding
-    ensures the plotted contours close at the edges of the distance neighborhood.
-    """
-    if max_grid_size < 4:
-        raise ValueError("max_grid_size must be at least 4.")
-    xmin, ymin, xmax, ymax = boundary_section.buffer(float(max_distance_px)).bounds
-    step = max(xmax - xmin, ymax - ymin) / (max_grid_size - 3)
-    x_px = np.linspace(xmin - step, xmax + step, int(np.ceil((xmax - xmin) / step)) + 3)
-    y_px = np.linspace(ymin - step, ymax + step, int(np.ceil((ymax - ymin) / step)) + 3)
-    x_grid, y_grid = np.meshgrid(x_px, y_px)
-    points_xy = np.column_stack((x_grid.ravel(), y_grid.ravel()))
-    eligible = diffusion_analysis_mask(points_xy, boundary_section, max_distance_px)
-    return AnalysisRegionPreview(x_px, y_px, eligible.reshape(y_px.size, x_px.size))
-
-
 def filter_bins_for_diffusion_analysis(
     diffusion_data: DiffusionBinData,
     boundary_section: LineString,
