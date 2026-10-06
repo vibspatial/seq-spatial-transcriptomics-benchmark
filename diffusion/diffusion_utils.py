@@ -25,6 +25,9 @@ from shapely.geometry.base import BaseGeometry
 import spatialdata as sd
 import numpy as np
 
+ENDPOINT_ATOL_PX = 1e-8
+ENDPOINT_RTOL = 1e-5
+
 # Note about signed distances and contour orientation:
 # - points outside the closed tissue annotation contour have a negative distance to it;
 # - points inside have a positive distance to it;
@@ -60,34 +63,26 @@ def signed_area(polygon: Polygon) -> float:
     return area
 
 
-def _iter_lines(geometry: BaseGeometry):
-    if geometry is None or geometry.is_empty:
-        return
-    for part in shapely.get_parts(geometry):
-        if part.geom_type == "LineString":
-            yield part
-        elif part.geom_type == "LinearRing":
-            yield LineString(part.coords)
-
-
-def _shape_boundary_lines(geom: BaseGeometry) -> list[LineString]:
+def _shape_exterior_lines(geom: BaseGeometry) -> list[LineString]:
+    """Return polygon exteriors in their stored order, excluding all hole rings."""
     if geom is None or geom.is_empty:
         return []
-    boundary = geom.boundary
-    if boundary is None or boundary.is_empty:
-        return []
-    return list(_iter_lines(boundary))
+    return [
+        LineString(part.exterior.coords)
+        for part in shapely.get_parts(geom)
+        if isinstance(part, Polygon) and not part.is_empty
+    ]
 
 
 def longest_shape_contour(
     sdata,
     shapes_layer: str,
 ) -> LineString | None:
-    """Return the longest contour (LineString) from a shapes layer."""
+    """Return the longest polygon exterior, preserving orientation and ignoring holes."""
     gdf = sdata.shapes[shapes_layer]
     if gdf.empty:
         return None
-    lines = [line for geom in gdf.geometry for line in _shape_boundary_lines(geom)]
+    lines = [line for geom in gdf.geometry for line in _shape_exterior_lines(geom)]
     if not lines:
         return None
     return max(lines, key=lambda line: line.length)
@@ -97,11 +92,11 @@ def full_shape_boundary_geometry(
     sdata,
     shapes_layer: str,
 ) -> BaseGeometry | None:
-    """Return the complete boundary geometry from a shapes layer."""
+    """Return all polygon exteriors from a shapes layer, excluding hole rings."""
     gdf = sdata.shapes[shapes_layer]
     if gdf.empty:
         return None
-    lines = [line for geom in gdf.geometry for line in _shape_boundary_lines(geom)]
+    lines = [line for geom in gdf.geometry for line in _shape_exterior_lines(geom)]
     if not lines:
         return None
     if len(lines) == 1:
@@ -109,9 +104,39 @@ def full_shape_boundary_geometry(
     return MultiLineString([line.coords for line in lines])
 
 
+def shape_contour_for_points(
+    sdata,
+    shapes_layer: str,
+    approx_start_xy: tuple[float, float],
+    approx_end_xy: tuple[float, float],
+) -> LineString:
+    """Select the exterior nearest to both endpoints, preserving vertex order.
+
+    Different pairs may select different polygon exteriors, including MultiPolygon
+    parts. Hole rings are excluded. Exact distance ties use shapes/part order.
+    """
+    lines = [
+        line for geom in sdata.shapes[shapes_layer].geometry
+        for line in _shape_exterior_lines(geom)
+    ]
+    if not lines:
+        raise ValueError(f"No exterior tissue contour found in shapes layer {shapes_layer!r}.")
+    start = Point(*approx_start_xy)
+    end = Point(*approx_end_xy)
+    start_idx = min(range(len(lines)), key=lambda i: lines[i].distance(start))
+    end_idx = min(range(len(lines)), key=lambda i: lines[i].distance(end))
+    if start_idx != end_idx:
+        raise ValueError(
+            f"Boundary pair {approx_start_xy!r} -> {approx_end_xy!r} selects different "
+            f"exterior contours in shapes layer {shapes_layer!r}. "
+            "Both endpoints of a section must be nearest to the same contour."
+        )
+    return lines[start_idx]
+
+
 def _is_closed_linestring(line: LineString, atol: float = 1e-8) -> bool:
     coords = np.asarray(line.coords, dtype=float)
-    return coords.shape[0] >= 2 and np.allclose(coords[0], coords[-1], atol=atol)
+    return coords.shape[0] >= 2 and np.allclose(coords[0], coords[-1], atol=atol, rtol=0.0)
 
 
 def _project_point_to_line(point_xy: tuple[float, float], line: LineString) -> tuple[float, np.ndarray]:
@@ -129,7 +154,7 @@ def _concatenate_lines(line_a: LineString, line_b: LineString) -> LineString:
         return LineString(coords_b)
     if coords_b.shape[0] == 0:
         return LineString(coords_a)
-    if np.allclose(coords_a[-1], coords_b[0], atol=1e-8):
+    if np.allclose(coords_a[-1], coords_b[0], atol=1e-8, rtol=0.0):
         coords = np.vstack([coords_a, coords_b[1:]])
     else:
         coords = np.vstack([coords_a, coords_b])
@@ -140,11 +165,15 @@ def oriented_boundary_section(
     contour: LineString,
     start_distance: float,
     end_distance: float,
+    *,
+    full_boundary: bool = False,
 ) -> LineString:
     """
     Extract boundary arc from start to end following the existing contour orientation.
 
     For closed contours and end < start, the arc wraps around contour end.
+    With full_boundary=True, make one complete circuit from start_distance;
+    end_distance is unused. Preserve the existing vertex order and orientation.
     """
     length = float(contour.length)
     if length <= 0:
@@ -152,6 +181,12 @@ def oriented_boundary_section(
     if _is_closed_linestring(contour):
         start_distance = float(start_distance % length)
         end_distance = float(end_distance % length)
+        if full_boundary:
+            if start_distance == 0.0:
+                return contour
+            tail = substring(contour, start_distance, length, normalized=False)
+            head = substring(contour, 0.0, start_distance, normalized=False)
+            return _concatenate_lines(tail, head)
         if np.isclose(start_distance, end_distance):
             raise ValueError("Snapped start and end points are too close on the contour.")
         if end_distance >= start_distance:
@@ -159,11 +194,15 @@ def oriented_boundary_section(
             assert isinstance(segment, LineString)
             return segment
         tail = substring(contour, start_distance, length, normalized=False)
+        if end_distance == 0.0:
+            return tail
         head = substring(contour, 0.0, end_distance, normalized=False)
         assert isinstance(tail, LineString)
         assert isinstance(head, LineString)
         return _concatenate_lines(tail, head)
 
+    if full_boundary:
+        raise ValueError("Identical endpoints require a closed contour for full-boundary analysis.")
     start_distance = float(np.clip(start_distance, 0.0, length))
     end_distance = float(np.clip(end_distance, 0.0, length))
     if np.isclose(start_distance, end_distance):
@@ -195,9 +234,17 @@ def build_boundary_section_geometry(
     max_distance_px: float,
     crop_margin_px: float,
 ) -> BoundarySectionGeometry:
+    """Build an oriented arc, or the full contour for exactly identical input points.
+
+    Distinct input points that snap to the same or nearly the same position remain
+    invalid; they must not accidentally request a full-boundary calculation.
+    """
     start_d, snapped_start = _project_point_to_line(approx_start_xy, contour)
     end_d, snapped_end = _project_point_to_line(approx_end_xy, contour)
-    section = oriented_boundary_section(contour, start_d, end_d)
+    section = oriented_boundary_section(
+        contour, start_d, end_d,
+        full_boundary=np.array_equal(approx_start_xy, approx_end_xy),
+    )
     thickened = section.buffer(float(max_distance_px), cap_style="round", join_style="round")
     if thickened is None or thickened.is_empty:
         raise ValueError("Failed to create thickened contour section.")
@@ -272,12 +319,16 @@ def signed_distance_to_linestring(
     """
     Calculates the signed distance to a LineString.
     
-    Sign convention:
+    Closed contours:
+    Use the true distance to the ring, positive inside its enclosure and negative
+    outside, with zero on the boundary. Ignore holes and ring orientation.
+
+    Open-section sign convention:
     Points on the left of the linestring
     (when moving from its first to its last point) will have a negative distance,
     points on the right a positive distance.
 
-    Distance:
+    Open-section distance:
     - Use closest point on interior segments.
     - If the closest segment is the first and the projection is before the start,
       extend the first segment to infinity.
@@ -293,6 +344,16 @@ def signed_distance_to_linestring(
         _, nearest_on_line = shapely.ops.nearest_points(points_geom, line)
     if closest_xy is None:
         closest_xy = shapely.get_coordinates(nearest_on_line)
+
+    if _is_closed_linestring(line):
+        # The analysis ring is an exterior: its enclosure deliberately has no holes.
+        # A closed ring has no endpoint extensions or preferred starting point.
+        enclosure = Polygon(line.coords)
+        shapely.prepare(enclosure)
+        inside = shapely.contains_xy(enclosure, points_xy[:, 0], points_xy[:, 1])
+        distances = np.sqrt(np.sum((points_xy - closest_xy) ** 2, axis=1))
+        return np.where(inside | (distances == 0.0), distances, -distances)
+
     if along_distances is None:
         along_distances = shapely.line_locate_point(line, nearest_on_line, normalized=False)
 
@@ -433,16 +494,19 @@ def closest_points_and_distances(
 def mask_excluding_contour_endpoint_closest_points(
     closest_xy: np.ndarray,
     contour: LineString,
-    atol: float = 1e-8,
+    atol: float = ENDPOINT_ATOL_PX,
 ) -> np.ndarray:
     """
     Avoid edge artifact: keep only points whose closest contour point is not the first/last contour coordinate.
+    Closed contours have no endpoints, so keep all their closest points.
     """
+    if _is_closed_linestring(contour):
+        return np.ones(len(closest_xy), dtype=bool)
     boundary_coords = np.asarray(contour.coords, dtype=float)
     boundary_start = boundary_coords[0]
     boundary_end = boundary_coords[-1]
-    closest_is_start = np.all(np.isclose(closest_xy, boundary_start, atol=atol), axis=1)
-    closest_is_end = np.all(np.isclose(closest_xy, boundary_end, atol=atol), axis=1)
+    closest_is_start = np.all(np.isclose(closest_xy, boundary_start, atol=atol, rtol=ENDPOINT_RTOL), axis=1)
+    closest_is_end = np.all(np.isclose(closest_xy, boundary_end, atol=atol, rtol=ENDPOINT_RTOL), axis=1)
     return ~(closest_is_start | closest_is_end)
 
 
@@ -599,39 +663,106 @@ def load_diffusion_results(output_path: str) -> DiffusionResults:
         )
 
 
-def filter_bins_for_diffusion_analysis(
-    diffusion_data: DiffusionBinData,
+def diffusion_analysis_mask(
+    points_xy: np.ndarray,
     boundary_section: LineString,
     max_distance_px: float,
-) -> DiffusionBinData:
+    *,
+    closest_xy: np.ndarray | None = None,
+    closest_distances: np.ndarray | None = None,
+) -> np.ndarray:
     """
-    Keep bins eligible for diffusion analysis before transcript-count filtering.
+    Shared spatial eligibility rule for analysis bins and the boundary preview.
 
-    This mirrors compute_diffusion(): stay within the round max-distance neighborhood and
-    remove bins whose closest boundary point is exactly one of the section endpoints.
+    Start with the round max-distance neighborhood, then exclude points whose
+    nearest boundary point is an open section's endpoint. For a straight section
+    this removes the round caps. For a folded section it is not generally the
+    same as a flat buffer. Closed boundaries have no endpoint exclusions.
+
+    Computation supplies its existing nearest points/distances. The preview only
+    needs nearest-point calculations near the endpoints, and needs no bin data.
     """
-    points_geom = shapely.points(diffusion_data.gene_bins.bin_centers)
+    points_xy = np.asarray(points_xy, dtype=float)
+    points_geom = shapely.points(points_xy)
     thickened_section = boundary_section.buffer(
         float(max_distance_px),
         cap_style="round",
         join_style="round",
     )
-    inside_thickened_mask = np.asarray(
+    shapely.prepare(thickened_section)
+    eligible = np.asarray(
         shapely.covers(thickened_section, points_geom),
         dtype=bool,
     )
-    filtered = diffusion_data.filter(inside_thickened_mask)
-
     # Numerical guard: keep expected max-distance neighborhood only.
-    filtered = filtered.filter(
-        np.abs(filtered.distance_data.closest_distances) <= (max_distance_px + 1e-6)
-    )
+    # The buffer already enforces this for the preview's geometric points.
+    if closest_distances is not None:
+        eligible &= np.abs(closest_distances) <= (max_distance_px + 1e-6)
 
-    endpoint_mask = mask_excluding_contour_endpoint_closest_points(
-        filtered.distance_data.closest_xy,
+    if _is_closed_linestring(boundary_section):
+        return eligible
+    if closest_xy is not None:
+        return eligible & mask_excluding_contour_endpoint_closest_points(closest_xy, boundary_section)
+
+    # A point in the buffer can only project to an endpoint if it lies within
+    # max_distance_px of that endpoint (plus the existing comparison tolerance).
+    # Avoid projecting an entire plotting grid onto a potentially long contour.
+    near_endpoint = np.zeros(len(points_xy), dtype=bool)
+    for endpoint in np.asarray(boundary_section.coords)[[0, -1]]:
+        tolerance = np.linalg.norm(ENDPOINT_ATOL_PX + ENDPOINT_RTOL * np.abs(endpoint))
+        radius = max_distance_px + tolerance + 1e-6
+        near_endpoint |= np.sum((points_xy - endpoint) ** 2, axis=1) <= radius ** 2
+    candidates = np.flatnonzero(eligible & near_endpoint)
+    if candidates.size:
+        _, nearest = shapely.ops.nearest_points(points_geom[candidates], boundary_section)
+        eligible[candidates] &= mask_excluding_contour_endpoint_closest_points(
+            shapely.get_coordinates(nearest), boundary_section,
+        )
+    return eligible
+
+
+@dataclass(frozen=True)
+class AnalysisRegionPreview:
+    x_px: np.ndarray
+    y_px: np.ndarray
+    eligible: np.ndarray
+
+
+def build_analysis_region_preview(
+    boundary_section: LineString,
+    max_distance_px: float,
+    max_grid_size: int = 1024,
+) -> AnalysisRegionPreview:
+    """Sample the actual eligibility rule on a plotting grid, including endpoint cuts.
+
+    Grid resolution only affects the drawn boundary, never bin selection. Padding
+    ensures the plotted contours close at the edges of the distance neighborhood.
+    """
+    if max_grid_size < 4:
+        raise ValueError("max_grid_size must be at least 4.")
+    xmin, ymin, xmax, ymax = boundary_section.buffer(float(max_distance_px)).bounds
+    step = max(xmax - xmin, ymax - ymin) / (max_grid_size - 3)
+    x_px = np.linspace(xmin - step, xmax + step, int(np.ceil((xmax - xmin) / step)) + 3)
+    y_px = np.linspace(ymin - step, ymax + step, int(np.ceil((ymax - ymin) / step)) + 3)
+    x_grid, y_grid = np.meshgrid(x_px, y_px)
+    points_xy = np.column_stack((x_grid.ravel(), y_grid.ravel()))
+    eligible = diffusion_analysis_mask(points_xy, boundary_section, max_distance_px)
+    return AnalysisRegionPreview(x_px, y_px, eligible.reshape(y_px.size, x_px.size))
+
+
+def filter_bins_for_diffusion_analysis(
+    diffusion_data: DiffusionBinData,
+    boundary_section: LineString,
+    max_distance_px: float,
+) -> DiffusionBinData:
+    """Select spatially eligible bins before filtering by transcript count."""
+    return diffusion_data.filter(diffusion_analysis_mask(
+        diffusion_data.gene_bins.bin_centers,
         boundary_section,
-    )
-    return filtered.filter(endpoint_mask)
+        max_distance_px,
+        closest_xy=diffusion_data.distance_data.closest_xy,
+        closest_distances=diffusion_data.distance_data.closest_distances,
+    ))
 
 
 def compute_diffusion(
@@ -655,11 +786,10 @@ def compute_diffusion(
             f"No boundary_point_pairs provided for experiment {experiment.dataset_id!r}."
         )
 
-    contour = longest_shape_contour(sdata, experiment.tissue_mask)
-    if contour is None or contour.is_empty:
-        raise ValueError(f"No tissue contour found in shapes layer {experiment.tissue_mask!r}.")
-
     for crop_idx, (approx_start, approx_end) in enumerate(experiment.boundary_point_pairs):
+        contour = shape_contour_for_points(
+            sdata, experiment.tissue_mask, approx_start, approx_end,
+        )
         section = build_boundary_section_geometry(
             contour=contour,
             approx_start_xy=approx_start,
@@ -770,6 +900,14 @@ def generate_diffusion_plots(
         results = load_diffusion_results(diffusion_results_path)
         crop_rect = np.asarray(results.crop_rect, dtype=float)
         analysis_region_bin_centers = results.analysis_region_bin_centers
+        # A closed section has no endpoint exclusions: its analysis zone is the
+        # distance buffer, including any interior rings. A hole-free bin hull
+        # fills the excluded tissue interior and loses the inner zone boundary.
+        analysis_region_geometry = None
+        if _is_closed_linestring(results.boundary_section):
+            analysis_region_geometry = results.boundary_section.buffer(
+                results.max_distance_px, cap_style="round", join_style="round",
+            )
         if plot_settings.full_tissue_bin_gene_counts and full_tissue_gene_bin_data is None:
             assert sdata is not None
             full_tissue_gene_bin_data = get_gene_bin_data(
@@ -798,7 +936,10 @@ def generate_diffusion_plots(
                 outline_width=1,
                 bounds=tuple(crop_rect),
                 overlay_contour=results.boundary_section,
-                overlay_bin_centers=analysis_region_bin_centers,
+                overlay_region=analysis_region_geometry,
+                overlay_bin_centers=(
+                    analysis_region_bin_centers if analysis_region_geometry is None else None
+                ),
                 approx_points=np.vstack([results.approx_start_xy, results.approx_end_xy]),
                 snapped_points=np.vstack([results.snapped_start_xy, results.snapped_end_xy]),
             )
@@ -831,6 +972,7 @@ def generate_diffusion_plots(
                 experiment.pixel_size_um,
                 f"{experiment.technology}",
                 dpi=600,
+                highlighted_analysis_region=analysis_region_geometry,
             )
 
         if plot_settings.bins_and_closest_points:
