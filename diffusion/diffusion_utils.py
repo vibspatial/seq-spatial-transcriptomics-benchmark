@@ -5,7 +5,9 @@ from time import perf_counter
 sys.path.append(os.path.abspath('..'))
 from diffusion import Experiment
 from diffusion_plots import (
+    BoundarySectionOverlay,
     DiffusionPlotSettings,
+    full_tissue_plot_bounds,
     read_experiment_distance_data,
     plot_bin_gene_counts_and_contour,
     plot_bins_and_closest_points_on_contour,
@@ -13,7 +15,7 @@ from diffusion_plots import (
     plot_distance_boxplot,
     plot_distance_histogram,
     plot_distances_linearized,
-    plot_full_tissue_bin_gene_counts_with_highlighted_section,
+    plot_full_tissue_bin_gene_counts_with_highlighted_sections,
     plot_tissue_outline_on_HE_image,
 )
 
@@ -91,12 +93,22 @@ def longest_shape_contour(
 def full_shape_boundary_geometry(
     sdata,
     shapes_layer: str,
+    include_holes: bool = False,
 ) -> BaseGeometry | None:
-    """Return all polygon exteriors from a shapes layer, excluding hole rings."""
+    """Return all polygon exteriors from a shapes layer, plus hole rings if include_holes."""
     gdf = sdata.shapes[shapes_layer]
     if gdf.empty:
         return None
-    lines = [line for geom in gdf.geometry for line in _shape_exterior_lines(geom)]
+    if include_holes:
+        lines = [
+            LineString(ring.coords)
+            for geom in gdf.geometry if geom is not None
+            for part in shapely.get_parts(geom)
+            if isinstance(part, Polygon) and not part.is_empty
+            for ring in (part.exterior, *part.interiors)
+        ]
+    else:
+        lines = [line for geom in gdf.geometry for line in _shape_exterior_lines(geom)]
     if not lines:
         return None
     if len(lines) == 1:
@@ -857,29 +869,17 @@ def generate_diffusion_plots(
 ) -> None:
     print(f"Generating diffusion plots for {experiment.technology} {experiment.dataset_id} at level {level}")
 
-    sdata = None
-    if (
-        (plot_settings.tissue_outline and experiment.he_image)
-        or plot_settings.full_tissue_bin_gene_counts
-    ):
-        sdata = sd.read_zarr(os.path.join(sdata_folder, experiment.sdata_path))
-
     if not experiment.boundary_point_pairs:
         raise ValueError(
             f"No boundary_point_pairs provided for experiment {experiment.dataset_id!r}."
         )
 
-    full_tissue_boundary = None
-    full_tissue_gene_bin_data = None
-    if plot_settings.full_tissue_bin_gene_counts:
-        assert sdata is not None
-        if experiment.tissue_mask is None:
-            raise ValueError("tissue_mask must be set to generate full-tissue diffusion plots.")
-        full_tissue_boundary = full_shape_boundary_geometry(sdata, experiment.tissue_mask)
-        if full_tissue_boundary is None or full_tissue_boundary.is_empty:
-            raise ValueError(
-                f"No tissue boundary found in shapes layer {experiment.tissue_mask!r}."
-            )
+    # Whole-tissue plots show all sections together, in analysis/ itself.
+    plot_tissue_outline = bool(plot_settings.tissue_outline and experiment.he_image)
+    analysis_folder = os.path.join(
+        plots_folder, experiment.technology, experiment.dataset_id, "analysis",
+    )
+    section_overlays = []
 
     for crop_idx, _ in enumerate(experiment.boundary_point_pairs):
         plot_folder = os.path.join(
@@ -898,8 +898,6 @@ def generate_diffusion_plots(
                 "Run compute_diffusion() first."
             )
         results = load_diffusion_results(diffusion_results_path)
-        crop_rect = np.asarray(results.crop_rect, dtype=float)
-        analysis_region_bin_centers = results.analysis_region_bin_centers
         # A closed section has no endpoint exclusions: its analysis zone is the
         # distance buffer, including any interior rings. A hole-free bin hull
         # fills the excluded tissue interior and loses the inner zone boundary.
@@ -908,41 +906,13 @@ def generate_diffusion_plots(
             analysis_region_geometry = results.boundary_section.buffer(
                 results.max_distance_px, cap_style="round", join_style="round",
             )
-        if plot_settings.full_tissue_bin_gene_counts and full_tissue_gene_bin_data is None:
-            assert sdata is not None
-            full_tissue_gene_bin_data = get_gene_bin_data(
-                sdata,
-                level,
-                results.raw_gene_bins.gene_name,
-            )
-
-        if plot_settings.tissue_outline and experiment.he_image:
-            assert sdata is not None
-            sdata_crop = sdata.query.bounding_box(
-                min_coordinate=crop_rect[:2],
-                max_coordinate=crop_rect[2:],
-                axes=("x", "y"),
-                target_coordinate_system=experiment.dataset_id,
-            )
-            plot_tissue_outline_on_HE_image(
-                sdata_crop,
-                experiment.he_image,
-                experiment.tissue_mask,
-                experiment.technology,
-                experiment.dataset_id,
-                experiment.pixel_size_um,
-                os.path.join(plot_folder, "tissue.png"),
-                fill_alpha=0.0,
-                outline_width=1,
-                bounds=tuple(crop_rect),
-                overlay_contour=results.boundary_section,
-                overlay_region=analysis_region_geometry,
-                overlay_bin_centers=(
-                    analysis_region_bin_centers if analysis_region_geometry is None else None
-                ),
-                approx_points=np.vstack([results.approx_start_xy, results.approx_end_xy]),
-                snapped_points=np.vstack([results.snapped_start_xy, results.snapped_end_xy]),
-            )
+        section_overlays.append(BoundarySectionOverlay(
+            boundary_section=results.boundary_section,
+            analysis_region=analysis_region_geometry,
+            analysis_bin_centers=results.analysis_region_bin_centers,
+            approx_points=np.vstack([results.approx_start_xy, results.approx_end_xy]),
+            snapped_points=np.vstack([results.snapped_start_xy, results.snapped_end_xy]),
+        ))
 
         if plot_settings.boundary:
             plot_boundary_geoseries(
@@ -958,21 +928,6 @@ def generate_diffusion_plots(
                 experiment.pixel_size_um,
                 f"{experiment.technology}",
                 dpi=600,
-            )
-
-        if plot_settings.full_tissue_bin_gene_counts:
-            assert full_tissue_boundary is not None
-            assert full_tissue_gene_bin_data is not None
-            plot_full_tissue_bin_gene_counts_with_highlighted_section(
-                full_tissue_gene_bin_data,
-                full_tissue_boundary,
-                results.boundary_section,
-                analysis_region_bin_centers,
-                os.path.join(plot_folder, "transcripts.png"),
-                experiment.pixel_size_um,
-                f"{experiment.technology}",
-                dpi=600,
-                highlighted_analysis_region=analysis_region_geometry,
             )
 
         if plot_settings.bins_and_closest_points:
@@ -992,6 +947,54 @@ def generate_diffusion_plots(
                 f"{experiment.technology}",
                 experiment.pixel_size_um,
                 dpi=600,
+            )
+
+    if plot_tissue_outline or plot_settings.full_tissue_bin_gene_counts:
+        if experiment.tissue_mask is None:
+            raise ValueError("tissue_mask must be set to generate full-tissue diffusion plots.")
+        sdata = sd.read_zarr(os.path.join(sdata_folder, experiment.sdata_path))
+        full_tissue_boundary = full_shape_boundary_geometry(sdata, experiment.tissue_mask)
+        if full_tissue_boundary is None or full_tissue_boundary.is_empty:
+            raise ValueError(
+                f"No tissue boundary found in shapes layer {experiment.tissue_mask!r}."
+            )
+        full_tissue_gene_bin_data = get_gene_bin_data(
+            sdata, level, results.raw_gene_bins.gene_name,
+        )
+        # Both whole-tissue plots share the extent of the transcripts plot.
+        nonzero = np.asarray(full_tissue_gene_bin_data.transcript_counts) > 0
+        bounds = full_tissue_plot_bounds(
+            full_tissue_boundary,
+            full_tissue_gene_bin_data.bin_centers[nonzero],
+            section_overlays,
+        )
+
+        if plot_tissue_outline:
+            plot_tissue_outline_on_HE_image(
+                sdata,
+                experiment.he_image,
+                experiment.tissue_mask,
+                experiment.technology,
+                experiment.dataset_id,
+                experiment.pixel_size_um,
+                os.path.join(analysis_folder, "tissue.png"),
+                fill_alpha=0.0,
+                outline_width=1,
+                bounds=bounds,
+                section_overlays=section_overlays,
+            )
+
+        if plot_settings.full_tissue_bin_gene_counts:
+            # Draw hole rings too, matching the tissue outline in tissue.png.
+            plot_full_tissue_bin_gene_counts_with_highlighted_sections(
+                full_tissue_gene_bin_data,
+                full_shape_boundary_geometry(sdata, experiment.tissue_mask, include_holes=True),
+                section_overlays,
+                os.path.join(analysis_folder, "transcripts.png"),
+                experiment.pixel_size_um,
+                f"{experiment.technology}",
+                dpi=600,
+                bounds=bounds,
             )
 
     # Spatial inspection plots remain per section; distribution plots pool all sections.

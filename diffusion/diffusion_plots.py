@@ -134,6 +134,50 @@ class DiffusionPlotSettings:
 
 
 @dataclass(frozen=True)
+class BoundarySectionOverlay:
+    """One analyzed boundary section and its distance zone, for whole-tissue plots.
+
+    An explicit `analysis_region` preserves interior rings for closed sections;
+    otherwise the zone outline is estimated from `analysis_bin_centers`.
+    """
+    boundary_section: BaseGeometry
+    analysis_region: BaseGeometry | None = None
+    analysis_bin_centers: np.ndarray | None = None
+    approx_points: np.ndarray | None = None
+    snapped_points: np.ndarray | None = None
+
+
+def full_tissue_plot_bounds(
+    full_tissue_contour: BaseGeometry,
+    bin_centers: np.ndarray,
+    section_overlays: Sequence[BoundarySectionOverlay] = (),
+    margin_fraction: float = 0.05,
+) -> tuple[float, float, float, float]:
+    """(xmin, ymin, xmax, ymax) of everything drawn on a whole-tissue plot.
+
+    Padded like matplotlib's default autoscale margins, so that every
+    whole-tissue figure shows the same extent.
+    """
+    extents = [np.asarray(full_tissue_contour.bounds, dtype=float)]
+    points = np.asarray(bin_centers, dtype=float).reshape(-1, 2)
+    if points.size > 0:
+        extents.append(np.concatenate([points.min(axis=0), points.max(axis=0)]))
+    for overlay in section_overlays:
+        for geometry in (overlay.boundary_section, overlay.analysis_region):
+            if geometry is not None and not geometry.is_empty:
+                extents.append(np.asarray(geometry.bounds, dtype=float))
+        if overlay.analysis_bin_centers is not None and np.size(overlay.analysis_bin_centers) > 0:
+            centers = np.asarray(overlay.analysis_bin_centers, dtype=float).reshape(-1, 2)
+            extents.append(np.concatenate([centers.min(axis=0), centers.max(axis=0)]))
+    extents = np.vstack(extents)
+    xmin, ymin = extents[:, :2].min(axis=0)
+    xmax, ymax = extents[:, 2:].max(axis=0)
+    dx = (xmax - xmin) * margin_fraction
+    dy = (ymax - ymin) * margin_fraction
+    return float(xmin - dx), float(ymin - dy), float(xmax + dx), float(ymax + dy)
+
+
+@dataclass(frozen=True)
 class DistanceDistribution:
     label: str
     distances_um: np.ndarray
@@ -502,11 +546,7 @@ def plot_tissue_outline_on_HE_image(
     outline_width=5,
     bounds: tuple[float, float, float, float] | None = None,
     rectangles: list[tuple[float, float, float, float]] | None = None,
-    overlay_region: BaseGeometry | None = None,
-    overlay_bin_centers: np.ndarray | None = None,
-    overlay_contour: BaseGeometry | None = None,
-    approx_points: np.ndarray | None = None,
-    snapped_points: np.ndarray | None = None,
+    section_overlays: Sequence[BoundarySectionOverlay] = (),
     show_approx_points: bool = False,
 ):
     # Plot H&E image with tissue outline on top.
@@ -548,15 +588,18 @@ def plot_tissue_outline_on_HE_image(
     bar_px = bar_um / pixel_size_um
     add_scalebar(ax=ax, length_px=bar_px, label=f"{int(bar_um)} {MICROMETER_UNIT}")
     draw_labeled_rectangles(ax=ax, rectangles=rectangles)
-    draw_boundary_section_overlays(
-        ax=ax,
-        overlay_region=overlay_region,
-        overlay_bin_centers=overlay_bin_centers,
-        overlay_contour=overlay_contour,
-        approx_points=approx_points,
-        snapped_points=snapped_points,
-        show_approx_points=show_approx_points,
-    )
+    for overlay in section_overlays:
+        draw_boundary_section_overlays(
+            ax=ax,
+            overlay_region=overlay.analysis_region,
+            overlay_bin_centers=(
+                overlay.analysis_bin_centers if overlay.analysis_region is None else None
+            ),
+            overlay_contour=overlay.boundary_section,
+            approx_points=overlay.approx_points,
+            snapped_points=overlay.snapped_points,
+            show_approx_points=show_approx_points,
+        )
 
     save_or_show_figure(fig, output_path)
 
@@ -947,11 +990,10 @@ def plot_tissue_contour_with_analysis_regions(
     save_or_show_figure(fig, output_path)
 
 
-def plot_full_tissue_bin_gene_counts_with_highlighted_section(
+def plot_full_tissue_bin_gene_counts_with_highlighted_sections(
     gene_bin_data: "GeneBinData",
     full_tissue_contour,
-    highlighted_section,
-    highlighted_analysis_bin_centers: np.ndarray | None,
+    section_overlays: Sequence[BoundarySectionOverlay],
     output_path: str,
     pixel_size_um: float,
     title: str,
@@ -960,33 +1002,24 @@ def plot_full_tissue_bin_gene_counts_with_highlighted_section(
     marker_size=1,
     show_axes: bool = False,
     dpi: int | None = None,
-    highlighted_analysis_region: BaseGeometry | None = None,
+    bounds: tuple[float, float, float, float] | None = None,
 ) -> None:
-    """Plot gene bins and the selected section, optionally with an exact analysis zone.
+    """Plot gene bins, the whole tissue contour (red) and all analysis zones (cyan).
 
-    An explicit region preserves interior rings for closed boundary sections;
-    otherwise the outline is estimated from the selected bin centers.
+    `bounds` = (xmin, ymin, xmax, ymax) defaults to `full_tissue_plot_bounds`.
     """
     fig, ax = plt.subplots(figsize=figsize, dpi=dpi)
     ax.set_title(title)
     shared_line_width = contour_line_width
     full_tissue_zorder = 1
     highlighted_analysis_region_zorder = 2
-    highlighted_section_zorder = 3
-    transcripts_zorder = 4
+    transcripts_zorder = 3
     gpd.GeoSeries([full_tissue_contour]).plot(
         ax=ax,
         color="red",
         linewidth=shared_line_width,
         zorder=full_tissue_zorder,
     )
-    gpd.GeoSeries([highlighted_section]).plot(
-        ax=ax,
-        color="#00BFFF",
-        linewidth=shared_line_width,
-        zorder=highlighted_section_zorder,
-    )
-
     counts = np.asarray(gene_bin_data.transcript_counts)
     nonzero_mask = counts > 0
     sc = ax.scatter(
@@ -1004,25 +1037,26 @@ def plot_full_tissue_bin_gene_counts_with_highlighted_section(
         cbar = fig.colorbar(sc, ax=ax, shrink=0.4)
         cbar.set_label(f"{gene_bin_data.gene_name} transcript count")
 
-    if highlighted_analysis_region is not None:
-        _plot_geometry_boundary(
-            ax=ax,
-            geometry=highlighted_analysis_region,
-            edgecolor="#00BFFF",
-            linewidth=shared_line_width,
-            zorder=highlighted_analysis_region_zorder,
-        )
-    elif (
-        highlighted_analysis_bin_centers is not None
-        and np.size(highlighted_analysis_bin_centers) > 0
-    ):
-        _plot_bin_region_boundary(
-            ax=ax,
-            bin_centers=highlighted_analysis_bin_centers,
-            edgecolor="#00BFFF",
-            linewidth=shared_line_width,
-            zorder=highlighted_analysis_region_zorder,
-        )
+    for overlay in section_overlays:
+        if overlay.analysis_region is not None:
+            _plot_geometry_boundary(
+                ax=ax,
+                geometry=overlay.analysis_region,
+                edgecolor="#00BFFF",
+                linewidth=shared_line_width,
+                zorder=highlighted_analysis_region_zorder,
+            )
+        elif (
+            overlay.analysis_bin_centers is not None
+            and np.size(overlay.analysis_bin_centers) > 0
+        ):
+            _plot_bin_region_boundary(
+                ax=ax,
+                bin_centers=overlay.analysis_bin_centers,
+                edgecolor="#00BFFF",
+                linewidth=shared_line_width,
+                zorder=highlighted_analysis_region_zorder,
+            )
 
     if show_axes:
         ax.set_xlabel("x [px]")
@@ -1040,7 +1074,13 @@ def plot_full_tissue_bin_gene_counts_with_highlighted_section(
             labelbottom=False,
             labelleft=False,
         )
-    ax.invert_yaxis()
+    if bounds is None:
+        bounds = full_tissue_plot_bounds(
+            full_tissue_contour, gene_bin_data.bin_centers[nonzero_mask], section_overlays,
+        )
+    xmin, ymin, xmax, ymax = bounds
+    ax.set_xlim(xmin, xmax)
+    ax.set_ylim(ymax, ymin)
     bar_um = 1000.0
     bar_px = bar_um / pixel_size_um
     add_scalebar(

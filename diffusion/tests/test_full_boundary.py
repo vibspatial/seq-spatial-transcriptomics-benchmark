@@ -47,6 +47,9 @@ class FullBoundaryTests(unittest.TestCase):
             full = utils.full_shape_boundary_geometry(sdata, "mask")
             self.assertEqual(len(full.geoms), 2)
             self.assertAlmostEqual(full.length, 48.0)
+            with_holes = utils.full_shape_boundary_geometry(sdata, "mask", include_holes=True)
+            self.assertEqual(len(with_holes.geoms), 3)
+            self.assertAlmostEqual(with_holes.length, 48.0 + polygon.interiors[0].length)
 
     def test_full_ring_rotates_to_snapped_start_preserving_all_segments_and_orientation(self):
         section = self.section((-1, 5))
@@ -150,7 +153,8 @@ class FullBoundaryTests(unittest.TestCase):
                  patch.object(plots, "save_or_show_figure", side_effect=save_small):
                 utils.generate_diffusion_plots("unused", experiment, "table", root, settings)
                 plots.plot_distance_cdf(specs, str(analysis / "cdf.png"), root, origin="peak")
-            for name in ["boundary.png", "transcripts_closeup.png", "transcripts.png",
+            self.assertTrue((analysis / "transcripts.png").is_file())
+            for name in ["boundary.png", "transcripts_closeup.png",
                          "closest_points.png", "distances_linearized.png"]:
                 self.assertTrue((analysis / "crop1" / name).is_file(), name)
             for name in ["histogram_binwidth_1um.png", "boxplot_um.png"]:

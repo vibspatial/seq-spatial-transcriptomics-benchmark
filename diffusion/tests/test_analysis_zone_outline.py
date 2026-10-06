@@ -66,15 +66,14 @@ class AnalysisZoneOutlineTests(unittest.TestCase):
         segments = [segment for collection in ax.collections
                     if isinstance(collection, LineCollection) and collection.get_zorder() == 2
                     for segment in collection.get_segments()]
-        return MultiLineString(segments), he_plot.call_args.kwargs
+        return MultiLineString(segments), he_plot.call_args.kwargs["section_overlays"][0]
 
     def test_closed_zone_draws_inside_and_outside_edges_at_the_distance_limit(self):
-        outline, he_options = self.render_zone(self.ring, 2.)
+        outline, he_overlay = self.render_zone(self.ring, 2.)
         self.assertEqual(len(outline.geoms), 2)
         self.assertTrue(outline.equals(self.ring.buffer(2.).boundary))
         self.assertAlmostEqual(outline.distance(Point(10, 10)), 8.)
-        self.assertIsNone(he_options["overlay_bin_centers"])
-        self.assertTrue(he_options["overlay_region"].boundary.equals(outline))
+        self.assertTrue(he_overlay.analysis_region.boundary.equals(outline))
         # Each ring bounds the eligible zone, rather than tracing the tissue edge.
         for edge in outline.geoms:
             distances = shapely.distance(shapely.points(np.asarray(edge.coords)), self.ring)
@@ -87,10 +86,10 @@ class AnalysisZoneOutlineTests(unittest.TestCase):
 
     def test_open_section_keeps_bin_based_outline(self):
         section = LineString([(0, 0), (0, 20)])
-        outline, he_options = self.render_zone(section, 2.)
+        outline, he_overlay = self.render_zone(section, 2.)
         self.assertEqual(len(outline.geoms), 1)
-        self.assertIsNone(he_options["overlay_region"])
-        self.assertGreater(len(he_options["overlay_bin_centers"]), 0)
+        self.assertIsNone(he_overlay.analysis_region)
+        self.assertGreater(len(he_overlay.analysis_bin_centers), 0)
         xmin, ymin, xmax, ymax = outline.bounds
         self.assertLess(xmin, -2.)
         self.assertGreater(xmax, 2.)
