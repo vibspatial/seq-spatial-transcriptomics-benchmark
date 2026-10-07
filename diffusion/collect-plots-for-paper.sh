@@ -2,6 +2,10 @@
 cd "$(dirname "${BASH_SOURCE[0]}")"
 target="plots-for-paper"
 
+# The tissue.png images probably won't be used in the paper,
+# but we collect them here anyway because they are a useful reference
+# when inspecting the transcripts.png images.
+
 mkdir -p "$target/BMKMANU S1000"
 cp "plots/BMKMANU S1000/exp74/analysis/tissue.png" "$target/BMKMANU S1000/"
 cp "plots/BMKMANU S1000/exp74/analysis/transcripts.png" "$target/BMKMANU S1000/"
